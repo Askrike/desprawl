@@ -1,0 +1,59 @@
+{
+  "provider": "render",
+  "resources": {
+    "render_web_service": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Render web service"
+    },
+    "render_private_service": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Render private service"
+    },
+    "render_background_worker": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Render background worker"
+    },
+    "render_cron_job": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Render cron job"
+    },
+    "render_static_site": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Render static site"
+    },
+    "render_postgres": {
+      "role": "primary",
+      "category": "database",
+      "label": "Render Postgres"
+    },
+    "render_keyvalue": {
+      "role": "primary",
+      "category": "database",
+      "label": "Render Key Value"
+    },
+    "render_redis": {
+      "role": "primary",
+      "category": "database",
+      "label": "Render Redis"
+    },
+    "render_env_group": {
+      "role": "satellite",
+      "category": "other",
+      "label": "Environment group"
+    },
+    "render_env_group_link": {
+      "role": "satellite",
+      "category": "other",
+      "label": "Environment group link"
+    },
+    "render_project": {
+      "role": "helper",
+      "category": "other"
+    }
+  }
+}

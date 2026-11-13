@@ -1,0 +1,96 @@
+{
+  "sources": [
+    {
+      "data_source": "azurerm_role_assignments",
+      "config": {
+        "scope": "\"/subscriptions/{subscription_id}\""
+      },
+      "list": "role_assignments",
+      "id": "role_assignment_id",
+      "kind_match": "/providers/(Microsoft\\.Authorization/roleAssignments)/",
+      "name": "role_assignment_name",
+      "note": "It lists the role assignments (access grants) for the subscription, which a general resource inventory doesn't return."
+    },
+    {
+      "data_source": "azurerm_resources",
+      "list": "resources",
+      "id": "id",
+      "kind": "type",
+      "name": "name",
+      "parent": "azurerm_resource_group",
+      "args": {
+        "resource_group_name": "name"
+      },
+      "note": "This is the general ARM resource inventory, and it is read once per resource group because it needs at least one of name, resource_group_name or type."
+    }
+  ],
+  "kinds": {
+    "Microsoft.Authorization/roleAssignments": {
+      "type": "azurerm_role_assignment",
+      "origin": "llm",
+      "note": "Role assignments are imported by their full ARM resource ID."
+    },
+    "Microsoft.Compute/disks": {
+      "type": "azurerm_managed_disk",
+      "origin": "llm",
+      "note": "Managed disks are imported by their full ARM resource ID."
+    },
+    "Microsoft.Compute/virtualMachineScaleSets": {
+      "type": "azurerm_linux_virtual_machine_scale_set",
+      "origin": "llm",
+      "note": "Linux is the most common VMSS flavor, and it is imported by its full ARM resource ID."
+    },
+    "Microsoft.ContainerRegistry/registries": {
+      "type": "azurerm_container_registry",
+      "origin": "llm",
+      "note": "Container registries are imported by their full ARM resource ID."
+    },
+    "Microsoft.ContainerService/managedClusters": {
+      "type": "azurerm_kubernetes_cluster",
+      "origin": "llm",
+      "note": "AKS managed clusters are imported by their full ARM resource ID."
+    },
+    "Microsoft.KeyVault/vaults": {
+      "type": "azurerm_key_vault",
+      "origin": "llm",
+      "note": "Key vaults are imported by their full ARM resource ID."
+    },
+    "Microsoft.ManagedIdentity/userAssignedIdentities": {
+      "type": "azurerm_user_assigned_identity",
+      "origin": "llm",
+      "note": "User-assigned identities are imported by their full ARM resource ID."
+    },
+    "Microsoft.Network/dnszones": {
+      "type": "azurerm_dns_zone",
+      "match": "^(?P\u003cprefix\u003e/subscriptions/[^/]+/resourceGroups/[^/]+/providers/Microsoft\\.Network)/(?i:dnszones)/(?P\u003cname\u003e[^/]+)$",
+      "id": "{prefix}/dnsZones/{name}",
+      "origin": "llm",
+      "note": "DNS zones are imported by ARM ID, but the provider requires the segment to be spelled `dnsZones`, so the lowercase `dnszones` is rewritten."
+    },
+    "Microsoft.Network/loadBalancers": {
+      "type": "azurerm_lb",
+      "origin": "llm",
+      "note": "Load balancers are imported by their full ARM resource ID."
+    },
+    "Microsoft.Network/networkSecurityGroups": {
+      "type": "azurerm_network_security_group",
+      "origin": "llm",
+      "note": "Network security groups are imported by their full ARM resource ID."
+    },
+    "Microsoft.Network/networkWatchers": {
+      "type": "azurerm_network_watcher",
+      "origin": "llm",
+      "note": "Network watchers are imported by their full ARM resource ID."
+    },
+    "Microsoft.Network/publicIPAddresses": {
+      "type": "azurerm_public_ip",
+      "origin": "llm",
+      "note": "Public IP addresses are imported by their full ARM resource ID."
+    },
+    "Microsoft.Network/virtualNetworks": {
+      "type": "azurerm_virtual_network",
+      "origin": "llm",
+      "note": "Virtual networks are imported by their full ARM resource ID."
+    }
+  }
+}

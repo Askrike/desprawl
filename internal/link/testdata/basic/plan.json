@@ -1,0 +1,280 @@
+{
+ "resource_changes": [
+  {
+   "address": "aws_iam_role.app_lambda",
+   "mode": "managed",
+   "type": "aws_iam_role",
+   "name": "app_lambda",
+   "change": {
+    "actions": [
+     "no-op"
+    ],
+    "before": {
+     "arn": "arn:aws:iam::111111111111:role/app-lambda",
+     "id": "app-lambda",
+     "name": "app-lambda"
+    },
+    "after": {
+     "arn": "arn:aws:iam::111111111111:role/app-lambda",
+     "id": "app-lambda",
+     "name": "app-lambda"
+    },
+    "importing": {
+     "id": "app-lambda"
+    }
+   }
+  },
+  {
+   "address": "aws_iam_role_policy_attachment.app_lambda_basic",
+   "mode": "managed",
+   "type": "aws_iam_role_policy_attachment",
+   "name": "app_lambda_basic",
+   "change": {
+    "actions": [
+     "no-op"
+    ],
+    "before": {
+     "id": "app-lambda-20240101"
+    },
+    "after": {
+     "id": "app-lambda-20240101"
+    },
+    "importing": {
+     "id": "app-lambda-20240101"
+    }
+   }
+  },
+  {
+   "address": "aws_iam_role_policy.app_lambda_sqs",
+   "mode": "managed",
+   "type": "aws_iam_role_policy",
+   "name": "app_lambda_sqs",
+   "change": {
+    "actions": [
+     "no-op"
+    ],
+    "before": {
+     "id": "app-lambda:sqs"
+    },
+    "after": {
+     "id": "app-lambda:sqs"
+    },
+    "importing": {
+     "id": "app-lambda:sqs"
+    }
+   }
+  },
+  {
+   "address": "aws_sqs_queue.jobs",
+   "mode": "managed",
+   "type": "aws_sqs_queue",
+   "name": "jobs",
+   "change": {
+    "actions": [
+     "no-op"
+    ],
+    "before": {
+     "arn": "arn:aws:sqs:eu-central-1:111111111111:jobs",
+     "id": "https://sqs.eu-central-1.amazonaws.com/111111111111/jobs",
+     "url": "https://sqs.eu-central-1.amazonaws.com/111111111111/jobs",
+     "name": "jobs"
+    },
+    "after": {
+     "arn": "arn:aws:sqs:eu-central-1:111111111111:jobs",
+     "id": "https://sqs.eu-central-1.amazonaws.com/111111111111/jobs",
+     "url": "https://sqs.eu-central-1.amazonaws.com/111111111111/jobs",
+     "name": "jobs"
+    },
+    "importing": {
+     "id": "https://sqs.eu-central-1.amazonaws.com/111111111111/jobs"
+    }
+   }
+  },
+  {
+   "address": "aws_cloudwatch_log_group.aws_lambda_app",
+   "mode": "managed",
+   "type": "aws_cloudwatch_log_group",
+   "name": "aws_lambda_app",
+   "change": {
+    "actions": [
+     "no-op"
+    ],
+    "before": {
+     "arn": "arn:aws:logs:eu-central-1:111111111111:log-group:/aws/lambda/app",
+     "id": "/aws/lambda/app",
+     "name": "/aws/lambda/app"
+    },
+    "after": {
+     "arn": "arn:aws:logs:eu-central-1:111111111111:log-group:/aws/lambda/app",
+     "id": "/aws/lambda/app",
+     "name": "/aws/lambda/app"
+    },
+    "importing": {
+     "id": "/aws/lambda/app"
+    }
+   }
+  },
+  {
+   "address": "aws_lambda_function.app",
+   "mode": "managed",
+   "type": "aws_lambda_function",
+   "name": "app",
+   "change": {
+    "actions": [
+     "no-op"
+    ],
+    "before": {
+     "arn": "arn:aws:lambda:eu-central-1:111111111111:function:app",
+     "id": "app",
+     "function_name": "app",
+     "qualified_arn": "arn:aws:lambda:eu-central-1:111111111111:function:app:$LATEST"
+    },
+    "after": {
+     "arn": "arn:aws:lambda:eu-central-1:111111111111:function:app",
+     "id": "app",
+     "function_name": "app",
+     "qualified_arn": "arn:aws:lambda:eu-central-1:111111111111:function:app:$LATEST"
+    },
+    "importing": {
+     "id": "app"
+    }
+   }
+  },
+  {
+   "address": "aws_lambda_event_source_mapping.app_jobs",
+   "mode": "managed",
+   "type": "aws_lambda_event_source_mapping",
+   "name": "app_jobs",
+   "change": {
+    "actions": [
+     "no-op"
+    ],
+    "before": {
+     "arn": "arn:aws:lambda:eu-central-1:111111111111:event-source-mapping:1b0a6b6e-0000-4000-8000-000000000001",
+     "id": "1b0a6b6e-0000-4000-8000-000000000001"
+    },
+    "after": {
+     "arn": "arn:aws:lambda:eu-central-1:111111111111:event-source-mapping:1b0a6b6e-0000-4000-8000-000000000001",
+     "id": "1b0a6b6e-0000-4000-8000-000000000001"
+    },
+    "importing": {
+     "id": "1b0a6b6e-0000-4000-8000-000000000001"
+    }
+   }
+  },
+  {
+   "address": "aws_security_group.a",
+   "mode": "managed",
+   "type": "aws_security_group",
+   "name": "a",
+   "change": {
+    "actions": [
+     "no-op"
+    ],
+    "before": {
+     "arn": "arn:aws:ec2:eu-central-1:111111111111:security-group/sg-0aaaaaaaaaaaaaaaa",
+     "id": "sg-0aaaaaaaaaaaaaaaa"
+    },
+    "after": {
+     "arn": "arn:aws:ec2:eu-central-1:111111111111:security-group/sg-0aaaaaaaaaaaaaaaa",
+     "id": "sg-0aaaaaaaaaaaaaaaa"
+    },
+    "importing": {
+     "id": "sg-0aaaaaaaaaaaaaaaa"
+    }
+   }
+  },
+  {
+   "address": "aws_security_group.b",
+   "mode": "managed",
+   "type": "aws_security_group",
+   "name": "b",
+   "change": {
+    "actions": [
+     "no-op"
+    ],
+    "before": {
+     "arn": "arn:aws:ec2:eu-central-1:111111111111:security-group/sg-0dddddddddddddddd",
+     "id": "sg-0dddddddddddddddd"
+    },
+    "after": {
+     "arn": "arn:aws:ec2:eu-central-1:111111111111:security-group/sg-0dddddddddddddddd",
+     "id": "sg-0dddddddddddddddd"
+    },
+    "importing": {
+     "id": "sg-0dddddddddddddddd"
+    }
+   }
+  },
+  {
+   "address": "aws_s3_bucket.data",
+   "mode": "managed",
+   "type": "aws_s3_bucket",
+   "name": "data",
+   "change": {
+    "actions": [
+     "no-op"
+    ],
+    "before": {
+     "arn": "arn:aws:s3:::data-bucket",
+     "id": "data-bucket",
+     "bucket": "data-bucket"
+    },
+    "after": {
+     "arn": "arn:aws:s3:::data-bucket",
+     "id": "data-bucket",
+     "bucket": "data-bucket"
+    },
+    "importing": {
+     "id": "data-bucket"
+    }
+   }
+  },
+  {
+   "address": "aws_s3_bucket_policy.data",
+   "mode": "managed",
+   "type": "aws_s3_bucket_policy",
+   "name": "data",
+   "change": {
+    "actions": [
+     "no-op"
+    ],
+    "before": {
+     "id": "data-bucket"
+    },
+    "after": {
+     "id": "data-bucket"
+    },
+    "importing": {
+     "id": "data-bucket"
+    }
+   }
+  },
+  {
+   "address": "aws_ecs_task_definition.web",
+   "mode": "managed",
+   "type": "aws_ecs_task_definition",
+   "name": "web",
+   "change": {
+    "actions": [
+     "no-op"
+    ],
+    "before": {
+     "arn": "arn:aws:ecs:eu-central-1:111111111111:task-definition/web:3",
+     "id": "web",
+     "family": "web",
+     "arn_without_revision": "arn:aws:ecs:eu-central-1:111111111111:task-definition/web"
+    },
+    "after": {
+     "arn": "arn:aws:ecs:eu-central-1:111111111111:task-definition/web:3",
+     "id": "web",
+     "family": "web",
+     "arn_without_revision": "arn:aws:ecs:eu-central-1:111111111111:task-definition/web"
+    },
+    "importing": {
+     "id": "web"
+    }
+   }
+  }
+ ]
+}

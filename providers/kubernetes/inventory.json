@@ -1,0 +1,626 @@
+{
+  "sources": [
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"certificates.k8s.io/v1\"",
+        "kind": "\"CertificateSigningRequest\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "note": "Lists all CertificateSigningRequests in the cluster."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"rbac.authorization.k8s.io/v1\"",
+        "kind": "\"ClusterRole\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "note": "Lists all ClusterRoles in the cluster."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"rbac.authorization.k8s.io/v1\"",
+        "kind": "\"ClusterRoleBinding\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "note": "Lists all ClusterRoleBindings, which are cluster-wide access grants."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"v1\"",
+        "kind": "\"ConfigMap\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists ConfigMaps across all namespaces when the namespace argument is omitted."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"batch/v1\"",
+        "kind": "\"CronJob\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists CronJobs across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"storage.k8s.io/v1\"",
+        "kind": "\"CSIDriver\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "note": "Lists all CSIDrivers in the cluster."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"apps/v1\"",
+        "kind": "\"DaemonSet\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists DaemonSets across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"apps/v1\"",
+        "kind": "\"Deployment\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists Deployments across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"discovery.k8s.io/v1\"",
+        "kind": "\"EndpointSlice\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists EndpointSlices across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"v1\"",
+        "kind": "\"Endpoints\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists Endpoints across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"autoscaling/v2\"",
+        "kind": "\"HorizontalPodAutoscaler\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists HorizontalPodAutoscalers across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"networking.k8s.io/v1\"",
+        "kind": "\"Ingress\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists Ingresses across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"networking.k8s.io/v1\"",
+        "kind": "\"IngressClass\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "note": "Lists all IngressClasses in the cluster."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"batch/v1\"",
+        "kind": "\"Job\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists Jobs across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"v1\"",
+        "kind": "\"LimitRange\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists LimitRanges across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"admissionregistration.k8s.io/v1\"",
+        "kind": "\"MutatingWebhookConfiguration\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "note": "Lists all MutatingWebhookConfigurations in the cluster."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"v1\"",
+        "kind": "\"Namespace\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "note": "Lists all Namespaces in the cluster."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"networking.k8s.io/v1\"",
+        "kind": "\"NetworkPolicy\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists NetworkPolicies across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"v1\"",
+        "kind": "\"PersistentVolume\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "note": "Lists all PersistentVolumes in the cluster."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"v1\"",
+        "kind": "\"PersistentVolumeClaim\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists PersistentVolumeClaims across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"v1\"",
+        "kind": "\"Pod\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists Pods across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"policy/v1\"",
+        "kind": "\"PodDisruptionBudget\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists PodDisruptionBudgets across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"scheduling.k8s.io/v1\"",
+        "kind": "\"PriorityClass\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "note": "Lists all PriorityClasses in the cluster."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"v1\"",
+        "kind": "\"ReplicationController\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists ReplicationControllers across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"v1\"",
+        "kind": "\"ResourceQuota\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists ResourceQuotas across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"rbac.authorization.k8s.io/v1\"",
+        "kind": "\"Role\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists Roles across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"rbac.authorization.k8s.io/v1\"",
+        "kind": "\"RoleBinding\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists RoleBindings, which are namespaced access grants, across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"node.k8s.io/v1\"",
+        "kind": "\"RuntimeClass\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "note": "Lists all RuntimeClasses in the cluster."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"v1\"",
+        "kind": "\"Secret\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists Secrets across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"v1\"",
+        "kind": "\"Service\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists Services across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"v1\"",
+        "kind": "\"ServiceAccount\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists ServiceAccounts, including default ones, across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"apps/v1\"",
+        "kind": "\"StatefulSet\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "parent": "kubernetes_namespace_v1",
+      "args": {
+        "namespace": "id"
+      },
+      "note": "Lists StatefulSets across all namespaces."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"admissionregistration.k8s.io/v1\"",
+        "kind": "\"ValidatingAdmissionPolicy\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "note": "Lists all ValidatingAdmissionPolicies in the cluster."
+    },
+    {
+      "data_source": "kubernetes_resources",
+      "config": {
+        "api_version": "\"admissionregistration.k8s.io/v1\"",
+        "kind": "\"ValidatingWebhookConfiguration\""
+      },
+      "list": "objects",
+      "id": "{metadata.namespace}/{metadata.name}",
+      "kind": "kind",
+      "name": "metadata.name",
+      "note": "Lists all ValidatingWebhookConfigurations in the cluster."
+    }
+  ],
+  "kinds": {
+    "CSIDriver": {
+      "type": "kubernetes_csi_driver_v1",
+      "origin": "llm",
+      "note": "CSIDriver is cluster-scoped, so it is imported by its name."
+    },
+    "ClusterRole": {
+      "type": "kubernetes_cluster_role_v1",
+      "origin": "llm",
+      "note": "ClusterRole is cluster-scoped, so it is imported by its name."
+    },
+    "ClusterRoleBinding": {
+      "type": "kubernetes_cluster_role_binding_v1",
+      "origin": "llm",
+      "note": "ClusterRoleBinding is cluster-scoped, so it is imported by its name."
+    },
+    "ConfigMap": {
+      "type": "kubernetes_config_map_v1",
+      "origin": "llm"
+    },
+    "DaemonSet": {
+      "type": "kubernetes_daemon_set_v1",
+      "origin": "llm"
+    },
+    "Deployment": {
+      "type": "kubernetes_deployment_v1",
+      "origin": "llm"
+    },
+    "EndpointSlice": {
+      "type": "kubernetes_endpoint_slice_v1",
+      "origin": "llm"
+    },
+    "Endpoints": {
+      "type": "kubernetes_endpoints_v1",
+      "origin": "llm"
+    },
+    "HorizontalPodAutoscaler": {
+      "type": "kubernetes_horizontal_pod_autoscaler_v2",
+      "origin": "llm",
+      "note": "HPAs are imported as namespace/name, and v2 is the current stable API version."
+    },
+    "Ingress": {
+      "type": "kubernetes_ingress_v1",
+      "origin": "llm"
+    },
+    "MutatingWebhookConfiguration": {
+      "type": "kubernetes_mutating_webhook_configuration_v1",
+      "origin": "llm",
+      "note": "MutatingWebhookConfiguration is cluster-scoped, so it is imported by its name."
+    },
+    "Namespace": {
+      "type": "kubernetes_namespace_v1",
+      "origin": "llm",
+      "note": "Namespace is imported by its name."
+    },
+    "NetworkPolicy": {
+      "type": "kubernetes_network_policy_v1",
+      "origin": "llm"
+    },
+    "PersistentVolume": {
+      "type": "kubernetes_persistent_volume_v1",
+      "origin": "llm",
+      "note": "PersistentVolume is cluster-scoped, so it is imported by its name."
+    },
+    "PersistentVolumeClaim": {
+      "type": "kubernetes_persistent_volume_claim_v1",
+      "origin": "llm"
+    },
+    "Pod": {
+      "type": "kubernetes_pod_v1",
+      "origin": "llm",
+      "note": "Pods are imported as namespace/name, even though most are owned by controllers."
+    },
+    "PodDisruptionBudget": {
+      "type": "kubernetes_pod_disruption_budget_v1",
+      "origin": "llm"
+    },
+    "PriorityClass": {
+      "type": "kubernetes_priority_class_v1",
+      "origin": "llm",
+      "note": "PriorityClass is cluster-scoped, so it is imported by its name."
+    },
+    "ResourceQuota": {
+      "type": "kubernetes_resource_quota_v1",
+      "origin": "llm"
+    },
+    "Role": {
+      "type": "kubernetes_role_v1",
+      "origin": "llm"
+    },
+    "RoleBinding": {
+      "type": "kubernetes_role_binding_v1",
+      "origin": "llm"
+    },
+    "RuntimeClass": {
+      "type": "kubernetes_runtime_class_v1",
+      "origin": "llm",
+      "note": "RuntimeClass is cluster-scoped, so it is imported by its name."
+    },
+    "Secret": {
+      "type": "kubernetes_secret_v1",
+      "origin": "llm"
+    },
+    "Service": {
+      "type": "kubernetes_service_v1",
+      "origin": "llm"
+    },
+    "ServiceAccount": {
+      "type": "kubernetes_service_account_v1",
+      "origin": "llm"
+    },
+    "StatefulSet": {
+      "type": "kubernetes_stateful_set_v1",
+      "origin": "llm"
+    },
+    "ValidatingAdmissionPolicy": {
+      "type": "kubernetes_validating_admission_policy_v1",
+      "origin": "llm",
+      "note": "ValidatingAdmissionPolicy is cluster-scoped, so it is imported by its name."
+    },
+    "ValidatingWebhookConfiguration": {
+      "type": "kubernetes_validating_webhook_configuration_v1",
+      "origin": "llm",
+      "note": "ValidatingWebhookConfiguration is cluster-scoped, so it is imported by its name."
+    }
+  }
+}

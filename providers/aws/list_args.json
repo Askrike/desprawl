@@ -1,0 +1,764 @@
+[
+  {
+    "type": "aws_accountaccess_entitlement",
+    "parent": "aws_accountaccess_application",
+    "args": {
+      "application_arn": "arn"
+    },
+    "origin": "llm",
+    "note": "The entitlements belong to an application, and the application's arn attribute identifies it."
+  },
+  {
+    "type": "aws_api_gateway_deployment",
+    "parent": "aws_api_gateway_rest_api",
+    "args": {
+      "rest_api_id": "id"
+    },
+    "origin": "llm",
+    "note": "Deployments belong to a REST API, so listing every REST API and using its id finds all deployments."
+  },
+  {
+    "type": "aws_api_gateway_integration",
+    "parent": "aws_api_gateway_resource",
+    "args": {
+      "resource_id": "id",
+      "rest_api_id": "rest_api_id"
+    },
+    "origin": "llm",
+    "note": "Integrations are listed per API Gateway resource, which supplies its own id and its rest_api_id."
+  },
+  {
+    "type": "aws_api_gateway_integration_response",
+    "parent": "aws_api_gateway_integration",
+    "args": {
+      "http_method": "http_method",
+      "resource_id": "resource_id",
+      "rest_api_id": "rest_api_id"
+    },
+    "origin": "llm",
+    "note": "Integration responses belong to an integration, which has all three identifying attributes."
+  },
+  {
+    "type": "aws_api_gateway_method",
+    "parent": "aws_api_gateway_resource",
+    "args": {
+      "resource_id": "id",
+      "rest_api_id": "rest_api_id"
+    },
+    "origin": "llm",
+    "note": "Methods are listed per API Gateway resource, which supplies its own id and its rest_api_id."
+  },
+  {
+    "type": "aws_api_gateway_method_response",
+    "parent": "aws_api_gateway_method",
+    "args": {
+      "http_method": "http_method",
+      "resource_id": "resource_id",
+      "rest_api_id": "rest_api_id"
+    },
+    "origin": "llm",
+    "note": "Method responses belong to a method, which has all three identifying attributes."
+  },
+  {
+    "type": "aws_api_gateway_resource",
+    "parent": "aws_api_gateway_rest_api",
+    "args": {
+      "rest_api_id": "id"
+    },
+    "origin": "llm",
+    "note": "Resources belong to a REST API, which is identified by its id."
+  },
+  {
+    "type": "aws_apigatewayv2_integration",
+    "parent": "aws_apigatewayv2_api",
+    "args": {
+      "api_id": "id"
+    },
+    "origin": "llm",
+    "note": "Integrations belong to an HTTP/WebSocket API, which is identified by its id."
+  },
+  {
+    "type": "aws_apigatewayv2_route",
+    "parent": "aws_apigatewayv2_api",
+    "args": {
+      "api_id": "id"
+    },
+    "origin": "llm",
+    "note": "Routes belong to an HTTP/WebSocket API, which is identified by its id."
+  },
+  {
+    "type": "aws_appautoscaling_policy",
+    "values": {
+      "service_namespace": [
+        "appstream",
+        "cassandra",
+        "comprehend",
+        "custom-resource",
+        "dynamodb",
+        "ec2",
+        "ecs",
+        "elasticache",
+        "elasticmapreduce",
+        "kafka",
+        "lambda",
+        "neptune",
+        "rds",
+        "sagemaker",
+        "workspaces"
+      ]
+    },
+    "origin": "llm",
+    "note": "service_namespace is an enumeration, so these values come from the Application Auto Scaling ServiceNamespace enum because the description names none, and the target parent itself needs this argument to be listed."
+  },
+  {
+    "type": "aws_appautoscaling_target",
+    "values": {
+      "service_namespace": [
+        "appstream",
+        "cassandra",
+        "comprehend",
+        "custom-resource",
+        "dynamodb",
+        "ec2",
+        "ecs",
+        "elasticache",
+        "elasticmapreduce",
+        "kafka",
+        "lambda",
+        "neptune",
+        "rds",
+        "sagemaker",
+        "workspaces"
+      ]
+    },
+    "origin": "llm",
+    "note": "service_namespace is an enumeration, so these values come from the Application Auto Scaling ServiceNamespace enum because the description names none, and the policy parent itself needs this argument to be listed."
+  },
+  {
+    "type": "aws_bedrockagentcore_gateway_rule",
+    "parent": "aws_bedrockagentcore_gateway",
+    "args": {
+      "gateway_identifier": "gateway_id"
+    },
+    "origin": "llm",
+    "note": "Gateway rules sit under an AgentCore gateway, so the gateway ID identifies the parent."
+  },
+  {
+    "type": "aws_bedrockagentcore_policy",
+    "parent": "aws_bedrockagentcore_policy_engine",
+    "args": {
+      "policy_engine_id": "policy_engine_id"
+    },
+    "origin": "llm",
+    "note": "Policies belong to a policy engine, so listing every policy engine and passing its ID covers all policies."
+  },
+  {
+    "type": "aws_cloudwatch_event_target",
+    "parent": "aws_cloudwatch_event_rule",
+    "args": {
+      "event_bus_name": "event_bus_name",
+      "rule": "name"
+    },
+    "origin": "llm",
+    "note": "Targets are attached to a rule on an event bus, and the event rule has both the bus name and the rule name."
+  },
+  {
+    "type": "aws_cloudwatch_log_metric_filter",
+    "parent": "aws_cloudwatch_log_group",
+    "args": {
+      "log_group_name": "name"
+    },
+    "origin": "llm",
+    "note": "Metric filters belong to a log group, which is identified by its name."
+  },
+  {
+    "type": "aws_cloudwatch_log_s3_table_integration_source",
+    "parent": "aws_observabilityadmin_s3_table_integration",
+    "args": {
+      "integration_arn": "arn"
+    },
+    "origin": "llm",
+    "note": "Integration sources belong to an S3 table integration created through Observability Admin, and its ARN identifies that parent."
+  },
+  {
+    "type": "aws_cloudwatch_log_stream",
+    "parent": "aws_cloudwatch_log_group",
+    "args": {
+      "log_group_name": "name"
+    },
+    "origin": "llm",
+    "note": "Log streams belong to a log group, which is identified by its name."
+  },
+  {
+    "type": "aws_cloudwatch_log_subscription_filter",
+    "parent": "aws_cloudwatch_log_group",
+    "args": {
+      "log_group_name": "name"
+    },
+    "origin": "llm",
+    "note": "Subscription filters belong to a log group, which is identified by its name."
+  },
+  {
+    "type": "aws_cloudwatchomni_access_profile",
+    "parent": "aws_cloudwatchomni_space",
+    "args": {
+      "space_id": "space_id"
+    },
+    "origin": "llm",
+    "note": "Access profiles belong to a Space, so listing every aws_cloudwatchomni_space and using its space_id covers all of them."
+  },
+  {
+    "type": "aws_config_remediation_configuration",
+    "parent": "aws_config_config_rule",
+    "args": {
+      "config_rule_names": "name"
+    },
+    "origin": "llm",
+    "note": "Remediation configurations are attached to Config rules, which are identified by their names."
+  },
+  {
+    "type": "aws_directory_service_directory_setting",
+    "parent": "aws_directory_service_directory",
+    "args": {
+      "directory_id": "id"
+    },
+    "origin": "llm",
+    "note": "Directory settings are listed per Directory Service directory, and the directory's id is its directory ID."
+  },
+  {
+    "type": "aws_directory_service_ip_route",
+    "parent": "aws_directory_service_directory",
+    "args": {
+      "directory_id": "id"
+    },
+    "origin": "llm",
+    "note": "IP routes are listed per Directory Service directory, and the directory's id is its directory ID."
+  },
+  {
+    "type": "aws_directoryservicedata_group",
+    "parent": "aws_directory_service_directory",
+    "args": {
+      "directory_id": "id"
+    },
+    "origin": "llm",
+    "note": "Directory data groups are listed per Directory Service directory, and the directory's id is its directory ID."
+  },
+  {
+    "type": "aws_directoryservicedata_user",
+    "parent": "aws_directory_service_directory",
+    "args": {
+      "directory_id": "id"
+    },
+    "origin": "llm",
+    "note": "Directory data users are listed per Directory Service directory, and the directory's id is its directory ID."
+  },
+  {
+    "type": "aws_dynamodb_global_secondary_index",
+    "parent": "aws_dynamodb_table",
+    "args": {
+      "table_name": "name"
+    },
+    "origin": "llm",
+    "note": "Every global secondary index belongs to a DynamoDB table, so listing all tables and passing each table's name covers every index."
+  },
+  {
+    "type": "aws_dynamodb_table_item",
+    "parent": "aws_dynamodb_table",
+    "args": {
+      "table_name": "name"
+    },
+    "origin": "llm",
+    "note": "Every item belongs to a DynamoDB table, so listing all tables by name covers every item."
+  },
+  {
+    "type": "aws_ec2_transit_gateway_policy_table_entry",
+    "parent": "aws_ec2_transit_gateway_policy_table",
+    "args": {
+      "transit_gateway_policy_table_id": "id"
+    },
+    "origin": "llm",
+    "note": "Policy table entries belong to a transit gateway policy table, and that table's id identifies it."
+  },
+  {
+    "type": "aws_ec2_transit_gateway_route",
+    "parent": "aws_ec2_transit_gateway_route_table",
+    "args": {
+      "transit_gateway_route_table_id": "id"
+    },
+    "origin": "llm",
+    "note": "Transit gateway routes belong to a transit gateway route table, so listing every route table covers every route."
+  },
+  {
+    "type": "aws_ec2_transit_gateway_route_table_propagation",
+    "parent": "aws_ec2_transit_gateway_route_table",
+    "args": {
+      "transit_gateway_route_table_id": "id"
+    },
+    "origin": "llm",
+    "note": "Propagations are listed per transit gateway route table, and that table's id identifies it."
+  },
+  {
+    "type": "aws_ecs_daemon",
+    "parent": "aws_ecs_cluster",
+    "args": {
+      "cluster_arn": "arn"
+    },
+    "origin": "llm",
+    "note": "Every daemon runs in an ECS cluster, so listing all clusters and passing each cluster's ARN covers every daemon."
+  },
+  {
+    "type": "aws_ecs_service",
+    "parent": "aws_ecs_cluster",
+    "args": {
+      "cluster": "name"
+    },
+    "origin": "llm",
+    "note": "Every service belongs to an ECS cluster, so listing all clusters and passing each cluster's name covers every service."
+  },
+  {
+    "type": "aws_efs_mount_target",
+    "parent": "aws_efs_file_system",
+    "args": {
+      "file_system_id": "id"
+    },
+    "origin": "llm",
+    "note": "Exactly one of access_point_id or file_system_id is required, and every mount target belongs to a file system, so listing per file system ID covers all of them."
+  },
+  {
+    "type": "aws_eks_access_entry",
+    "parent": "aws_eks_cluster",
+    "args": {
+      "cluster_name": "name"
+    },
+    "origin": "llm",
+    "note": "Access entries belong to an EKS cluster, so listing every aws_eks_cluster and using its name covers all of them."
+  },
+  {
+    "type": "aws_eks_access_policy_association",
+    "parent": "aws_eks_access_entry",
+    "args": {
+      "cluster_name": "cluster_name",
+      "principal_arn": "principal_arn"
+    },
+    "origin": "llm",
+    "note": "Every policy association belongs to an access entry, and the access entry has both the cluster name and the principal ARN."
+  },
+  {
+    "type": "aws_eks_addon",
+    "parent": "aws_eks_cluster",
+    "args": {
+      "cluster_name": "name"
+    },
+    "origin": "llm",
+    "note": "Every add-on belongs to an EKS cluster, so listing all clusters by name covers every add-on."
+  },
+  {
+    "type": "aws_eks_node_group",
+    "parent": "aws_eks_cluster",
+    "args": {
+      "cluster_name": "name"
+    },
+    "origin": "llm",
+    "note": "Every node group belongs to an EKS cluster, so listing all clusters by name covers every node group."
+  },
+  {
+    "type": "aws_glue_catalog_table",
+    "parent": "aws_glue_catalog_database",
+    "args": {
+      "database_name": "name"
+    },
+    "origin": "llm",
+    "note": "Glue tables are listed per Glue Catalog database, and the database's name identifies it."
+  },
+  {
+    "type": "aws_iam_role_policy",
+    "parent": "aws_iam_role",
+    "args": {
+      "role_name": "name"
+    },
+    "origin": "llm",
+    "note": "Inline role policies belong to an IAM role, which is identified by its name."
+  },
+  {
+    "type": "aws_iam_user_policy",
+    "parent": "aws_iam_user",
+    "args": {
+      "user_name": "name"
+    },
+    "origin": "llm",
+    "note": "Inline user policies belong to an IAM user, which is identified by its name."
+  },
+  {
+    "type": "aws_lambda_alias",
+    "parent": "aws_lambda_function",
+    "args": {
+      "function_name": "function_name"
+    },
+    "origin": "llm",
+    "note": "Aliases belong to a Lambda function, so listing every function covers every alias."
+  },
+  {
+    "type": "aws_lambda_permission",
+    "parent": "aws_lambda_function",
+    "args": {
+      "function_name": "function_name"
+    },
+    "origin": "llm",
+    "note": "Permissions are statements in a Lambda function's resource policy, so listing every function covers every permission."
+  },
+  {
+    "type": "aws_lb_listener",
+    "parent": "aws_lb",
+    "args": {
+      "load_balancer_arn": "arn"
+    },
+    "origin": "llm",
+    "note": "Listeners belong to a load balancer, which is identified by its ARN."
+  },
+  {
+    "type": "aws_lb_listener_rule",
+    "parent": "aws_lb_listener",
+    "args": {
+      "listener_arn": "arn"
+    },
+    "origin": "llm",
+    "note": "Listener rules belong to a listener, which is identified by its ARN."
+  },
+  {
+    "type": "aws_lb_target_group_attachment",
+    "parent": "aws_lb_target_group",
+    "args": {
+      "target_group_arn": "arn"
+    },
+    "origin": "llm",
+    "note": "Attachments belong to a target group, which is identified by its ARN."
+  },
+  {
+    "type": "aws_msk_topic",
+    "parent": "aws_msk_cluster",
+    "args": {
+      "cluster_arn": "arn"
+    },
+    "origin": "llm",
+    "note": "Topics belong to an MSK cluster, which is identified by its ARN."
+  },
+  {
+    "type": "aws_neptunegraph_private_graph_endpoint",
+    "parent": "aws_neptunegraph_graph",
+    "args": {
+      "graph_identifier": "id"
+    },
+    "origin": "llm",
+    "note": "Private graph endpoints belong to a Neptune Analytics graph, and the graph's id identifies it."
+  },
+  {
+    "type": "aws_opensearchserverless_access_policy",
+    "values": {
+      "type": [
+        "data"
+      ]
+    },
+    "origin": "llm",
+    "note": "The type argument is an enumeration, and its only valid value is data."
+  },
+  {
+    "type": "aws_opensearchserverless_lifecycle_policy",
+    "values": {
+      "type": [
+        "retention"
+      ]
+    },
+    "origin": "llm",
+    "note": "The type argument is an enumeration, and its only valid value is retention."
+  },
+  {
+    "type": "aws_opensearchserverless_security_config",
+    "values": {
+      "type": [
+        "saml",
+        "iamidentitycenter",
+        "iamfederation"
+      ]
+    },
+    "origin": "llm",
+    "note": "The type argument is an enumeration, and listing all three valid values covers every security config."
+  },
+  {
+    "type": "aws_opensearchserverless_security_policy",
+    "values": {
+      "type": [
+        "encryption",
+        "network"
+      ]
+    },
+    "origin": "llm",
+    "note": "The type argument is an enumeration, and listing both encryption and network covers every security policy."
+  },
+  {
+    "type": "aws_pinpointsmsvoicev2_event_destination",
+    "parent": "aws_pinpointsmsvoicev2_configuration_set",
+    "args": {
+      "configuration_set_names": "name"
+    },
+    "origin": "llm",
+    "note": "Event destinations belong to a configuration set, so each set's name drives the listing."
+  },
+  {
+    "type": "aws_pinpointsmsvoicev2_keyword",
+    "parent": "aws_pinpointsmsvoicev2_pool",
+    "args": {
+      "origination_identity_arn": "arn"
+    },
+    "origin": "llm",
+    "note": "Pools are origination identities that can hold keywords, so pool arn fills the argument, but keywords on phone numbers will be missed because no phone number parent is among the candidates."
+  },
+  {
+    "type": "aws_pinpointsmsvoicev2_resource_policy",
+    "parent": "aws_pinpointsmsvoicev2_pool",
+    "args": {
+      "resource_arn": "arn"
+    },
+    "origin": "llm",
+    "note": "Pool arn identifies a resource that can have a policy attached, but policies on other resource types such as sender IDs or phone numbers need a different parent and are not covered."
+  },
+  {
+    "type": "aws_prometheus_anomaly_detector",
+    "parent": "aws_prometheus_workspace",
+    "args": {
+      "workspace_id": "id"
+    },
+    "origin": "llm",
+    "note": "Anomaly detectors belong to an AMP workspace, and the workspace ID is in its id attribute."
+  },
+  {
+    "type": "aws_resiliencehubv2_assertion",
+    "parent": "aws_resiliencehubv2_service",
+    "args": {
+      "service_arn": "arn"
+    },
+    "origin": "llm",
+    "note": "Assertions are listed per service, and listing all services gives every service ARN."
+  },
+  {
+    "type": "aws_resiliencehubv2_input_source",
+    "parent": "aws_resiliencehubv2_service",
+    "args": {
+      "service_arn": "arn"
+    },
+    "origin": "llm",
+    "note": "Input sources are listed per service, and listing all services gives every service ARN."
+  },
+  {
+    "type": "aws_resiliencehubv2_service_function",
+    "parent": "aws_resiliencehubv2_service",
+    "args": {
+      "service_arn": "arn"
+    },
+    "origin": "llm",
+    "note": "Service functions are listed per service, and listing all services gives every service ARN."
+  },
+  {
+    "type": "aws_resiliencehubv2_user_journey",
+    "parent": "aws_resiliencehubv2_system",
+    "args": {
+      "system_arn": "arn"
+    },
+    "origin": "llm",
+    "note": "User journeys are listed per system, and listing all systems gives every system ARN."
+  },
+  {
+    "type": "aws_route",
+    "parent": "aws_route_table",
+    "args": {
+      "route_table_id": "id"
+    },
+    "origin": "llm",
+    "note": "Routes belong to route tables, so listing every route table and using its id covers all routes."
+  },
+  {
+    "type": "aws_route53_record",
+    "parent": "aws_route53_zone",
+    "args": {
+      "zone_id": "zone_id"
+    },
+    "origin": "llm",
+    "note": "Records are listed per hosted zone, and listing all zones gives every zone ID."
+  },
+  {
+    "type": "aws_route53_vpc_association_authorization",
+    "parent": "aws_route53_zone",
+    "args": {
+      "zone_id": "zone_id"
+    },
+    "origin": "llm",
+    "note": "VPC association authorizations are listed per hosted zone, and listing all zones gives every zone ID."
+  },
+  {
+    "type": "aws_route53_zone_association",
+    "parent": "aws_vpc",
+    "args": {
+      "vpc_id": "id"
+    },
+    "origin": "llm",
+    "note": "Zone associations are listed per VPC, so listing every VPC and using its id covers all associations."
+  },
+  {
+    "type": "aws_route_table_association",
+    "parent": "aws_route_table",
+    "args": {
+      "route_table_id": "id"
+    },
+    "origin": "llm",
+    "note": "Each route table's ID is the parent for listing its associations."
+  },
+  {
+    "type": "aws_s3_object",
+    "parent": "aws_s3_bucket",
+    "args": {
+      "bucket": "bucket"
+    },
+    "origin": "llm",
+    "note": "Objects live in buckets, so enumerating all S3 buckets by name covers every object."
+  },
+  {
+    "type": "aws_s3files_access_point",
+    "parent": "aws_s3files_file_system",
+    "args": {
+      "file_system_id": "id"
+    },
+    "origin": "llm",
+    "note": "Access points belong to a file system, identified by the file system's id."
+  },
+  {
+    "type": "aws_s3files_file_system_policy",
+    "parent": "aws_s3files_file_system",
+    "args": {
+      "file_system_id": "id"
+    },
+    "origin": "llm",
+    "note": "A file system policy is attached to a file system, identified by the file system's id."
+  },
+  {
+    "type": "aws_s3files_mount_target",
+    "parent": "aws_s3files_file_system",
+    "args": {
+      "file_system_id": "id"
+    },
+    "origin": "llm",
+    "note": "Mount targets belong to a file system, and listing every file system covers every mount target."
+  },
+  {
+    "type": "aws_s3files_synchronization_configuration",
+    "parent": "aws_s3files_file_system",
+    "args": {
+      "file_system_id": "id"
+    },
+    "origin": "llm",
+    "note": "Synchronization configurations belong to a file system, and listing every file system covers all of them."
+  },
+  {
+    "type": "aws_secretsmanager_secret_version",
+    "parent": "aws_secretsmanager_secret",
+    "args": {
+      "secret_id": "arn"
+    },
+    "origin": "llm",
+    "note": "Secret versions belong to a secret, and secret_id accepts the secret ARN."
+  },
+  {
+    "type": "aws_securityhub_standards_control",
+    "parent": "aws_securityhub_standards_subscription",
+    "args": {
+      "standards_subscription_arn": "arn"
+    },
+    "origin": "llm",
+    "note": "Standards controls are listed per standards subscription, which is identified by its ARN."
+  },
+  {
+    "type": "aws_sns_topic_subscription",
+    "parent": "aws_sns_topic",
+    "args": {
+      "topic_arn": "arn"
+    },
+    "origin": "llm",
+    "note": "Subscriptions belong to a topic, identified by the topic's ARN."
+  },
+  {
+    "type": "aws_ssoadmin_account_assignment",
+    "parent": "aws_ssoadmin_permission_set",
+    "args": {
+      "instance_arn": "instance_arn",
+      "permission_set_arn": "arn"
+    },
+    "scope": {
+      "account_id": "account_id"
+    },
+    "origin": "llm",
+    "note": "Assignments are listed per permission set (which carries its instance ARN) for the target account, taken here from the account_id scope, so assignments to other organization accounts are not covered."
+  },
+  {
+    "type": "aws_ssoadmin_region",
+    "parent": "aws_ssoadmin_account_assignment",
+    "args": {
+      "instance_arn": "instance_arn"
+    },
+    "origin": "llm",
+    "note": "The instance ARN identifies the parent Identity Center instance, and account assignments are the only listable candidate that carry it as an attribute."
+  },
+  {
+    "type": "aws_volume_attachment",
+    "parent": "aws_instance",
+    "args": {
+      "instance_id": "id"
+    },
+    "origin": "llm",
+    "note": "Volume attachments are listed per EC2 instance, so listing every aws_instance and using its id covers all attachments."
+  },
+  {
+    "type": "aws_wafv2_ip_set",
+    "values": {
+      "scope": [
+        "CLOUDFRONT",
+        "REGIONAL"
+      ]
+    },
+    "origin": "llm",
+    "note": "scope is an enumeration, and listing both CLOUDFRONT and REGIONAL covers every IP set."
+  },
+  {
+    "type": "aws_wafv2_web_acl_rule",
+    "parent": "aws_wafv2_web_acl",
+    "args": {
+      "web_acl_arn": "arn"
+    },
+    "origin": "llm",
+    "note": "Rules belong to a WAFv2 Web ACL, which is identified by its ARN."
+  },
+  {
+    "type": "aws_workmail_domain",
+    "parent": "aws_workmail_organization",
+    "args": {
+      "organization_id": "organization_id"
+    },
+    "origin": "llm",
+    "note": "The WorkMail organization is the direct parent of domains, so listing all organizations covers every domain."
+  },
+  {
+    "type": "aws_workmail_group",
+    "parent": "aws_workmail_organization",
+    "args": {
+      "organization_id": "organization_id"
+    },
+    "origin": "llm",
+    "note": "The WorkMail organization is the direct parent of groups, so listing all organizations covers every group."
+  },
+  {
+    "type": "aws_workmail_user",
+    "parent": "aws_workmail_organization",
+    "args": {
+      "organization_id": "organization_id"
+    },
+    "origin": "llm",
+    "note": "The WorkMail organization is the direct parent of users, so listing all organizations covers every user."
+  }
+]

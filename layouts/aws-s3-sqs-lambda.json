@@ -1,0 +1,16 @@
+{
+  "grid": {
+    "aws_lambda_function.MyHandlerFunction-Function": [
+      3,
+      1
+    ],
+    "aws_s3_bucket.MySourceS3Bucket": [
+      0,
+      1
+    ],
+    "aws_sqs_queue.MyHandlerQueue": [
+      2,
+      0
+    ]
+  }
+}

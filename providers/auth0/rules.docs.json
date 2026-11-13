@@ -1,0 +1,641 @@
+[
+  {
+    "source": "auth0_action",
+    "path": "modules.module_id",
+    "target": "auth0_action_module",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 3
+  },
+  {
+    "source": "auth0_action",
+    "path": "modules.module_version_id",
+    "target": "auth0_action_module",
+    "attr": "version_id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 3
+  },
+  {
+    "source": "auth0_client",
+    "path": "default_organization.organization_id",
+    "target": "auth0_organization",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_client",
+    "path": "resource_server_identifier",
+    "target": "auth0_resource_server",
+    "attr": "identifier",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_client_credentials",
+    "path": "client_id",
+    "target": "auth0_client",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 14
+  },
+  {
+    "source": "auth0_client_grant",
+    "path": "audience",
+    "target": "auth0_resource_server",
+    "attr": "identifier",
+    "match": "exact",
+    "origin": "docs",
+    "support": 6
+  },
+  {
+    "source": "auth0_client_grant",
+    "path": "client_id",
+    "target": "auth0_client",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 4
+  },
+  {
+    "source": "auth0_connection",
+    "path": "options.client_id",
+    "target": "auth0_client",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_connection_client",
+    "path": "client_id",
+    "target": "auth0_client",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_connection_client",
+    "path": "connection_id",
+    "target": "auth0_connection",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_connection_clients",
+    "path": "connection_id",
+    "target": "auth0_connection",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_connection_clients",
+    "path": "enabled_clients",
+    "target": "auth0_client",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "auth0_connection_directory",
+    "path": "connection_id",
+    "target": "auth0_connection",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 4
+  },
+  {
+    "source": "auth0_connection_directory_synchronized_groups",
+    "path": "connection_id",
+    "target": "auth0_connection",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_connection_keys",
+    "path": "connection_id",
+    "target": "auth0_connection",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_connection_scim_configuration",
+    "path": "connection_id",
+    "target": "auth0_connection",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 4
+  },
+  {
+    "source": "auth0_connection_scim_token",
+    "path": "connection_id",
+    "target": "auth0_connection",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_custom_domain_default",
+    "path": "domain",
+    "target": "auth0_custom_domain",
+    "attr": "domain",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_custom_domain_verification",
+    "path": "custom_domain_id",
+    "target": "auth0_custom_domain",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_event_stream",
+    "path": "action_configuration.action_id",
+    "target": "auth0_action",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_network_acl",
+    "path": "rule.not_match.http_message_signature.keys.id",
+    "target": "auth0_network_acl_key",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_organization_client",
+    "path": "client_id",
+    "target": "auth0_client",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_organization_client",
+    "path": "organization_id",
+    "target": "auth0_organization",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_organization_client_grant",
+    "path": "grant_id",
+    "target": "auth0_client_grant",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_organization_client_grant",
+    "path": "organization_id",
+    "target": "auth0_organization",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_organization_clients",
+    "path": "clients.client_id",
+    "target": "auth0_client",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "auth0_organization_clients",
+    "path": "organization_id",
+    "target": "auth0_organization",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_organization_connection",
+    "path": "connection_id",
+    "target": "auth0_connection",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_organization_connection",
+    "path": "organization_id",
+    "target": "auth0_organization",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_organization_connections",
+    "path": "enabled_connections.connection_id",
+    "target": "auth0_connection",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "auth0_organization_connections",
+    "path": "organization_id",
+    "target": "auth0_organization",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_organization_member",
+    "path": "organization_id",
+    "target": "auth0_organization",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 7
+  },
+  {
+    "source": "auth0_organization_member",
+    "path": "roles",
+    "target": "auth0_role",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 4
+  },
+  {
+    "source": "auth0_organization_member",
+    "path": "user_id",
+    "target": "auth0_user",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 7
+  },
+  {
+    "source": "auth0_organization_member_role",
+    "path": "organization_id",
+    "target": "auth0_organization",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 6
+  },
+  {
+    "source": "auth0_organization_member_role",
+    "path": "role_id",
+    "target": "auth0_role",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 6
+  },
+  {
+    "source": "auth0_organization_member_role",
+    "path": "user_id",
+    "target": "auth0_user",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 6
+  },
+  {
+    "source": "auth0_organization_member_roles",
+    "path": "organization_id",
+    "target": "auth0_organization",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 3
+  },
+  {
+    "source": "auth0_organization_member_roles",
+    "path": "roles",
+    "target": "auth0_role",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 6
+  },
+  {
+    "source": "auth0_organization_member_roles",
+    "path": "user_id",
+    "target": "auth0_user",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 3
+  },
+  {
+    "source": "auth0_organization_members",
+    "path": "members",
+    "target": "auth0_user",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "auth0_organization_members",
+    "path": "organization_id",
+    "target": "auth0_organization",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_resource_server_scope",
+    "path": "resource_server_identifier",
+    "target": "auth0_resource_server",
+    "attr": "identifier",
+    "match": "exact",
+    "origin": "docs",
+    "support": 6
+  },
+  {
+    "source": "auth0_resource_server_scopes",
+    "path": "resource_server_identifier",
+    "target": "auth0_resource_server",
+    "attr": "identifier",
+    "match": "exact",
+    "origin": "docs",
+    "support": 8
+  },
+  {
+    "source": "auth0_role",
+    "path": "owner_id",
+    "target": "auth0_organization",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_role",
+    "path": "permissions.resource_server_identifier",
+    "target": "auth0_resource_server",
+    "attr": "identifier",
+    "match": "exact",
+    "origin": "docs",
+    "support": 4
+  },
+  {
+    "source": "auth0_role_permission",
+    "path": "resource_server_identifier",
+    "target": "auth0_resource_server",
+    "attr": "identifier",
+    "match": "exact",
+    "origin": "docs",
+    "support": 5
+  },
+  {
+    "source": "auth0_role_permission",
+    "path": "role_id",
+    "target": "auth0_role",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 5
+  },
+  {
+    "source": "auth0_role_permissions",
+    "path": "dynamic.content.resource_server_identifier",
+    "target": "auth0_resource_server",
+    "attr": "identifier",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_role_permissions",
+    "path": "dynamic.for_each",
+    "target": "auth0_resource_server_scopes",
+    "attr": "scopes",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_role_permissions",
+    "path": "permissions.resource_server_identifier",
+    "target": "auth0_resource_server",
+    "attr": "identifier",
+    "match": "exact",
+    "origin": "docs",
+    "support": 4
+  },
+  {
+    "source": "auth0_role_permissions",
+    "path": "role_id",
+    "target": "auth0_role",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 3
+  },
+  {
+    "source": "auth0_token_exchange_profile",
+    "path": "action_id",
+    "target": "auth0_action",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_trigger_action",
+    "path": "action_id",
+    "target": "auth0_action",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_trigger_actions",
+    "path": "actions.display_name",
+    "target": "auth0_action",
+    "attr": "name",
+    "match": "exact",
+    "origin": "docs",
+    "support": 3
+  },
+  {
+    "source": "auth0_trigger_actions",
+    "path": "actions.id",
+    "target": "auth0_action",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 3
+  },
+  {
+    "source": "auth0_trigger_binding",
+    "path": "actions.display_name",
+    "target": "auth0_action",
+    "attr": "name",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_trigger_binding",
+    "path": "actions.id",
+    "target": "auth0_action",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_user",
+    "path": "roles",
+    "target": "auth0_role",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "auth0_user_permission",
+    "path": "permission",
+    "target": "auth0_resource_server",
+    "attr": "scopes",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_user_permission",
+    "path": "resource_server_identifier",
+    "target": "auth0_resource_server",
+    "attr": "identifier",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_user_permission",
+    "path": "user_id",
+    "target": "auth0_user",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_user_permissions",
+    "path": "permissions.name",
+    "target": "auth0_resource_server",
+    "attr": "scopes",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "auth0_user_permissions",
+    "path": "permissions.resource_server_identifier",
+    "target": "auth0_resource_server",
+    "attr": "identifier",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "auth0_user_permissions",
+    "path": "user_id",
+    "target": "auth0_user",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "auth0_user_role",
+    "path": "role_id",
+    "target": "auth0_role",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 5
+  },
+  {
+    "source": "auth0_user_role",
+    "path": "user_id",
+    "target": "auth0_user",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 5
+  },
+  {
+    "source": "auth0_user_roles",
+    "path": "roles",
+    "target": "auth0_role",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 5
+  },
+  {
+    "source": "auth0_user_roles",
+    "path": "user_id",
+    "target": "auth0_user",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 3
+  },
+  {
+    "source": "aws_security_group_rule",
+    "path": "security_group_id",
+    "target": "aws_security_group",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "digitalocean_record",
+    "path": "value",
+    "target": "auth0_custom_domain",
+    "attr": "verification.0.methods.0.record",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  }
+]

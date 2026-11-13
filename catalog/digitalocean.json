@@ -1,0 +1,189 @@
+{
+  "provider": "digitalocean",
+  "resources": {
+    "digitalocean_app": {
+      "role": "primary",
+      "category": "compute",
+      "label": "App Platform app"
+    },
+    "digitalocean_droplet": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Droplet"
+    },
+    "digitalocean_droplet_autoscale": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Droplet autoscale pool"
+    },
+    "digitalocean_kubernetes_cluster": {
+      "role": "satellite",
+      "category": "compute",
+      "label": "Kubernetes cluster"
+    },
+    "digitalocean_kubernetes_node_pool": {
+      "role": "satellite",
+      "category": "compute",
+      "label": "Kubernetes node pool"
+    },
+    "digitalocean_agent_platform_agent": {
+      "role": "primary",
+      "category": "compute",
+      "label": "AI agent"
+    },
+    "digitalocean_database_cluster": {
+      "role": "primary",
+      "category": "database",
+      "label": "Managed database"
+    },
+    "digitalocean_database_db": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "cluster_id"
+    },
+    "digitalocean_database_user": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "cluster_id"
+    },
+    "digitalocean_database_firewall": {
+      "role": "child",
+      "category": "security",
+      "parent_attr": "cluster_id"
+    },
+    "digitalocean_database_replica": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "cluster_id"
+    },
+    "digitalocean_database_connection_pool": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "cluster_id"
+    },
+    "digitalocean_database_kafka_topic": {
+      "role": "child",
+      "category": "messaging",
+      "parent_attr": "cluster_id"
+    },
+    "digitalocean_vector_database": {
+      "role": "primary",
+      "category": "database",
+      "label": "Vector database"
+    },
+    "digitalocean_agent_platform_knowledge_base": {
+      "role": "primary",
+      "category": "database",
+      "label": "Knowledge base"
+    },
+    "digitalocean_spaces_bucket": {
+      "role": "primary",
+      "category": "storage",
+      "label": "Spaces bucket"
+    },
+    "digitalocean_spaces_bucket_object": {
+      "role": "child",
+      "category": "storage",
+      "parent_attr": "bucket"
+    },
+    "digitalocean_spaces_bucket_policy": {
+      "role": "child",
+      "category": "storage",
+      "parent_attr": "bucket"
+    },
+    "digitalocean_volume": {
+      "role": "primary",
+      "category": "storage",
+      "label": "Volume"
+    },
+    "digitalocean_volume_attachment": {
+      "role": "connector",
+      "category": "storage",
+      "from_attr": "droplet_id",
+      "to_attr": "volume_id",
+      "verb": "mounts"
+    },
+    "digitalocean_nfs": {
+      "role": "primary",
+      "category": "storage",
+      "label": "NFS share"
+    },
+    "digitalocean_loadbalancer": {
+      "role": "primary",
+      "category": "network",
+      "label": "Load balancer",
+      "verb": "routes to"
+    },
+    "digitalocean_cdn": {
+      "role": "primary",
+      "category": "network",
+      "label": "CDN endpoint"
+    },
+    "digitalocean_domain": {
+      "role": "satellite",
+      "category": "network",
+      "label": "Domain"
+    },
+    "digitalocean_record": {
+      "role": "child",
+      "category": "network",
+      "parent_attr": "domain"
+    },
+    "digitalocean_reserved_ip": {
+      "role": "satellite",
+      "category": "network",
+      "label": "Reserved IP"
+    },
+    "digitalocean_reserved_ip_assignment": {
+      "role": "satellite",
+      "category": "network",
+      "label": "Reserved IP assignment"
+    },
+    "digitalocean_vpc": {
+      "role": "ignore",
+      "category": "network"
+    },
+    "digitalocean_firewall": {
+      "role": "satellite",
+      "category": "security",
+      "label": "Firewall"
+    },
+    "digitalocean_certificate": {
+      "role": "satellite",
+      "category": "security",
+      "label": "Certificate"
+    },
+    "digitalocean_ssh_key": {
+      "role": "satellite",
+      "category": "security",
+      "label": "SSH key"
+    },
+    "digitalocean_container_registry": {
+      "role": "satellite",
+      "category": "storage",
+      "label": "Container registry"
+    },
+    "digitalocean_monitor_alert": {
+      "role": "satellite",
+      "category": "observability",
+      "label": "Monitor alert"
+    },
+    "digitalocean_uptime_check": {
+      "role": "satellite",
+      "category": "observability",
+      "label": "Uptime check"
+    },
+    "digitalocean_project": {
+      "role": "helper",
+      "category": "other"
+    },
+    "digitalocean_project_resources": {
+      "role": "helper",
+      "category": "other"
+    },
+    "digitalocean_tag": {
+      "role": "helper",
+      "category": "other"
+    }
+  }
+}

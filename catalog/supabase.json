@@ -1,0 +1,35 @@
+{
+  "provider": "supabase",
+  "resources": {
+    "supabase_project": {
+      "role": "primary",
+      "category": "database",
+      "label": "Supabase project"
+    },
+    "supabase_edge_function": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Supabase edge function"
+    },
+    "supabase_branch": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "parent_project_ref"
+    },
+    "supabase_edge_function_secrets": {
+      "role": "child",
+      "category": "security",
+      "parent_attr": "project_ref"
+    },
+    "supabase_settings": {
+      "role": "child",
+      "category": "other",
+      "parent_attr": "project_ref"
+    },
+    "supabase_apikey": {
+      "role": "child",
+      "category": "security",
+      "parent_attr": "project_ref"
+    }
+  }
+}

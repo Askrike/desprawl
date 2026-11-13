@@ -1,0 +1,103 @@
+{
+  "exclude_types": {
+    "aws_s3_object": "data plane: bucket contents",
+    "aws_dynamodb_table_item": "data plane: table contents",
+    "aws_cloudwatch_log_stream": "data plane: created by log producers",
+    "aws_secretsmanager_secret_version": "holds secret values",
+    "aws_iam_access_key": "credentials",
+    "aws_ssm_patch_baseline": "lists AWS-owned default baselines",
+    "aws_network_interface": "mostly created and owned by services (Lambda, VPC endpoints, EFS, load balancers); not written by hand"
+  },
+  "query_provider": {
+    "max_retries": 4
+  },
+  "params": {
+    "account_id": {
+      "ref": "data.aws_caller_identity.current.account_id",
+      "data": "data \"aws_caller_identity\" \"current\" {}"
+    },
+    "region": {
+      "ref": "data.aws_region.current.region",
+      "data": "data \"aws_region\" \"current\" {}"
+    }
+  },
+  "exclude_attributes": [
+    "aws_security_group.egress",
+    "aws_security_group.ingress",
+    "tags_all"
+  ],
+  "skip": [
+    {
+      "type": "aws_db_snapshot",
+      "attr": "snapshot_type",
+      "match": "^automated$",
+      "reason": "automated backups are created and deleted by RDS"
+    },
+    {
+      "type": "aws_kms_key",
+      "attr": "description",
+      "match": "^Default (master )?key that protects my ",
+      "reason": "AWS managed keys (aws/*) belong to AWS"
+    },
+    {
+      "type": "aws_security_group",
+      "attr": "name",
+      "match": "^default$",
+      "reason": "a VPC's default group is aws_default_security_group, imported separately"
+    },
+    {
+      "type": "aws_cloudwatch_metric_alarm",
+      "attr": "alarm_name",
+      "match": "^TargetTracking-",
+      "reason": "created and deleted by its target tracking scaling policy"
+    },
+    {
+      "type": "aws_db_parameter_group",
+      "attr": "name",
+      "match": "^default\\.",
+      "reason": "AWS default parameter groups can't be created or changed"
+    },
+    {
+      "type": "aws_db_option_group",
+      "attr": "name",
+      "match": "^default:",
+      "reason": "AWS default option groups can't be created or changed"
+    },
+    {
+      "type": "aws_memorydb_parameter_group",
+      "attr": "name",
+      "match": "^default\\.",
+      "reason": "AWS default parameter groups can't be created or changed"
+    },
+    {
+      "type": "aws_elasticache_cluster",
+      "attr": "replication_group_id",
+      "match": ".",
+      "reason": "a member of a replication group, which manages it"
+    },
+    {
+      "type": "aws_kms_alias",
+      "attr": "name",
+      "match": "^alias/aws/",
+      "reason": "aliases of AWS managed keys belong to AWS; the prefix is reserved"
+    },
+    {
+      "type": "aws_cloudwatch_event_bus",
+      "attr": "name",
+      "match": "^default$",
+      "reason": "every account's default event bus belongs to AWS and can't be created"
+    },
+    {
+      "type": "aws_memorydb_user",
+      "attr": "user_name",
+      "match": "^default$",
+      "reason": "MemoryDB's default user is created by AWS"
+    },
+    {
+      "type": "aws_xray_sampling_rule",
+      "attr": "rule_name",
+      "match": "^Default$",
+      "reason": "X-Ray's Default sampling rule is created by AWS and can't be deleted"
+    }
+  ]
+}

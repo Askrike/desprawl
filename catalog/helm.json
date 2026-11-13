@@ -1,0 +1,16 @@
+{
+  "provider": "helm",
+  "resources": {
+    "helm_release": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Helm release"
+    }
+  },
+  "data_sources": {
+    "helm_template": {
+      "role": "helper",
+      "category": "other"
+    }
+  }
+}

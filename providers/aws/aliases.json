@@ -1,0 +1,14 @@
+[
+  {
+    "match": "^(arn:aws[a-z-]*:secretsmanager:[a-z0-9-]+:\\d{12}:secret:[A-Za-z0-9/_+=.@-]+)-[A-Za-z0-9]{6}$",
+    "origin": "llm",
+    "support": 2,
+    "note": "Secrets Manager adds a hyphen and 6 random alphanumeric characters to the secret ARN; references often use the ARN without them."
+  },
+  {
+    "match": "^arn:aws[a-z-]*:ecs:[a-z0-9-]+:\\d{12}:task-definition/([A-Za-z0-9_-]+:\\d+)$",
+    "origin": "llm",
+    "support": 4,
+    "note": "An ECS task definition revision is written family:revision, the last part of its ARN."
+  }
+]

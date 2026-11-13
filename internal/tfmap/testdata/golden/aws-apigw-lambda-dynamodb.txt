@@ -1,0 +1,7 @@
+component DynamoDB table aws_dynamodb_table.movie_table
+component HTTP API aws_apigatewayv2_api.http_lambda
+component Lambda function aws_lambda_function.apigw_lambda_ddb
+component S3 bucket aws_s3_bucket.lambda_bucket
+connection aws_apigatewayv2_api.http_lambda -> aws_lambda_function.apigw_lambda_ddb [routes to · access]
+connection aws_lambda_function.apigw_lambda_ddb -> aws_dynamodb_table.movie_table [access]
+connection aws_lambda_function.apigw_lambda_ddb -> aws_s3_bucket.lambda_bucket [uses]

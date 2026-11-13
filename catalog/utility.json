@@ -1,0 +1,107 @@
+{
+  "provider": "utility",
+  "resources": {
+    "random_string": {
+      "role": "helper",
+      "category": "other"
+    },
+    "random_pet": {
+      "role": "helper",
+      "category": "other"
+    },
+    "random_id": {
+      "role": "helper",
+      "category": "other"
+    },
+    "random_password": {
+      "role": "helper",
+      "category": "other"
+    },
+    "random_integer": {
+      "role": "helper",
+      "category": "other"
+    },
+    "random_uuid": {
+      "role": "helper",
+      "category": "other"
+    },
+    "random_shuffle": {
+      "role": "helper",
+      "category": "other"
+    },
+    "time_sleep": {
+      "role": "helper",
+      "category": "other"
+    },
+    "time_static": {
+      "role": "helper",
+      "category": "other"
+    },
+    "time_rotating": {
+      "role": "helper",
+      "category": "other"
+    },
+    "time_offset": {
+      "role": "helper",
+      "category": "other"
+    },
+    "null_resource": {
+      "role": "helper",
+      "category": "other"
+    },
+    "terraform_data": {
+      "role": "helper",
+      "category": "other"
+    },
+    "tls_private_key": {
+      "role": "helper",
+      "category": "other"
+    },
+    "tls_self_signed_cert": {
+      "role": "helper",
+      "category": "other"
+    },
+    "tls_cert_request": {
+      "role": "helper",
+      "category": "other"
+    },
+    "local_file": {
+      "role": "helper",
+      "category": "other"
+    },
+    "local_sensitive_file": {
+      "role": "helper",
+      "category": "other"
+    }
+  },
+  "data_sources": {
+    "archive_file": {
+      "role": "helper",
+      "category": "other"
+    },
+    "external": {
+      "role": "helper",
+      "category": "other"
+    },
+    "http": {
+      "role": "helper",
+      "category": "other"
+    },
+    "local_file": {
+      "role": "helper",
+      "category": "other"
+    },
+    "tls_certificate": {
+      "role": "helper",
+      "category": "other"
+    },
+    "template_file": {
+      "role": "helper",
+      "category": "other"
+    },
+    "cloudinit_config": {
+      "role": "helper",
+      "category": "other"
+    }
+  }
+}

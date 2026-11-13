@@ -1,0 +1,5 @@
+component EventBridge rule aws_cloudwatch_event_rule.MyEventRule
+component Lambda function aws_lambda_function.lambda_function
+component SNS topic aws_sns_topic.MySNSTopic
+connection aws_cloudwatch_event_rule.MyEventRule -> aws_sns_topic.MySNSTopic [targets · access]
+connection aws_sns_topic.MySNSTopic -> aws_lambda_function.lambda_function [delivers to · access]

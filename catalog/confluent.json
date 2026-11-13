@@ -1,0 +1,68 @@
+{
+  "provider": "confluent",
+  "resources": {
+    "confluent_environment": {
+      "role": "helper",
+      "category": "other"
+    },
+    "confluent_kafka_cluster": {
+      "role": "primary",
+      "category": "messaging",
+      "label": "Kafka cluster"
+    },
+    "confluent_kafka_topic": {
+      "role": "child",
+      "category": "messaging",
+      "parent_attr": "kafka_cluster"
+    },
+    "confluent_kafka_acl": {
+      "role": "child",
+      "category": "security",
+      "parent_attr": "kafka_cluster"
+    },
+    "confluent_kafka_cluster_config": {
+      "role": "child",
+      "category": "messaging",
+      "parent_attr": "kafka_cluster"
+    },
+    "confluent_connector": {
+      "role": "primary",
+      "category": "integration",
+      "label": "Kafka connector"
+    },
+    "confluent_ksql_cluster": {
+      "role": "primary",
+      "category": "compute",
+      "label": "ksqlDB cluster"
+    },
+    "confluent_flink_compute_pool": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Flink compute pool"
+    },
+    "confluent_flink_statement": {
+      "role": "satellite",
+      "category": "compute",
+      "label": "Flink statement"
+    },
+    "confluent_service_account": {
+      "role": "satellite",
+      "category": "identity",
+      "label": "Service account"
+    },
+    "confluent_api_key": {
+      "role": "satellite",
+      "category": "identity",
+      "label": "API key"
+    },
+    "confluent_role_binding": {
+      "role": "satellite",
+      "category": "identity",
+      "label": "Role binding"
+    },
+    "confluent_network": {
+      "role": "ignore",
+      "category": "network"
+    }
+  }
+}

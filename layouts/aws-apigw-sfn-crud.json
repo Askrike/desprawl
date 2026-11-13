@@ -1,0 +1,16 @@
+{
+  "grid": {
+    "aws_api_gateway_rest_api.API_SF_CRUD-tf_API": [
+      0,
+      0
+    ],
+    "aws_dynamodb_table.API_SF_CRUD-DB": [
+      3,
+      0
+    ],
+    "aws_sfn_state_machine.API_SF_CRUD-tf_CF": [
+      2,
+      0
+    ]
+  }
+}

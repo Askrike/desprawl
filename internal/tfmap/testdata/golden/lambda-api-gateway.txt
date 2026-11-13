@@ -1,0 +1,5 @@
+component HTTP API aws_apigatewayv2_api.lambda
+component Lambda function aws_lambda_function.hello_world
+component S3 bucket aws_s3_bucket.lambda_bucket
+connection aws_apigatewayv2_api.lambda -> aws_lambda_function.hello_world [routes to · access]
+connection aws_lambda_function.hello_world -> aws_s3_bucket.lambda_bucket [uses]

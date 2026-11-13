@@ -1,0 +1,15 @@
+component Atlas cluster mongodbatlas_advanced_cluster.main
+component Cloudflare queue cloudflare_queue.jobs
+component Cloudflare zone cloudflare_zone.site
+component R2 bucket cloudflare_r2_bucket.uploads
+component Vercel Blob store vercel_blob_store.assets
+component Vercel project vercel_project.web
+component Worker cloudflare_workers_script.api
+component Worker cloudflare_workers_script.worker
+connection cloudflare_queue.jobs -> cloudflare_workers_script.worker [triggers]
+connection cloudflare_workers_script.api -> cloudflare_queue.jobs [uses]
+connection cloudflare_workers_script.api -> cloudflare_r2_bucket.uploads [uses]
+connection cloudflare_workers_script.api -> mongodbatlas_advanced_cluster.main [uses]
+connection cloudflare_zone.site -> cloudflare_workers_script.api [routes to]
+connection cloudflare_zone.site -> vercel_project.web [routes to]
+connection vercel_project.web -> vercel_blob_store.assets [uses]

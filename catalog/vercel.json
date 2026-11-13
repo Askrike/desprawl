@@ -1,0 +1,86 @@
+{
+  "provider": "vercel",
+  "resources": {
+    "vercel_project": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Vercel project"
+    },
+    "vercel_deployment": {
+      "role": "child",
+      "category": "compute",
+      "parent_attr": "project_id"
+    },
+    "vercel_project_domain": {
+      "role": "child",
+      "category": "network",
+      "parent_attr": "project_id"
+    },
+    "vercel_project_environment_variable": {
+      "role": "child",
+      "category": "other",
+      "parent_attr": "project_id"
+    },
+    "vercel_project_environment_variables": {
+      "role": "child",
+      "category": "other",
+      "parent_attr": "project_id"
+    },
+    "vercel_project_crons": {
+      "role": "child",
+      "category": "compute",
+      "parent_attr": "project_id"
+    },
+    "vercel_firewall_config": {
+      "role": "child",
+      "category": "security",
+      "parent_attr": "project_id"
+    },
+    "vercel_edge_config": {
+      "role": "primary",
+      "category": "database",
+      "label": "Edge Config"
+    },
+    "vercel_edge_config_item": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "edge_config_id"
+    },
+    "vercel_edge_config_token": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "edge_config_id"
+    },
+    "vercel_blob_store": {
+      "role": "primary",
+      "category": "storage",
+      "label": "Vercel Blob store"
+    },
+    "vercel_blob_project_connection": {
+      "role": "connector",
+      "category": "storage",
+      "from_attr": "project_id",
+      "to_attr": "blob_store_id"
+    },
+    "vercel_alias": {
+      "role": "satellite",
+      "category": "network",
+      "label": "Alias"
+    },
+    "vercel_dns_record": {
+      "role": "satellite",
+      "category": "network",
+      "label": "DNS record"
+    },
+    "vercel_log_drain": {
+      "role": "satellite",
+      "category": "observability",
+      "label": "Log drain"
+    },
+    "vercel_shared_environment_variable": {
+      "role": "satellite",
+      "category": "other",
+      "label": "Shared environment variable"
+    }
+  }
+}

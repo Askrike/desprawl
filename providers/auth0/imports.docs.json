@@ -1,0 +1,337 @@
+{
+  "auth0_action": {
+    "ids": [
+      "12f4f21b-017a-319d-92e7-2291c1ca36c4"
+    ]
+  },
+  "auth0_attack_protection": {
+    "ids": [
+      "24940d4b-4bd4-44e7-894e-f92e4de36a40"
+    ]
+  },
+  "auth0_branding": {
+    "ids": [
+      "22f4f21b-017a-319d-92e7-2291c1ca36c4"
+    ]
+  },
+  "auth0_branding_phone_notification_template": {
+    "ids": [
+      "tem_xxxxxxxxxxxxxxxxxxx"
+    ]
+  },
+  "auth0_branding_theme": {
+    "ids": [
+      "XXXXXXXXXXXXXXXXXXXX"
+    ]
+  },
+  "auth0_client": {
+    "ids": [
+      "\u003cclient_id\u003e`.",
+      "AaiyAPdpYdesoKnqjj8HJqRn4T5titww"
+    ]
+  },
+  "auth0_client_cimd": {
+    "ids": [
+      "tpc_5FPpaVyZGSNRCBzTb2zURZ"
+    ]
+  },
+  "auth0_client_credentials": {
+    "ids": [
+      "AaiyAPdpYdesoKnqjj8HJqRn4T5titww"
+    ]
+  },
+  "auth0_client_grant": {
+    "ids": [
+      "cgr_XXXXXXXXXXXXXXXX"
+    ]
+  },
+  "auth0_connection": {
+    "ids": [
+      "con_a17f21fdb24d48a0",
+      "name\u003e \u003cconnID\u003e` in order to prevent issues due to the breaking change after upgrading to this version."
+    ]
+  },
+  "auth0_connection_client": {
+    "ids": [
+      "con_XXXXX::XXXXXXXX"
+    ]
+  },
+  "auth0_connection_clients": {
+    "ids": [
+      "con_XXXXX"
+    ]
+  },
+  "auth0_connection_directory": {
+    "ids": [
+      "con_XXXXXXXXXXXXXX"
+    ]
+  },
+  "auth0_connection_directory_synchronized_groups": {
+    "ids": [
+      "con_XXXXXXXXXXXXXX"
+    ]
+  },
+  "auth0_connection_profile": {
+    "ids": [
+      "cop_xxxxxxxxxxxxxxxxx"
+    ]
+  },
+  "auth0_connection_scim_configuration": {
+    "ids": [
+      "con_XXXXX"
+    ]
+  },
+  "auth0_custom_domain": {
+    "ids": [
+      "cd_XXXXXXXXXXXXXXXX"
+    ]
+  },
+  "auth0_custom_domain_default": {
+    "ids": [
+      "custom_domain_default"
+    ]
+  },
+  "auth0_custom_domain_verification": {
+    "ids": [
+      "cd_XXXXXXXXXXXXXXXX"
+    ]
+  },
+  "auth0_email_provider": {
+    "ids": [
+      "\u003canyUUID for example: b4213dc2-2eed-42c3-9516-c6131a9ce0b0\u003e`.",
+      "b4213dc2-2eed-42c3-9516-c6131a9ce0b0"
+    ]
+  },
+  "auth0_email_template": {
+    "ids": [
+      "welcome_email"
+    ]
+  },
+  "auth0_event_stream": {
+    "ids": [
+      "est_XXXXXXXXXXXXXXXX"
+    ]
+  },
+  "auth0_flow": {
+    "ids": [
+      "af_4JwsAjokf6DpK8xJCkTRjK"
+    ]
+  },
+  "auth0_flow_vault_connection": {
+    "ids": [
+      "ac_42HT5oiobDyUs8ASwEEWK0"
+    ]
+  },
+  "auth0_form": {
+    "ids": [
+      "ap_ojkKbiPMG6J5E5VCKdeCzK"
+    ]
+  },
+  "auth0_guardian": {
+    "ids": [
+      "24940d4b-4bd4-44e7-894e-f92e4de36a40"
+    ]
+  },
+  "auth0_hook": {
+    "ids": [
+      "00001"
+    ]
+  },
+  "auth0_log_stream": {
+    "ids": [
+      "lst_XXXXXXXXXXXXXXXX"
+    ]
+  },
+  "auth0_network_acl": {
+    "ids": [
+      "167f9a50-4444-3333-1111-ndfdaf953ab4"
+    ]
+  },
+  "auth0_organization": {
+    "ids": [
+      "org_XXXXXXXXXXXXXX"
+    ]
+  },
+  "auth0_organization_client": {
+    "ids": [
+      "org_XXXXX::clientXXXXX"
+    ]
+  },
+  "auth0_organization_client_grant": {
+    "ids": [
+      "org_XXXXX::cgr_XXXXX"
+    ]
+  },
+  "auth0_organization_clients": {
+    "ids": [
+      "org_XXXXX"
+    ]
+  },
+  "auth0_organization_connection": {
+    "ids": [
+      "org_XXXXX::con_XXXXX"
+    ]
+  },
+  "auth0_organization_connections": {
+    "ids": [
+      "org_XXXXX"
+    ]
+  },
+  "auth0_organization_member": {
+    "ids": [
+      "org_XXXXX::auth0|XXXXX"
+    ]
+  },
+  "auth0_organization_member_role": {
+    "ids": [
+      "org_XXXXX::auth0|XXXXX::role_XXXX"
+    ]
+  },
+  "auth0_organization_member_roles": {
+    "ids": [
+      "org_XXXXX::auth0|XXXXX"
+    ]
+  },
+  "auth0_organization_members": {
+    "ids": [
+      "org_XXXXX"
+    ]
+  },
+  "auth0_pages": {
+    "ids": [
+      "22f4f21b-017a-319d-92e7-2291c1ca36c4"
+    ]
+  },
+  "auth0_phone_provider": {
+    "ids": [
+      "pro_XXXXXXXXXXXXXXXX"
+    ]
+  },
+  "auth0_prompt": {
+    "ids": [
+      "22f4f21b-017a-319d-92e7-2291c1ca36c4"
+    ]
+  },
+  "auth0_prompt_custom_text": {
+    "ids": [
+      "login::en"
+    ]
+  },
+  "auth0_prompt_partials": {
+    "ids": [
+      "login"
+    ]
+  },
+  "auth0_prompt_screen_partial": {
+    "ids": [
+      "login:login"
+    ]
+  },
+  "auth0_prompt_screen_partials": {
+    "ids": [
+      "login-passwordless"
+    ]
+  },
+  "auth0_rate_limit_policy": {
+    "ids": [
+      "rlp_XXXXXXXXXXXXXXXX"
+    ]
+  },
+  "auth0_resource_server": {
+    "ids": [
+      "XXXXXXXXXXXXXXXXXXXXXXX"
+    ]
+  },
+  "auth0_resource_server_scope": {
+    "ids": [
+      "https://api.travel0.com/v1::read:posts"
+    ]
+  },
+  "auth0_resource_server_scopes": {
+    "ids": [
+      "https://api.travel0.com/v1"
+    ]
+  },
+  "auth0_role": {
+    "ids": [
+      "XXXXXXXXXXXXXXXXXXXXXXX"
+    ]
+  },
+  "auth0_role_permission": {
+    "ids": [
+      "rol_XXXXXXXXXXXXX::https://example.com::read:foo"
+    ]
+  },
+  "auth0_role_permissions": {
+    "ids": [
+      "rol_XXXXXXXXXXXX"
+    ]
+  },
+  "auth0_rule": {
+    "ids": [
+      "rul_XXXXXXXXXXXXX"
+    ]
+  },
+  "auth0_rule_config": {
+    "ids": [
+      "foo"
+    ]
+  },
+  "auth0_self_service_profile": {
+    "ids": [
+      "ssp_32oi5unksja93124"
+    ]
+  },
+  "auth0_self_service_profile_custom_text": {
+    "ids": [
+      "some-sso-id::en::get-started"
+    ]
+  },
+  "auth0_tenant": {
+    "ids": [
+      "82f4f21b-017a-319d-92e7-2291c1ca36c4"
+    ]
+  },
+  "auth0_token_exchange_profile": {
+    "ids": [
+      "tep_XXXXXXXXXXXXXX"
+    ]
+  },
+  "auth0_trigger_action": {
+    "ids": [
+      "post-login::28b5c8fa-d371-5734-acf6-d0cf80ead918"
+    ]
+  },
+  "auth0_trigger_actions": {
+    "ids": [
+      "\u003ctrigger_id\u003e`.",
+      "post-login"
+    ]
+  },
+  "auth0_user": {
+    "ids": [
+      "auth0|111111111111111111111111"
+    ]
+  },
+  "auth0_user_permission": {
+    "ids": [
+      "auth0|111111111111111111111111::https://api.travel0.com/v1::read:posts"
+    ]
+  },
+  "auth0_user_permissions": {
+    "ids": [
+      "auth0|111111111111111111111111"
+    ]
+  },
+  "auth0_user_role": {
+    "ids": [
+      "auth0|111111111111111111111111::role_123",
+      "auth0|111111111111111111111111:role_123"
+    ]
+  },
+  "auth0_user_roles": {
+    "ids": [
+      "auth0|111111111111111111111111"
+    ]
+  }
+}

@@ -1,0 +1,290 @@
+[
+  {
+    "source": "aws_route53_record",
+    "path": "records",
+    "target": "kubernetes_ingress",
+    "attr": "status.0.load_balancer.0.ingress.0.hostname",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "aws_route53_record",
+    "path": "records",
+    "target": "kubernetes_ingress_v1",
+    "attr": "status.0.load_balancer.0.ingress.0.hostname",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "aws_route53_record",
+    "path": "records",
+    "target": "kubernetes_service",
+    "attr": "status.0.load_balancer.0.ingress.0.hostname",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "aws_route53_record",
+    "path": "records",
+    "target": "kubernetes_service_v1",
+    "attr": "status.0.load_balancer.0.ingress.0.hostname",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "aws_route53_record",
+    "path": "zone_id",
+    "target": "aws_route53_zone",
+    "attr": "zone_id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "azurerm_managed_disk",
+    "path": "location",
+    "target": "azurerm_resource_group",
+    "attr": "location",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "azurerm_managed_disk",
+    "path": "resource_group_name",
+    "target": "azurerm_resource_group",
+    "attr": "name",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "azurerm_managed_disk",
+    "path": "tags.environment",
+    "target": "azurerm_resource_group",
+    "attr": "name",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "kubernetes_api_service",
+    "path": "spec.selector.app",
+    "target": "kubernetes_pod",
+    "attr": "metadata.0.labels.app",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_api_service_v1",
+    "path": "spec.selector.app",
+    "target": "kubernetes_pod",
+    "attr": "metadata.0.labels.app",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_default_service_account",
+    "path": "secret.name",
+    "target": "kubernetes_secret",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_default_service_account_v1",
+    "path": "secret.name",
+    "target": "kubernetes_secret_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_deployment",
+    "path": "metadata.namespace",
+    "target": "kubernetes_namespace",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_ingress",
+    "path": "spec.rule.http.path.backend.service_name",
+    "target": "kubernetes_service",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_ingress_v1",
+    "path": "spec.rule.http.path.backend.service.name",
+    "target": "kubernetes_service_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_persistent_volume",
+    "path": "spec.persistent_volume_source.azure_disk.data_disk_uri",
+    "target": "azurerm_managed_disk",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_persistent_volume_claim",
+    "path": "spec.volume_name",
+    "target": "kubernetes_persistent_volume",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_persistent_volume_claim_v1",
+    "path": "spec.volume_name",
+    "target": "kubernetes_persistent_volume_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_persistent_volume_v1",
+    "path": "spec.persistent_volume_source.azure_disk.data_disk_uri",
+    "target": "azurerm_managed_disk",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_secret",
+    "path": "data.tls.crt",
+    "target": "kubernetes_certificate_signing_request",
+    "attr": "certificate",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_secret",
+    "path": "data.tls.crt",
+    "target": "kubernetes_certificate_signing_request_v1",
+    "attr": "certificate",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_secret",
+    "path": "data.tls.key",
+    "target": "tls_private_key",
+    "attr": "private_key_pem",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "kubernetes_secret",
+    "path": "metadata.annotations.kubernetes.io/service-account.name",
+    "target": "kubernetes_service_account",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_secret_v1",
+    "path": "metadata.annotations.kubernetes.io/service-account.name",
+    "target": "kubernetes_service_account_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_service",
+    "path": "metadata.name",
+    "target": "kubernetes_endpoints",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_service",
+    "path": "metadata.namespace",
+    "target": "kubernetes_namespace",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_service",
+    "path": "spec.selector.app",
+    "target": "kubernetes_deployment",
+    "attr": "spec.0.template.0.metadata.0.labels.app",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_service",
+    "path": "spec.selector.app",
+    "target": "kubernetes_pod",
+    "attr": "metadata.0.labels.app",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "kubernetes_service_v1",
+    "path": "metadata.name",
+    "target": "kubernetes_endpoints_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_service_v1",
+    "path": "spec.selector.app",
+    "target": "kubernetes_pod",
+    "attr": "metadata.0.labels.app",
+    "match": "exact",
+    "origin": "docs",
+    "support": 3
+  },
+  {
+    "source": "kubernetes_service_v1",
+    "path": "spec.selector.app",
+    "target": "kubernetes_pod_v1",
+    "attr": "metadata.0.labels.app",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "kubernetes_token_request_v1",
+    "path": "metadata.name",
+    "target": "kubernetes_service_account_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  }
+]

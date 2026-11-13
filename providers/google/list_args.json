@@ -1,0 +1,711 @@
+[
+  {
+    "type": "google_apigee_api_product",
+    "parent": "google_apigee_organization",
+    "args": {
+      "org_id": "id"
+    },
+    "origin": "llm",
+    "note": "org_id takes the form organizations/{org_name}, which is the id of the Apigee organization that owns the API product."
+  },
+  {
+    "type": "google_apigee_data_collector",
+    "parent": "google_apigee_organization",
+    "args": {
+      "org_id": "id"
+    },
+    "origin": "llm",
+    "note": "org_id takes the form organizations/{org_name}, which is the id of the Apigee organization that owns the data collector."
+  },
+  {
+    "type": "google_apigee_datastore",
+    "parent": "google_apigee_organization",
+    "args": {
+      "org_id": "id"
+    },
+    "origin": "llm",
+    "note": "org_id takes the form organizations/{org_name}, which is the id of the Apigee organization that owns the datastore."
+  },
+  {
+    "type": "google_apigee_endpoint_attachment",
+    "parent": "google_apigee_organization",
+    "args": {
+      "org_id": "id"
+    },
+    "origin": "llm",
+    "note": "org_id takes the form organizations/{org_name}, which is the id of the Apigee organization that owns the endpoint attachment."
+  },
+  {
+    "type": "google_apigee_envgroup",
+    "parent": "google_apigee_organization",
+    "args": {
+      "org_id": "id"
+    },
+    "origin": "llm",
+    "note": "org_id takes the form organizations/{org_name}, which is the id of the Apigee organization that owns the envgroup."
+  },
+  {
+    "type": "google_bigquery_dataset_access",
+    "parent": "google_bigquery_dataset",
+    "args": {
+      "dataset_id": "dataset_id"
+    },
+    "origin": "llm",
+    "note": "Access entries belong to a BigQuery dataset, so listing every dataset covers all of them."
+  },
+  {
+    "type": "google_bigquery_dataset_iam_member",
+    "parent": "google_bigquery_dataset",
+    "args": {
+      "dataset_id": "dataset_id"
+    },
+    "origin": "llm",
+    "note": "IAM members are attached to a BigQuery dataset, so listing every dataset covers all of them."
+  },
+  {
+    "type": "google_bigquery_table",
+    "parent": "google_bigquery_dataset",
+    "args": {
+      "dataset_id": "dataset_id"
+    },
+    "origin": "llm",
+    "note": "Tables belong to a BigQuery dataset, so listing every dataset covers all of them."
+  },
+  {
+    "type": "google_cloud_run_service",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "location is the region the listing runs in, so it maps to the location scope."
+  },
+  {
+    "type": "google_colab_notebook_execution",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "location is the region the listing runs in, so it maps to the location scope."
+  },
+  {
+    "type": "google_colab_runtime",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "location is the region the listing runs in, so it maps to the location scope."
+  },
+  {
+    "type": "google_colab_runtime_template",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "location is the region the listing runs in, so it maps to the location scope."
+  },
+  {
+    "type": "google_colab_schedule",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "location is the region the listing runs in, so it maps to the location scope."
+  },
+  {
+    "type": "google_compute_network_firewall_policy_association",
+    "parent": "google_compute_network_firewall_policy",
+    "args": {
+      "firewall_policy": "name"
+    },
+    "origin": "llm",
+    "note": "Global network firewall policy associations sit under a global network firewall policy, which is identified by its name."
+  },
+  {
+    "type": "google_compute_public_delegated_prefix",
+    "scope": {
+      "region": "location"
+    },
+    "origin": "llm",
+    "note": "region is the location the listing runs in, so it maps to the location scope."
+  },
+  {
+    "type": "google_compute_region_composite_health_check",
+    "scope": {
+      "region": "location"
+    },
+    "origin": "llm",
+    "note": "region is the location the listing runs in, so it maps to the location scope."
+  },
+  {
+    "type": "google_compute_region_health_aggregation_policy",
+    "scope": {
+      "region": "location"
+    },
+    "origin": "llm",
+    "note": "region is the location the listing runs in, so it maps to the location scope."
+  },
+  {
+    "type": "google_compute_region_health_source",
+    "scope": {
+      "region": "location"
+    },
+    "origin": "llm",
+    "note": "Region is the listing scope, filled from the shared location."
+  },
+  {
+    "type": "google_compute_region_network_endpoint_group",
+    "scope": {
+      "region": "location"
+    },
+    "origin": "llm",
+    "note": "Region is the listing scope, filled from the shared location."
+  },
+  {
+    "type": "google_compute_wire_group",
+    "parent": "google_compute_cross_site_network",
+    "args": {
+      "cross_site_network": "name"
+    },
+    "origin": "llm",
+    "note": "Wire groups sit under a cross-site network, which is identified by its name."
+  },
+  {
+    "type": "google_contact_center_insights_analysis_rule",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the listing scope, not a parent resource."
+  },
+  {
+    "type": "google_contact_center_insights_assessment_rule",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the listing scope, not a parent resource."
+  },
+  {
+    "type": "google_contact_center_insights_auto_labeling_rule",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the listing scope, not a parent resource."
+  },
+  {
+    "type": "google_contact_center_insights_qa_scorecard",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the listing scope, not a parent resource."
+  },
+  {
+    "type": "google_contact_center_insights_view",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the listing scope, not a parent resource."
+  },
+  {
+    "type": "google_discovery_engine_assistant",
+    "parent": "google_discovery_engine_search_engine",
+    "args": {
+      "collection_id": "collection_id",
+      "engine_id": "engine_id",
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Assistants sit under a search engine (app), which has collection_id, engine_id and location as attributes."
+  },
+  {
+    "type": "google_discovery_engine_chat_engine",
+    "values": {
+      "collection_id": [
+        "default_collection"
+      ]
+    },
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the listing scope and collections aren't listable, so collection_id is set to Discovery Engine's standard default_collection (an assumption, since no description named values), and engines in other collections would be missed."
+  },
+  {
+    "type": "google_discovery_engine_cmek_config",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the listing scope, not a parent resource."
+  },
+  {
+    "type": "google_discovery_engine_control",
+    "parent": "google_discovery_engine_search_engine",
+    "args": {
+      "engine_id": "engine_id",
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Controls sit under an engine, and the search engine has both engine_id and location as attributes."
+  },
+  {
+    "type": "google_discovery_engine_data_store",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the listing scope, not a parent resource."
+  },
+  {
+    "type": "google_discovery_engine_license_config",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the listing scope, not a parent resource."
+  },
+  {
+    "type": "google_discovery_engine_recommendation_engine",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the listing scope, not a parent resource."
+  },
+  {
+    "type": "google_discovery_engine_schema",
+    "parent": "google_discovery_engine_data_store",
+    "args": {
+      "data_store_id": "data_store_id",
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Schemas are children of a data store, which has both the data_store_id and location attributes."
+  },
+  {
+    "type": "google_discovery_engine_search_engine",
+    "values": {
+      "collection_id": [
+        "default_collection"
+      ],
+      "location": [
+        "global",
+        "us",
+        "eu"
+      ]
+    },
+    "origin": "llm",
+    "note": "None of the candidates is a collection parent (the ones with collection_id are engine children), so collection_id and location are filled as enumerations: the standard default_collection and the Discovery Engine multi-regions."
+  },
+  {
+    "type": "google_discovery_engine_serving_config",
+    "parent": "google_discovery_engine_search_engine",
+    "args": {
+      "engine_id": "engine_id",
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Serving configs belong to an engine, and the search engine has both engine_id and location (chat and recommendation engines would also work as parents)."
+  },
+  {
+    "type": "google_discovery_engine_sitemap",
+    "parent": "google_discovery_engine_data_store",
+    "args": {
+      "data_store_id": "data_store_id",
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Sitemaps are children of a data store, which has both data_store_id and location."
+  },
+  {
+    "type": "google_discovery_engine_target_site",
+    "parent": "google_discovery_engine_data_store",
+    "args": {
+      "data_store_id": "data_store_id",
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Target sites are children of a data store, which has both data_store_id and location."
+  },
+  {
+    "type": "google_discovery_engine_user_store",
+    "values": {
+      "location": [
+        "global",
+        "us",
+        "eu"
+      ]
+    },
+    "origin": "llm",
+    "note": "User stores are top-level per location, so location is enumerated over the Discovery Engine multi-regions instead of taken from a parent."
+  },
+  {
+    "type": "google_dns_record_set",
+    "parent": "google_dns_managed_zone",
+    "args": {
+      "managed_zone": "name"
+    },
+    "origin": "llm",
+    "note": "Record sets live inside a managed zone, which is identified by its name attribute."
+  },
+  {
+    "type": "google_gke_backup_backup_channel",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the region the listing runs in, so it maps to the location scope parameter."
+  },
+  {
+    "type": "google_gke_backup_backup_plan",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the region the listing runs in, so it maps to the location scope parameter."
+  },
+  {
+    "type": "google_gke_backup_restore_channel",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the region the listing runs in, so it maps to the location scope parameter."
+  },
+  {
+    "type": "google_gke_backup_restore_plan",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the region the listing runs in, so it maps to the location scope parameter."
+  },
+  {
+    "type": "google_migration_center_assets_export_job",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the region the listing runs in, so it maps to the location scope parameter."
+  },
+  {
+    "type": "google_migration_center_discovery_client",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the region the listing runs in, so it maps to the location scope parameter."
+  },
+  {
+    "type": "google_migration_center_group",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the region the listing runs in, so it maps to the location scope parameter."
+  },
+  {
+    "type": "google_migration_center_import_job",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the region the listing runs in, so it maps to the location scope parameter."
+  },
+  {
+    "type": "google_migration_center_preference_set",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the region the listing runs in, so it maps to the location scope parameter."
+  },
+  {
+    "type": "google_migration_center_report_config",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Location is the region the listing runs in, so it maps to the location scope parameter."
+  },
+  {
+    "type": "google_migration_center_source",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Migration Center sources are listed per project location, so location is a scope argument, not a parent."
+  },
+  {
+    "type": "google_network_security_authz_policy",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Authz policies are listed per location, which is a scope argument."
+  },
+  {
+    "type": "google_network_security_intercept_deployment",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Intercept deployments are listed per location, which is a scope argument."
+  },
+  {
+    "type": "google_network_security_intercept_deployment_group",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Intercept deployment groups are listed per location, which is a scope argument."
+  },
+  {
+    "type": "google_network_security_intercept_endpoint_group",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Intercept endpoint groups are listed per location, which is a scope argument."
+  },
+  {
+    "type": "google_network_security_intercept_endpoint_group_association",
+    "values": {
+      "location": [
+        "global"
+      ]
+    },
+    "origin": "llm",
+    "note": "Location is an enumeration, and intercept endpoint group associations are limited to the global location, so the candidate is a sibling rather than a parent."
+  },
+  {
+    "type": "google_network_security_mirroring_deployment",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Mirroring deployments are listed per location, which is a scope argument."
+  },
+  {
+    "type": "google_network_security_mirroring_deployment_group",
+    "values": {
+      "location": [
+        "global"
+      ]
+    },
+    "origin": "llm",
+    "note": "Location is an enumeration, and mirroring deployment groups are limited to the global location."
+  },
+  {
+    "type": "google_network_security_mirroring_endpoint",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Mirroring endpoints are listed per location, which is a scope argument."
+  },
+  {
+    "type": "google_network_security_mirroring_endpoint_group",
+    "values": {
+      "location": [
+        "global"
+      ]
+    },
+    "origin": "llm",
+    "note": "Location is an enumeration, and mirroring endpoint groups are limited to the global location."
+  },
+  {
+    "type": "google_network_security_mirroring_endpoint_group_association",
+    "values": {
+      "location": [
+        "global"
+      ]
+    },
+    "origin": "llm",
+    "note": "Location is an enumeration, and mirroring endpoint group associations are limited to the global location."
+  },
+  {
+    "type": "google_network_services_authz_extension",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Authz extensions are listed per location, which is a scope argument."
+  },
+  {
+    "type": "google_network_services_multicast_consumer_association",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Multicast consumer associations are listed per location, which is a scope argument."
+  },
+  {
+    "type": "google_network_services_multicast_domain",
+    "values": {
+      "location": [
+        "global"
+      ]
+    },
+    "origin": "llm",
+    "note": "Location is an enumeration, and multicast domains are global resources."
+  },
+  {
+    "type": "google_network_services_multicast_domain_activation",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Multicast domain activations are listed per location, which is a scope argument."
+  },
+  {
+    "type": "google_network_services_multicast_domain_group",
+    "values": {
+      "location": [
+        "global"
+      ]
+    },
+    "origin": "llm",
+    "note": "Location is an enumeration, and multicast domain groups are global resources."
+  },
+  {
+    "type": "google_network_services_multicast_group_consumer_activation",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Multicast group consumer activations are listed per location, which is a scope argument."
+  },
+  {
+    "type": "google_network_services_multicast_group_producer_activation",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "Multicast group producer activations are listed per location, which is a scope argument."
+  },
+  {
+    "type": "google_network_services_multicast_group_range",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "The location argument is the location the listing runs in, so it maps to the location scope parameter."
+  },
+  {
+    "type": "google_network_services_multicast_group_range_activation",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "The location argument is the location the listing runs in, so it maps to the location scope parameter."
+  },
+  {
+    "type": "google_network_services_multicast_producer_association",
+    "scope": {
+      "location": "location"
+    },
+    "origin": "llm",
+    "note": "The location argument is the location the listing runs in, so it maps to the location scope parameter."
+  },
+  {
+    "type": "google_project_iam_binding",
+    "parent": "google_project",
+    "args": {
+      "project": "project_id"
+    },
+    "origin": "llm",
+    "note": "IAM bindings belong to a project, so listing every project and using its project_id covers all bindings."
+  },
+  {
+    "type": "google_project_iam_member",
+    "parent": "google_project",
+    "args": {
+      "project": "project_id"
+    },
+    "origin": "llm",
+    "note": "IAM members belong to a project, so listing every project and using its project_id covers all members."
+  },
+  {
+    "type": "google_pubsub_subscription_iam_member",
+    "parent": "google_pubsub_subscription",
+    "args": {
+      "subscription": "id"
+    },
+    "origin": "llm",
+    "note": "Subscription IAM members belong to a subscription, and its fully qualified id identifies it unambiguously across projects."
+  },
+  {
+    "type": "google_pubsub_topic_iam_member",
+    "parent": "google_pubsub_topic",
+    "args": {
+      "topic": "id"
+    },
+    "origin": "llm",
+    "note": "Topic IAM members belong to a topic, and its fully qualified id identifies it unambiguously across projects."
+  },
+  {
+    "type": "google_secret_manager_secret_iam_member",
+    "parent": "google_secret_manager_secret",
+    "args": {
+      "secret_id": "id"
+    },
+    "origin": "llm",
+    "note": "Secret IAM members belong to a secret, and its fully qualified id (projects/{p}/secrets/{s}) is accepted as secret_id."
+  },
+  {
+    "type": "google_secret_manager_secret_version",
+    "parent": "google_secret_manager_secret",
+    "args": {
+      "secret": "id"
+    },
+    "origin": "llm",
+    "note": "Secret versions belong to a secret, which is identified by its fully qualified id."
+  },
+  {
+    "type": "google_service_account_iam_member",
+    "parent": "google_service_account",
+    "args": {
+      "service_account_id": "name"
+    },
+    "origin": "llm",
+    "note": "Service account IAM members belong to a service account, whose fully qualified name (projects/{p}/serviceAccounts/{email}) is what service_account_id expects."
+  },
+  {
+    "type": "google_service_account_key",
+    "parent": "google_service_account",
+    "args": {
+      "service_account_id": "name"
+    },
+    "origin": "llm",
+    "note": "Service account keys belong to a service account, which is identified by its fully qualified name."
+  },
+  {
+    "type": "google_storage_bucket_iam_member",
+    "parent": "google_storage_bucket",
+    "args": {
+      "bucket": "name"
+    },
+    "origin": "llm",
+    "note": "The bucket argument identifies the parent Cloud Storage bucket by its name."
+  },
+  {
+    "type": "google_vertex_ai_evaluation_metric",
+    "scope": {
+      "region": "location"
+    },
+    "origin": "llm",
+    "note": "The region argument is the location the listing runs in, so it maps to the location scope parameter."
+  },
+  {
+    "type": "google_vertex_ai_rag_corpus",
+    "scope": {
+      "region": "location"
+    },
+    "origin": "llm",
+    "note": "The region argument is the location the listing runs in, so it maps to the location scope parameter."
+  }
+]

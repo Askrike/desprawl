@@ -1,0 +1,86 @@
+{
+  "provider": "heroku",
+  "resources": {
+    "heroku_app": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Heroku app"
+    },
+    "heroku_addon": {
+      "role": "primary",
+      "category": "database",
+      "label": "Heroku add-on",
+      "inverse": true
+    },
+    "heroku_addon_attachment": {
+      "role": "connector",
+      "category": "database",
+      "from_attr": "app_id",
+      "to_attr": "addon_id"
+    },
+    "heroku_formation": {
+      "role": "child",
+      "category": "compute",
+      "parent_attr": "app_id"
+    },
+    "heroku_build": {
+      "role": "child",
+      "category": "compute",
+      "parent_attr": "app_id"
+    },
+    "heroku_app_release": {
+      "role": "child",
+      "category": "compute",
+      "parent_attr": "app_id"
+    },
+    "heroku_app_config_association": {
+      "role": "child",
+      "category": "other",
+      "parent_attr": "app_id"
+    },
+    "heroku_domain": {
+      "role": "child",
+      "category": "network",
+      "parent_attr": "app_id"
+    },
+    "heroku_ssl": {
+      "role": "child",
+      "category": "security",
+      "parent_attr": "app_id"
+    },
+    "heroku_drain": {
+      "role": "child",
+      "category": "observability",
+      "parent_attr": "app_id"
+    },
+    "heroku_app_webhook": {
+      "role": "child",
+      "category": "integration",
+      "parent_attr": "app_id"
+    },
+    "heroku_pipeline_coupling": {
+      "role": "child",
+      "category": "compute",
+      "parent_attr": "app_id"
+    },
+    "heroku_pipeline": {
+      "role": "satellite",
+      "category": "compute",
+      "label": "Pipeline"
+    },
+    "heroku_config": {
+      "role": "satellite",
+      "category": "other",
+      "label": "Config vars"
+    },
+    "heroku_telemetry_drain": {
+      "role": "satellite",
+      "category": "observability",
+      "label": "Telemetry drain"
+    },
+    "heroku_space": {
+      "role": "ignore",
+      "category": "network"
+    }
+  }
+}

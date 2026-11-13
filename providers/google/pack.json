@@ -1,0 +1,21 @@
+{
+  "exclude_types": {
+    "google_secret_manager_secret_version": "holds secret values",
+    "google_service_account_key": "credentials",
+    "google_storage_hmac_key": "credentials",
+    "google_compute_backend_bucket_signed_url_key": "credentials",
+    "google_compute_backend_service_signed_url_key": "credentials",
+    "google_kms_crypto_key_version": "key material versions, managed by rotation"
+  },
+  "params": {
+    "project": {
+      "ref": "data.google_client_config.current.project",
+      "data": "data \"google_client_config\" \"current\" {}"
+    },
+    "region": {
+      "ref": "data.google_client_config.current.region",
+      "data": "data \"google_client_config\" \"current\" {}"
+    }
+  },
+  "exclude_attributes": ["effective_labels", "terraform_labels"]
+}

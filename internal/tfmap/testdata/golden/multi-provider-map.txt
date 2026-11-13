@@ -1,0 +1,15 @@
+component Auth0 API module.auth0.auth0_resource_server.api
+component Auth0 action module.auth0.auth0_action.enrich
+component Auth0 application module.auth0.auth0_client.web
+component Auth0 application module.auth0.auth0_client.worker
+component Auth0 connection module.auth0.auth0_connection.users
+component Auth0 log stream module.auth0.auth0_log_stream.events
+component DynamoDB table module.aws.aws_dynamodb_table.movie_table
+component HTTP API module.aws.aws_apigatewayv2_api.http_lambda
+component Lambda function module.aws.aws_lambda_function.apigw_lambda_ddb
+component S3 bucket module.aws.aws_s3_bucket.lambda_bucket
+connection module.auth0.auth0_client.web -> module.auth0.auth0_connection.users [signs in with]
+connection module.auth0.auth0_client.worker -> module.auth0.auth0_resource_server.api [access]
+connection module.aws.aws_apigatewayv2_api.http_lambda -> module.aws.aws_lambda_function.apigw_lambda_ddb [routes to · access]
+connection module.aws.aws_lambda_function.apigw_lambda_ddb -> module.aws.aws_dynamodb_table.movie_table [access]
+connection module.aws.aws_lambda_function.apigw_lambda_ddb -> module.aws.aws_s3_bucket.lambda_bucket [uses]

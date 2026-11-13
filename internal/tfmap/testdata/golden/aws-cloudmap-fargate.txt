@@ -1,0 +1,3 @@
+component Cloud Map namespace aws_service_discovery_public_dns_namespace.cloud_map_dns
+component ECS service aws_ecs_service.demo_service
+connection aws_ecs_service.demo_service -> aws_service_discovery_public_dns_namespace.cloud_map_dns [uses]

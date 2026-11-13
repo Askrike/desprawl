@@ -1,0 +1,45 @@
+{
+  "provider": "upstash",
+  "resources": {
+    "upstash_redis_database": {
+      "role": "primary",
+      "category": "database",
+      "label": "Upstash Redis"
+    },
+    "upstash_vector_index": {
+      "role": "primary",
+      "category": "database",
+      "label": "Upstash Vector"
+    },
+    "upstash_search": {
+      "role": "primary",
+      "category": "database",
+      "label": "Upstash Search"
+    },
+    "upstash_qstash_topic": {
+      "role": "primary",
+      "category": "messaging",
+      "label": "QStash topic"
+    },
+    "upstash_qstash_topic_v2": {
+      "role": "primary",
+      "category": "messaging",
+      "label": "QStash topic"
+    },
+    "upstash_qstash_endpoint": {
+      "role": "child",
+      "category": "messaging",
+      "parent_attr": "topic_id"
+    },
+    "upstash_qstash_schedule": {
+      "role": "primary",
+      "category": "messaging",
+      "label": "QStash schedule"
+    },
+    "upstash_qstash_schedule_v2": {
+      "role": "primary",
+      "category": "messaging",
+      "label": "QStash schedule"
+    }
+  }
+}

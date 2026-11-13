@@ -1,0 +1,112 @@
+[
+  {
+    "source": "aws_cloudwatch_event_rule",
+    "path": "event_bus_name",
+    "target": "aws_cloudwatch_event_bus",
+    "attr": "name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 2,
+    "note": "event_bus_name names the event bus the rule is attached to, so it points to aws_cloudwatch_event_bus.name."
+  },
+  {
+    "source": "aws_cloudwatch_event_target",
+    "path": "event_bus_name",
+    "target": "aws_cloudwatch_event_bus",
+    "attr": "name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 2,
+    "note": "event_bus_name identifies the event bus the target belongs to, by its name."
+  },
+  {
+    "source": "aws_cloudwatch_metric_alarm",
+    "path": "dimensions.ClusterName",
+    "target": "aws_ecs_cluster",
+    "attr": "name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 14,
+    "note": "The ClusterName dimension names the ECS cluster whose metrics the alarm watches."
+  },
+  {
+    "source": "aws_cloudwatch_metric_alarm",
+    "path": "dimensions.ServiceName",
+    "target": "aws_ecs_service",
+    "attr": "name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 12,
+    "note": "The ServiceName dimension names the ECS service whose metrics the alarm watches."
+  },
+  {
+    "source": "aws_db_instance",
+    "path": "db_subnet_group_name",
+    "target": "aws_db_subnet_group",
+    "attr": "name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 2,
+    "note": "db_subnet_group_name names the DB subnet group the instance uses."
+  },
+  {
+    "source": "aws_ecs_service",
+    "path": "capacity_provider_strategy.capacity_provider",
+    "target": "aws_ecs_capacity_provider",
+    "attr": "name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 1,
+    "note": "capacity_provider_strategy.capacity_provider holds the name of the ECS capacity provider that the service uses."
+  },
+  {
+    "source": "aws_ecs_task_definition",
+    "path": "container_definitions.logConfiguration.options.awslogs-group",
+    "target": "aws_cloudwatch_log_group",
+    "attr": "name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 6,
+    "note": "awslogs-group names the CloudWatch log group that the container sends its logs to."
+  },
+  {
+    "source": "aws_iam_policy",
+    "path": "policy.Statement.Resource",
+    "target": "aws_kms_key",
+    "attr": "arn",
+    "match": "exact",
+    "origin": "llm",
+    "support": 1,
+    "note": "The policy statement's Resource field names this KMS key by its ARN."
+  },
+  {
+    "source": "aws_iam_role_policy",
+    "path": "policy.Statement.Resource",
+    "target": "aws_kms_key",
+    "attr": "arn",
+    "match": "exact",
+    "origin": "llm",
+    "support": 1,
+    "note": "The policy statement's Resource field names this KMS key by its ARN."
+  },
+  {
+    "source": "aws_instance",
+    "path": "key_name",
+    "target": "aws_key_pair",
+    "attr": "key_name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 1,
+    "note": "An instance's key_name identifies the EC2 key pair it launches with."
+  },
+  {
+    "source": "aws_lb_listener_rule",
+    "path": "condition.host_header.values",
+    "target": "aws_route53_record",
+    "attr": "fqdn",
+    "match": "exact",
+    "origin": "llm",
+    "support": 4,
+    "note": "The host header condition matches the hostname that this Route53 record defines, and fqdn is the canonical attribute to reference for it."
+  }
+]

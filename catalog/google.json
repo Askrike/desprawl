@@ -1,0 +1,758 @@
+{
+  "provider": "google",
+  "resources": {
+    "google_project": {
+      "role": "helper",
+      "category": "other"
+    },
+    "google_project_service": {
+      "role": "helper",
+      "category": "other"
+    },
+    "google_project_service_identity": {
+      "role": "helper",
+      "category": "identity"
+    },
+    "google_project_iam_custom_role": {
+      "role": "helper",
+      "category": "identity"
+    },
+    "google_project_iam_binding": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "members",
+      "to_attr": "project",
+      "verb": "granted roles on"
+    },
+    "google_project_iam_member": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "member",
+      "to_attr": "project",
+      "verb": "granted roles on"
+    },
+    "google_service_account": {
+      "role": "satellite",
+      "category": "identity",
+      "label": "Service account"
+    },
+    "google_service_account_key": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "service_account_id"
+    },
+    "google_service_account_iam_binding": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "members",
+      "to_attr": "service_account_id",
+      "verb": "may act as"
+    },
+    "google_service_account_iam_member": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "member",
+      "to_attr": "service_account_id",
+      "verb": "may act as"
+    },
+    "google_cloud_run_service": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Cloud Run service"
+    },
+    "google_cloud_run_service_iam_binding": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "members",
+      "to_attr": "service",
+      "verb": "may invoke"
+    },
+    "google_cloud_run_service_iam_member": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "member",
+      "to_attr": "service",
+      "verb": "may invoke"
+    },
+    "google_cloud_run_domain_mapping": {
+      "role": "satellite",
+      "category": "network",
+      "label": "Domain mapping"
+    },
+    "google_cloud_run_v2_service": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Cloud Run service"
+    },
+    "google_cloud_run_v2_service_iam_binding": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "members",
+      "to_attr": "name",
+      "verb": "may invoke"
+    },
+    "google_cloud_run_v2_service_iam_member": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "member",
+      "to_attr": "name",
+      "verb": "may invoke"
+    },
+    "google_cloud_run_v2_job": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Cloud Run job"
+    },
+    "google_cloud_run_v2_job_iam_binding": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "members",
+      "to_attr": "name",
+      "verb": "may run"
+    },
+    "google_cloud_run_v2_job_iam_member": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "member",
+      "to_attr": "name",
+      "verb": "may run"
+    },
+    "google_cloudfunctions_function": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Cloud Function"
+    },
+    "google_cloudfunctions_function_iam_binding": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "members",
+      "to_attr": "cloud_function",
+      "verb": "may invoke"
+    },
+    "google_cloudfunctions_function_iam_member": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "member",
+      "to_attr": "cloud_function",
+      "verb": "may invoke"
+    },
+    "google_cloudfunctions2_function": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Cloud Function"
+    },
+    "google_cloudfunctions2_function_iam_binding": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "members",
+      "to_attr": "cloud_function",
+      "verb": "may invoke"
+    },
+    "google_cloudfunctions2_function_iam_member": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "member",
+      "to_attr": "cloud_function",
+      "verb": "may invoke"
+    },
+    "google_container_cluster": {
+      "role": "satellite",
+      "category": "compute",
+      "label": "GKE cluster"
+    },
+    "google_container_node_pool": {
+      "role": "child",
+      "category": "compute",
+      "parent_attr": "cluster"
+    },
+    "google_compute_instance": {
+      "role": "primary",
+      "category": "compute",
+      "label": "VM instance"
+    },
+    "google_compute_instance_template": {
+      "role": "satellite",
+      "category": "compute",
+      "label": "Instance template"
+    },
+    "google_compute_instance_group_manager": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Managed instance group"
+    },
+    "google_compute_region_instance_group_manager": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Managed instance group"
+    },
+    "google_compute_autoscaler": {
+      "role": "child",
+      "category": "compute",
+      "parent_attr": "target"
+    },
+    "google_compute_region_autoscaler": {
+      "role": "child",
+      "category": "compute",
+      "parent_attr": "target"
+    },
+    "google_compute_disk": {
+      "role": "satellite",
+      "category": "storage",
+      "label": "Persistent disk"
+    },
+    "google_compute_attached_disk": {
+      "role": "child",
+      "category": "storage",
+      "parent_attr": "instance"
+    },
+    "google_storage_bucket": {
+      "role": "primary",
+      "category": "storage",
+      "label": "Cloud Storage bucket"
+    },
+    "google_storage_bucket_object": {
+      "role": "child",
+      "category": "storage",
+      "parent_attr": "bucket"
+    },
+    "google_storage_bucket_acl": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "bucket"
+    },
+    "google_storage_bucket_access_control": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "bucket"
+    },
+    "google_storage_bucket_iam_binding": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "members",
+      "to_attr": "bucket",
+      "verb": "may access"
+    },
+    "google_storage_bucket_iam_member": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "member",
+      "to_attr": "bucket",
+      "verb": "may access"
+    },
+    "google_storage_notification": {
+      "role": "connector",
+      "category": "integration",
+      "from_attr": "bucket",
+      "to_attr": "topic",
+      "verb": "notifies"
+    },
+    "google_artifact_registry_repository": {
+      "role": "primary",
+      "category": "storage",
+      "label": "Artifact Registry repo"
+    },
+    "google_artifact_registry_repository_iam_binding": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "members",
+      "to_attr": "repository",
+      "verb": "may access"
+    },
+    "google_artifact_registry_repository_iam_member": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "member",
+      "to_attr": "repository",
+      "verb": "may access"
+    },
+    "google_sql_database_instance": {
+      "role": "primary",
+      "category": "database",
+      "label": "Cloud SQL instance"
+    },
+    "google_sql_database": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "instance"
+    },
+    "google_sql_user": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "instance"
+    },
+    "google_firestore_database": {
+      "role": "primary",
+      "category": "database",
+      "label": "Firestore database"
+    },
+    "google_firestore_index": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "database"
+    },
+    "google_spanner_instance": {
+      "role": "primary",
+      "category": "database",
+      "label": "Spanner instance"
+    },
+    "google_spanner_database": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "instance"
+    },
+    "google_bigquery_dataset": {
+      "role": "primary",
+      "category": "database",
+      "label": "BigQuery dataset"
+    },
+    "google_bigquery_table": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "dataset_id"
+    },
+    "google_bigquery_dataset_access": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "dataset_id"
+    },
+    "google_bigquery_dataset_iam_binding": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "members",
+      "to_attr": "dataset_id",
+      "verb": "may access"
+    },
+    "google_bigquery_dataset_iam_member": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "member",
+      "to_attr": "dataset_id",
+      "verb": "may access"
+    },
+    "google_redis_instance": {
+      "role": "primary",
+      "category": "database",
+      "label": "Memorystore Redis"
+    },
+    "google_compute_network": {
+      "role": "ignore",
+      "category": "network"
+    },
+    "google_compute_subnetwork": {
+      "role": "child",
+      "category": "network",
+      "parent_attr": "network"
+    },
+    "google_compute_firewall": {
+      "role": "child",
+      "category": "security",
+      "parent_attr": "network"
+    },
+    "google_compute_route": {
+      "role": "child",
+      "category": "network",
+      "parent_attr": "network"
+    },
+    "google_compute_router": {
+      "role": "child",
+      "category": "network",
+      "parent_attr": "network"
+    },
+    "google_compute_router_nat": {
+      "role": "child",
+      "category": "network",
+      "parent_attr": "router"
+    },
+    "google_compute_network_peering": {
+      "role": "connector",
+      "category": "network",
+      "from_attr": "network",
+      "to_attr": "peer_network",
+      "verb": "peers with"
+    },
+    "google_service_networking_connection": {
+      "role": "child",
+      "category": "network",
+      "parent_attr": "network"
+    },
+    "google_vpc_access_connector": {
+      "role": "satellite",
+      "category": "network",
+      "label": "VPC connector"
+    },
+    "google_compute_global_address": {
+      "role": "satellite",
+      "category": "network",
+      "label": "IP address"
+    },
+    "google_compute_address": {
+      "role": "satellite",
+      "category": "network",
+      "label": "IP address"
+    },
+    "google_dns_managed_zone": {
+      "role": "primary",
+      "category": "network",
+      "label": "DNS zone"
+    },
+    "google_dns_record_set": {
+      "role": "child",
+      "category": "network",
+      "parent_attr": "managed_zone"
+    },
+    "google_compute_url_map": {
+      "role": "primary",
+      "category": "network",
+      "label": "Load balancer"
+    },
+    "google_compute_target_http_proxy": {
+      "role": "child",
+      "category": "network",
+      "parent_attr": "url_map"
+    },
+    "google_compute_target_https_proxy": {
+      "role": "child",
+      "category": "network",
+      "parent_attr": "url_map"
+    },
+    "google_compute_global_forwarding_rule": {
+      "role": "child",
+      "category": "network",
+      "parent_attr": "target"
+    },
+    "google_compute_forwarding_rule": {
+      "role": "child",
+      "category": "network",
+      "parent_attr": "target"
+    },
+    "google_compute_backend_service": {
+      "role": "satellite",
+      "category": "network",
+      "label": "Backend service"
+    },
+    "google_compute_region_backend_service": {
+      "role": "satellite",
+      "category": "network",
+      "label": "Backend service"
+    },
+    "google_compute_backend_bucket": {
+      "role": "satellite",
+      "category": "network",
+      "label": "Backend bucket"
+    },
+    "google_compute_region_network_endpoint_group": {
+      "role": "child",
+      "category": "network",
+      "parent_attr": "cloud_run"
+    },
+    "google_compute_network_endpoint_group": {
+      "role": "child",
+      "category": "network",
+      "parent_attr": "network"
+    },
+    "google_compute_health_check": {
+      "role": "satellite",
+      "category": "network",
+      "label": "Health check"
+    },
+    "google_compute_managed_ssl_certificate": {
+      "role": "satellite",
+      "category": "security",
+      "label": "SSL certificate"
+    },
+    "google_compute_ssl_certificate": {
+      "role": "satellite",
+      "category": "security",
+      "label": "SSL certificate"
+    },
+    "google_compute_security_policy": {
+      "role": "satellite",
+      "category": "security",
+      "label": "Cloud Armor policy"
+    },
+    "google_secret_manager_secret": {
+      "role": "primary",
+      "category": "security",
+      "label": "Secret"
+    },
+    "google_secret_manager_secret_version": {
+      "role": "child",
+      "category": "security",
+      "parent_attr": "secret"
+    },
+    "google_secret_manager_secret_iam_binding": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "members",
+      "to_attr": "secret_id",
+      "verb": "may read"
+    },
+    "google_secret_manager_secret_iam_member": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "member",
+      "to_attr": "secret_id",
+      "verb": "may read"
+    },
+    "google_kms_key_ring": {
+      "role": "helper",
+      "category": "security"
+    },
+    "google_kms_crypto_key": {
+      "role": "satellite",
+      "category": "security",
+      "label": "KMS key"
+    },
+    "google_kms_crypto_key_iam_binding": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "members",
+      "to_attr": "crypto_key_id",
+      "verb": "may use"
+    },
+    "google_kms_crypto_key_iam_member": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "member",
+      "to_attr": "crypto_key_id",
+      "verb": "may use"
+    },
+    "google_pubsub_topic": {
+      "role": "primary",
+      "category": "messaging",
+      "label": "Pub/Sub topic"
+    },
+    "google_pubsub_topic_iam_binding": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "members",
+      "to_attr": "topic",
+      "verb": "may publish to"
+    },
+    "google_pubsub_topic_iam_member": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "member",
+      "to_attr": "topic",
+      "verb": "may publish to"
+    },
+    "google_pubsub_subscription": {
+      "role": "connector",
+      "category": "messaging",
+      "from_attr": "topic",
+      "to_attr": "push_config.push_endpoint",
+      "verb": "pushes to"
+    },
+    "google_pubsub_subscription_iam_binding": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "members",
+      "to_attr": "subscription",
+      "verb": "may consume"
+    },
+    "google_pubsub_subscription_iam_member": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "member",
+      "to_attr": "subscription",
+      "verb": "may consume"
+    },
+    "google_pubsub_schema": {
+      "role": "satellite",
+      "category": "messaging",
+      "label": "Pub/Sub schema"
+    },
+    "google_eventarc_trigger": {
+      "role": "primary",
+      "category": "messaging",
+      "label": "Eventarc trigger"
+    },
+    "google_cloud_scheduler_job": {
+      "role": "primary",
+      "category": "messaging",
+      "label": "Scheduler job"
+    },
+    "google_cloud_tasks_queue": {
+      "role": "primary",
+      "category": "messaging",
+      "label": "Cloud Tasks queue"
+    },
+    "google_cloud_tasks_queue_iam_binding": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "members",
+      "to_attr": "name",
+      "verb": "may enqueue to"
+    },
+    "google_cloud_tasks_queue_iam_member": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "member",
+      "to_attr": "name",
+      "verb": "may enqueue to"
+    },
+    "google_workflows_workflow": {
+      "role": "primary",
+      "category": "integration",
+      "label": "Workflow"
+    },
+    "google_logging_project_sink": {
+      "role": "satellite",
+      "category": "observability",
+      "label": "Log sink"
+    },
+    "google_logging_metric": {
+      "role": "satellite",
+      "category": "observability",
+      "label": "Log metric"
+    },
+    "google_monitoring_alert_policy": {
+      "role": "satellite",
+      "category": "observability",
+      "label": "Alert policy"
+    },
+    "google_monitoring_notification_channel": {
+      "role": "helper",
+      "category": "observability"
+    },
+    "google_monitoring_uptime_check_config": {
+      "role": "satellite",
+      "category": "observability",
+      "label": "Uptime check"
+    },
+    "google_alloydb_cluster": {
+      "role": "primary",
+      "category": "database",
+      "label": "AlloyDB cluster"
+    },
+    "google_alloydb_instance": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "cluster"
+    },
+    "google_bigtable_instance": {
+      "role": "primary",
+      "category": "database",
+      "label": "Bigtable instance"
+    },
+    "google_bigtable_table": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "instance_name"
+    },
+    "google_memcache_instance": {
+      "role": "primary",
+      "category": "database",
+      "label": "Memorystore Memcached"
+    },
+    "google_redis_cluster": {
+      "role": "primary",
+      "category": "database",
+      "label": "Memorystore Redis Cluster"
+    },
+    "google_filestore_instance": {
+      "role": "primary",
+      "category": "storage",
+      "label": "Filestore instance"
+    },
+    "google_composer_environment": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Composer environment"
+    },
+    "google_dataflow_job": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Dataflow job"
+    },
+    "google_dataproc_cluster": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Dataproc cluster"
+    },
+    "google_vertex_ai_endpoint": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Vertex AI endpoint"
+    },
+    "google_cloudbuild_trigger": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Cloud Build trigger"
+    },
+    "google_app_engine_application": {
+      "role": "primary",
+      "category": "compute",
+      "label": "App Engine app"
+    },
+    "google_app_engine_standard_app_version": {
+      "role": "satellite",
+      "category": "compute",
+      "label": "App Engine version"
+    },
+    "google_pubsub_lite_topic": {
+      "role": "primary",
+      "category": "messaging",
+      "label": "Pub/Sub Lite topic"
+    }
+  },
+  "data_sources": {
+    "google_project": {
+      "role": "helper",
+      "category": "other"
+    },
+    "google_client_config": {
+      "role": "helper",
+      "category": "other"
+    },
+    "google_client_openid_userinfo": {
+      "role": "helper",
+      "category": "other"
+    },
+    "google_compute_zones": {
+      "role": "helper",
+      "category": "other"
+    },
+    "google_compute_image": {
+      "role": "helper",
+      "category": "compute"
+    },
+    "google_iam_policy": {
+      "role": "helper",
+      "category": "identity"
+    },
+    "google_storage_project_service_account": {
+      "role": "helper",
+      "category": "identity"
+    },
+    "google_compute_default_service_account": {
+      "role": "helper",
+      "category": "identity"
+    },
+    "google_service_account": {
+      "role": "satellite",
+      "category": "identity",
+      "label": "Service account (existing)"
+    },
+    "google_secret_manager_secret_version": {
+      "role": "satellite",
+      "category": "security",
+      "label": "Secret (existing)"
+    },
+    "google_compute_network": {
+      "role": "primary",
+      "category": "network",
+      "label": "VPC network (existing)"
+    },
+    "google_compute_subnetwork": {
+      "role": "primary",
+      "category": "network",
+      "label": "Subnet (existing)"
+    },
+    "google_container_cluster": {
+      "role": "primary",
+      "category": "compute",
+      "label": "GKE cluster (existing)"
+    }
+  }
+}

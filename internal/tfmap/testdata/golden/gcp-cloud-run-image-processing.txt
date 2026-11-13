@@ -1,0 +1,7 @@
+component Cloud Run service google_cloud_run_v2_service.default
+component Cloud Storage bucket google_storage_bucket.imageproc_input
+component Cloud Storage bucket google_storage_bucket.imageproc_output
+component Pub/Sub topic google_pubsub_topic.default
+connection google_cloud_run_v2_service.default -> google_storage_bucket.imageproc_output [uses]
+connection google_pubsub_topic.default -> google_cloud_run_v2_service.default [pushes to]
+connection google_storage_bucket.imageproc_input -> google_pubsub_topic.default [notifies]

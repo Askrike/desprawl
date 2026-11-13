@@ -1,0 +1,33 @@
+# Linters run in CI (.github/workflows/ci.yml). Start with checks that find bugs rather
+# than enforce style; enable more (errcheck, gosec, gocritic) once the code is clean of them.
+version: "2"
+
+linters:
+  default: none
+  enable:
+    - asciicheck # non-ASCII identifiers
+    - bidichk # dangerous unicode sequences
+    - bodyclose # unclosed HTTP response bodies
+    - copyloopvar # needless loop variable copies
+    - durationcheck # two durations multiplied together
+    - govet
+    - ineffassign
+    - misspell
+    - nilerr # returning nil after checking err != nil
+    - nolintlint # malformed //nolint directives
+    - staticcheck
+    - unused
+  settings:
+    staticcheck:
+      # golangci-lint's default set, without the De Morgan's law quickfix.
+      checks: ["all", "-ST1000", "-ST1003", "-ST1016", "-ST1020", "-ST1021", "-ST1022", "-QF1001"]
+  exclusions:
+    rules:
+      # MCP roots are deprecated (SEP-2577) but still how clients name the workspace.
+      # Remove once desprawl takes the workspace another way.
+      - linters: [staticcheck]
+        text: "SA1019: .*roots feature is deprecated"
+
+formatters:
+  enable:
+    - gofmt

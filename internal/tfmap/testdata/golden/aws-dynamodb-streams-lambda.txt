@@ -1,0 +1,4 @@
+component DynamoDB table aws_dynamodb_table.dynamodb_table_users
+component Lambda function aws_lambda_function.lambda_dynamodb_stream_handler
+connection aws_dynamodb_table.dynamodb_table_users -> aws_lambda_function.lambda_dynamodb_stream_handler [triggers]
+connection aws_lambda_function.lambda_dynamodb_stream_handler -> aws_dynamodb_table.dynamodb_table_users [access]

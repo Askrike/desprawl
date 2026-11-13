@@ -1,0 +1,6 @@
+component Lambda function aws_lambda_function.MyHandlerFunction-Function
+component S3 bucket aws_s3_bucket.MySourceS3Bucket
+component SQS queue aws_sqs_queue.MyHandlerQueue
+connection aws_lambda_function.MyHandlerFunction-Function -> aws_s3_bucket.MySourceS3Bucket [access]
+connection aws_s3_bucket.MySourceS3Bucket -> aws_sqs_queue.MyHandlerQueue [notifies · access]
+connection aws_sqs_queue.MyHandlerQueue -> aws_lambda_function.MyHandlerFunction-Function [triggers]

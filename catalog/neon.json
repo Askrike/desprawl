@@ -1,0 +1,30 @@
+{
+  "provider": "neon",
+  "resources": {
+    "neon_project": {
+      "role": "primary",
+      "category": "database",
+      "label": "Neon project"
+    },
+    "neon_branch": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "project_id"
+    },
+    "neon_database": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "project_id"
+    },
+    "neon_endpoint": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "project_id"
+    },
+    "neon_role": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "project_id"
+    }
+  }
+}

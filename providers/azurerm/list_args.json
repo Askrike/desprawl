@@ -1,0 +1,497 @@
+[
+  {
+    "type": "azurerm_application_insights_workbook_template",
+    "parent": "azurerm_resource_group",
+    "args": {
+      "resource_group_name": "name"
+    },
+    "origin": "llm",
+    "note": "Workbook templates live inside a resource group, so list them in every resource group by its name."
+  },
+  {
+    "type": "azurerm_batch_application",
+    "parent": "azurerm_batch_account",
+    "args": {
+      "batch_account_id": "id"
+    },
+    "origin": "llm",
+    "note": "Batch applications belong to a Batch account, identified by its ID."
+  },
+  {
+    "type": "azurerm_capacity_reservation",
+    "parent": "azurerm_capacity_reservation_group",
+    "args": {
+      "capacity_reservation_group_id": "id"
+    },
+    "origin": "llm",
+    "note": "Capacity reservations belong to a capacity reservation group, identified by its ID."
+  },
+  {
+    "type": "azurerm_cdn_frontdoor_batch_rule_set",
+    "parent": "azurerm_cdn_frontdoor_profile",
+    "args": {
+      "cdn_frontdoor_profile_id": "id"
+    },
+    "origin": "llm",
+    "note": "Batch rule sets belong to a Front Door profile, identified by its ID."
+  },
+  {
+    "type": "azurerm_cdn_frontdoor_origin",
+    "parent": "azurerm_cdn_frontdoor_origin_group",
+    "args": {
+      "cdn_frontdoor_origin_group_id": "id"
+    },
+    "origin": "llm",
+    "note": "Origins belong to a Front Door origin group, identified by its ID."
+  },
+  {
+    "type": "azurerm_cdn_frontdoor_origin_group",
+    "parent": "azurerm_cdn_frontdoor_profile",
+    "args": {
+      "cdn_frontdoor_profile_id": "id"
+    },
+    "origin": "llm",
+    "note": "Origin groups belong to a Front Door profile, identified by its ID."
+  },
+  {
+    "type": "azurerm_cognitive_account_connection_account_key",
+    "parent": "azurerm_cognitive_account",
+    "args": {
+      "cognitive_account_id": "id"
+    },
+    "origin": "llm",
+    "note": "Connections belong to a Cognitive Services account, identified by its ID."
+  },
+  {
+    "type": "azurerm_cognitive_account_connection_account_managed_identity",
+    "parent": "azurerm_cognitive_account",
+    "args": {
+      "cognitive_account_id": "id"
+    },
+    "origin": "llm",
+    "note": "Connections belong to a Cognitive Services account, identified by its ID."
+  },
+  {
+    "type": "azurerm_cognitive_account_connection_api_key",
+    "parent": "azurerm_cognitive_account",
+    "args": {
+      "cognitive_account_id": "id"
+    },
+    "origin": "llm",
+    "note": "Connections belong to a Cognitive Services account, identified by its ID."
+  },
+  {
+    "type": "azurerm_cognitive_account_connection_custom_keys",
+    "parent": "azurerm_cognitive_account",
+    "args": {
+      "cognitive_account_id": "id"
+    },
+    "origin": "llm",
+    "note": "Connections belong to a Cognitive Services account, identified by its ID."
+  },
+  {
+    "type": "azurerm_cognitive_account_connection_entra_id",
+    "parent": "azurerm_cognitive_account",
+    "args": {
+      "cognitive_account_id": "id"
+    },
+    "origin": "llm",
+    "note": "Entra ID connections belong to a cognitive account, so they are listed per account using the account's id."
+  },
+  {
+    "type": "azurerm_cognitive_deployment",
+    "parent": "azurerm_cognitive_account",
+    "args": {
+      "cognitive_account_id": "id"
+    },
+    "origin": "llm",
+    "note": "Deployments belong to a cognitive account, so they are listed per account using the account's id."
+  },
+  {
+    "type": "azurerm_data_protection_backup_policy_cosmosdb_account",
+    "parent": "azurerm_data_protection_backup_vault",
+    "args": {
+      "data_protection_backup_vault_id": "id"
+    },
+    "origin": "llm",
+    "note": "Backup policies belong to a data protection backup vault, identified by the vault's id."
+  },
+  {
+    "type": "azurerm_dns_a_record",
+    "parent": "azurerm_dns_zone",
+    "args": {
+      "dns_zone_id": "id"
+    },
+    "origin": "llm",
+    "note": "A records belong to a public DNS zone, identified by the zone's id."
+  },
+  {
+    "type": "azurerm_dns_cname_record",
+    "parent": "azurerm_dns_zone",
+    "args": {
+      "dns_zone_id": "id"
+    },
+    "origin": "llm",
+    "note": "CNAME records belong to a public DNS zone, identified by the zone's id."
+  },
+  {
+    "type": "azurerm_dns_txt_record",
+    "parent": "azurerm_dns_zone",
+    "args": {
+      "dns_zone_id": "id"
+    },
+    "origin": "llm",
+    "note": "TXT records belong to a public DNS zone, identified by the zone's id."
+  },
+  {
+    "type": "azurerm_eventhub",
+    "parent": "azurerm_eventhub_namespace",
+    "args": {
+      "eventhub_namespace_id": "id"
+    },
+    "origin": "llm",
+    "note": "Event hubs belong to an Event Hubs namespace, identified by the namespace's id."
+  },
+  {
+    "type": "azurerm_eventhub_consumer_group",
+    "parent": "azurerm_eventhub",
+    "args": {
+      "eventhub_id": "id"
+    },
+    "origin": "llm",
+    "note": "Consumer groups belong to an event hub, identified by the event hub's id."
+  },
+  {
+    "type": "azurerm_federated_identity_credential",
+    "parent": "azurerm_user_assigned_identity",
+    "args": {
+      "user_assigned_identity_id": "id"
+    },
+    "origin": "llm",
+    "note": "Federated identity credentials belong to a user-assigned identity, identified by the identity's id."
+  },
+  {
+    "type": "azurerm_firewall_policy_rule_collection_group",
+    "parent": "azurerm_firewall_policy",
+    "args": {
+      "firewall_policy_id": "id"
+    },
+    "origin": "llm",
+    "note": "Rule collection groups belong to an Azure Firewall policy, identified by the policy's id."
+  },
+  {
+    "type": "azurerm_kubernetes_cluster_node_pool",
+    "parent": "azurerm_kubernetes_cluster",
+    "args": {
+      "kubernetes_cluster_id": "id"
+    },
+    "origin": "llm",
+    "note": "Node pools belong to an AKS cluster, identified by the cluster's id."
+  },
+  {
+    "type": "azurerm_lb_backend_address_pool",
+    "parent": "azurerm_lb",
+    "args": {
+      "load_balancer_id": "id"
+    },
+    "origin": "llm",
+    "note": "Backend address pools belong to a load balancer, identified by the load balancer's id."
+  },
+  {
+    "type": "azurerm_lb_probe",
+    "parent": "azurerm_lb",
+    "args": {
+      "loadbalancer_id": "id"
+    },
+    "origin": "llm",
+    "note": "Probes belong to a load balancer, so listing across every azurerm_lb ID covers them all."
+  },
+  {
+    "type": "azurerm_mssql_elasticpool",
+    "parent": "azurerm_mssql_server",
+    "args": {
+      "mssql_server_id": "id"
+    },
+    "origin": "llm",
+    "note": "Elastic pools belong to an MSSQL server, identified by the server's ID."
+  },
+  {
+    "type": "azurerm_mssql_job_agent",
+    "parent": "azurerm_mssql_server",
+    "args": {
+      "mssql_server_id": "id"
+    },
+    "origin": "llm",
+    "note": "Job agents belong to an MSSQL server, identified by the server's ID."
+  },
+  {
+    "type": "azurerm_mysql_flexible_database",
+    "parent": "azurerm_mysql_flexible_server",
+    "args": {
+      "flexible_server_id": "id"
+    },
+    "origin": "llm",
+    "note": "Databases belong to a MySQL flexible server, identified by its ID."
+  },
+  {
+    "type": "azurerm_mysql_flexible_server_configuration",
+    "parent": "azurerm_mysql_flexible_server",
+    "args": {
+      "flexible_server_id": "id"
+    },
+    "origin": "llm",
+    "note": "Configurations belong to a MySQL flexible server, identified by its ID."
+  },
+  {
+    "type": "azurerm_mysql_flexible_server_firewall_rule",
+    "parent": "azurerm_mysql_flexible_server",
+    "args": {
+      "flexible_server_id": "id"
+    },
+    "origin": "llm",
+    "note": "Firewall rules belong to a MySQL flexible server, identified by its ID."
+  },
+  {
+    "type": "azurerm_netapp_volume_bucket",
+    "parent": "azurerm_netapp_volume",
+    "args": {
+      "volume_id": "id"
+    },
+    "origin": "llm",
+    "note": "Buckets belong to a NetApp volume, identified by the volume's ID."
+  },
+  {
+    "type": "azurerm_network_security_rule",
+    "parent": "azurerm_network_security_group",
+    "args": {
+      "network_security_group_id": "id"
+    },
+    "origin": "llm",
+    "note": "Security rules belong to a network security group, identified by its ID."
+  },
+  {
+    "type": "azurerm_network_watcher_flow_log",
+    "parent": "azurerm_network_watcher",
+    "args": {
+      "network_watcher_id": "id"
+    },
+    "origin": "llm",
+    "note": "Flow logs belong to a network watcher, identified by its ID."
+  },
+  {
+    "type": "azurerm_postgresql_flexible_server_configuration",
+    "parent": "azurerm_postgresql_flexible_server",
+    "args": {
+      "postgresql_flexible_server_id": "id"
+    },
+    "origin": "llm",
+    "note": "Configurations belong to a PostgreSQL flexible server, identified by its ID."
+  },
+  {
+    "type": "azurerm_postgresql_flexible_server_firewall_rule",
+    "parent": "azurerm_postgresql_flexible_server",
+    "args": {
+      "postgresql_flexible_server_id": "id"
+    },
+    "origin": "llm",
+    "note": "Firewall rules belong to a PostgreSQL flexible server, identified by its ID."
+  },
+  {
+    "type": "azurerm_private_dns_a_record",
+    "parent": "azurerm_private_dns_zone",
+    "args": {
+      "private_dns_zone_id": "id"
+    },
+    "origin": "llm",
+    "note": "A records belong to a private DNS zone, identified by the zone's ID."
+  },
+  {
+    "type": "azurerm_private_dns_cname_record",
+    "parent": "azurerm_private_dns_zone",
+    "args": {
+      "private_dns_zone_id": "id"
+    },
+    "origin": "llm",
+    "note": "CNAME records live within a private DNS zone, identified by the zone's id."
+  },
+  {
+    "type": "azurerm_private_dns_resolver_forwarding_rule",
+    "parent": "azurerm_private_dns_resolver_dns_forwarding_ruleset",
+    "args": {
+      "private_dns_resolver_dns_forwarding_ruleset_id": "id"
+    },
+    "origin": "llm",
+    "note": "Forwarding rules live within a DNS forwarding ruleset, identified by the ruleset's id."
+  },
+  {
+    "type": "azurerm_private_dns_zone_virtual_network_link",
+    "parent": "azurerm_private_dns_zone",
+    "args": {
+      "private_dns_zone_id": "id"
+    },
+    "origin": "llm",
+    "note": "Virtual network links live within a private DNS zone, identified by the zone's id."
+  },
+  {
+    "type": "azurerm_redis_firewall_rule",
+    "parent": "azurerm_redis_cache",
+    "args": {
+      "redis_cache_id": "id"
+    },
+    "origin": "llm",
+    "note": "Firewall rules live within a Redis cache, identified by the cache's id."
+  },
+  {
+    "type": "azurerm_route",
+    "parent": "azurerm_route_table",
+    "args": {
+      "route_table_id": "id"
+    },
+    "origin": "llm",
+    "note": "Routes live within a route table, identified by the route table's id."
+  },
+  {
+    "type": "azurerm_servicebus_queue",
+    "parent": "azurerm_servicebus_namespace",
+    "args": {
+      "servicebus_namespace_id": "id"
+    },
+    "origin": "llm",
+    "note": "Queues live within a Service Bus namespace, identified by the namespace's id."
+  },
+  {
+    "type": "azurerm_signalr_service_custom_certificate",
+    "parent": "azurerm_signalr_service",
+    "args": {
+      "signalr_service_id": "id"
+    },
+    "origin": "llm",
+    "note": "Custom certificates live within a SignalR service, identified by the service's id."
+  },
+  {
+    "type": "azurerm_signalr_service_custom_domain",
+    "parent": "azurerm_signalr_service",
+    "args": {
+      "signalr_service_id": "id"
+    },
+    "origin": "llm",
+    "note": "Custom domains live within a SignalR service, identified by the service's id."
+  },
+  {
+    "type": "azurerm_storage_container",
+    "parent": "azurerm_storage_account",
+    "args": {
+      "storage_account_id": "id"
+    },
+    "origin": "llm",
+    "note": "Containers live within a storage account, identified by the account's id."
+  },
+  {
+    "type": "azurerm_storage_mover_agent",
+    "parent": "azurerm_storage_mover",
+    "args": {
+      "storage_mover_id": "id"
+    },
+    "origin": "llm",
+    "note": "Agents live within a storage mover, identified by the mover's id."
+  },
+  {
+    "type": "azurerm_storage_mover_job_definition",
+    "parent": "azurerm_storage_mover_project",
+    "args": {
+      "storage_mover_project_id": "id"
+    },
+    "origin": "llm",
+    "note": "Job definitions live within a storage mover project, identified by the project's id."
+  },
+  {
+    "type": "azurerm_storage_mover_project",
+    "parent": "azurerm_storage_mover",
+    "args": {
+      "storage_mover_id": "id"
+    },
+    "origin": "llm",
+    "note": "Projects live within a storage mover, identified by the mover's id."
+  },
+  {
+    "type": "azurerm_storage_mover_source_endpoint",
+    "parent": "azurerm_storage_mover",
+    "args": {
+      "storage_mover_id": "id"
+    },
+    "origin": "llm",
+    "note": "Source endpoints belong to a storage mover, so listing within each storage mover by its id covers every endpoint."
+  },
+  {
+    "type": "azurerm_storage_mover_target_endpoint",
+    "parent": "azurerm_storage_mover",
+    "args": {
+      "storage_mover_id": "id"
+    },
+    "origin": "llm",
+    "note": "Target endpoints belong to a storage mover, so listing within each storage mover by its id covers every endpoint."
+  },
+  {
+    "type": "azurerm_storage_sync_server_endpoint",
+    "parent": "azurerm_storage_sync_group",
+    "args": {
+      "storage_sync_group_id": "id"
+    },
+    "origin": "llm",
+    "note": "Server endpoints belong to a storage sync group, so listing within each sync group by its id covers every endpoint."
+  },
+  {
+    "type": "azurerm_subnet",
+    "parent": "azurerm_virtual_network",
+    "args": {
+      "virtual_network_id": "id"
+    },
+    "origin": "llm",
+    "note": "Subnets belong to an Azure virtual network, so listing within each virtual network by its id covers every subnet."
+  },
+  {
+    "type": "azurerm_virtual_hub_connection",
+    "parent": "azurerm_virtual_hub",
+    "args": {
+      "virtual_hub_id": "id"
+    },
+    "origin": "llm",
+    "note": "Hub connections belong to a virtual hub, so listing within each virtual hub by its id covers every connection."
+  },
+  {
+    "type": "azurerm_virtual_network",
+    "parent": "azurerm_resource_group",
+    "args": {
+      "resource_group_name": "name"
+    },
+    "origin": "llm",
+    "note": "Virtual networks live in resource groups, so listing within each resource group by its name covers every network."
+  },
+  {
+    "type": "azurerm_virtual_network_peering",
+    "parent": "azurerm_virtual_network",
+    "args": {
+      "virtual_network_id": "id"
+    },
+    "origin": "llm",
+    "note": "Peerings belong to a virtual network, so listing within each virtual network by its id covers every peering."
+  },
+  {
+    "type": "azurerm_web_pubsub_custom_certificate",
+    "parent": "azurerm_web_pubsub",
+    "args": {
+      "web_pubsub_id": "id"
+    },
+    "origin": "llm",
+    "note": "Custom certificates belong to a Web PubSub service, so listing within each service by its id covers every certificate."
+  },
+  {
+    "type": "azurerm_web_pubsub_custom_domain",
+    "parent": "azurerm_web_pubsub",
+    "args": {
+      "web_pubsub_id": "id"
+    },
+    "origin": "llm",
+    "note": "Custom domains belong to a Web PubSub service, so listing within each service by its id covers every domain."
+  }
+]

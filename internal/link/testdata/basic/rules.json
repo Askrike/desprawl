@@ -1,0 +1,34 @@
+[
+ {
+  "source": "aws_iam_role_policy_attachment",
+  "path": "role",
+  "target": "aws_iam_role",
+  "attr": "name",
+  "match": "exact",
+  "origin": "manual"
+ },
+ {
+  "source": "aws_iam_role_policy",
+  "path": "role",
+  "target": "aws_iam_role",
+  "attr": "name",
+  "match": "exact",
+  "origin": "manual"
+ },
+ {
+  "source": "aws_s3_bucket_policy",
+  "path": "bucket",
+  "target": "aws_s3_bucket",
+  "attr": "bucket",
+  "match": "exact",
+  "origin": "manual"
+ },
+ {
+  "source": "aws_ecs_task_definition",
+  "path": "container_definitions.logConfiguration.options.awslogs-group",
+  "target": "aws_cloudwatch_log_group",
+  "attr": "name",
+  "match": "exact",
+  "origin": "manual"
+ }
+]

@@ -1,0 +1,60 @@
+{
+  "provider": "snowflake",
+  "resources": {
+    "snowflake_database": {
+      "role": "primary",
+      "category": "database",
+      "label": "Snowflake database"
+    },
+    "snowflake_schema": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "database"
+    },
+    "snowflake_table": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "database"
+    },
+    "snowflake_dynamic_table": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "database"
+    },
+    "snowflake_external_table": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "database"
+    },
+    "snowflake_stage": {
+      "role": "child",
+      "category": "storage",
+      "parent_attr": "database"
+    },
+    "snowflake_pipe": {
+      "role": "child",
+      "category": "integration",
+      "parent_attr": "database"
+    },
+    "snowflake_warehouse": {
+      "role": "satellite",
+      "category": "compute",
+      "label": "Warehouse"
+    },
+    "snowflake_account_role": {
+      "role": "satellite",
+      "category": "identity",
+      "label": "Role"
+    },
+    "snowflake_user": {
+      "role": "satellite",
+      "category": "identity",
+      "label": "User"
+    },
+    "snowflake_service_user": {
+      "role": "satellite",
+      "category": "identity",
+      "label": "Service user"
+    }
+  }
+}

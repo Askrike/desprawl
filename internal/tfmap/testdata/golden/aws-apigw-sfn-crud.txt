@@ -1,0 +1,5 @@
+component DynamoDB table aws_dynamodb_table.API_SF_CRUD-DB
+component REST API aws_api_gateway_rest_api.API_SF_CRUD-tf_API
+component State machine aws_sfn_state_machine.API_SF_CRUD-tf_CF
+connection aws_api_gateway_rest_api.API_SF_CRUD-tf_API -> aws_sfn_state_machine.API_SF_CRUD-tf_CF [access]
+connection aws_sfn_state_machine.API_SF_CRUD-tf_CF -> aws_dynamodb_table.API_SF_CRUD-DB [access]

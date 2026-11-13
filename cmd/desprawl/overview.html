@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>desprawl · overview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600&family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* The map page's palette (index.html), and a colour per stage state. */
+  :root {
+    --canvas: #f8f8f8; --surface: #ffffff; --raised: #f4f4f5; --hover: #fafafa;
+    --ink: #090909; --muted: #71717a; --faint: #a1a1aa; --rule: #ececee; --border: #e4e4e7;
+    --accent: #2563eb; --code: #f4f4f5;
+    --ok: #16a34a; --warn: #d97706; --warn-ink: #b45309; --danger: #dc2626;
+    --sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --canvas: #141414; --surface: #1a1a1a; --raised: #232323; --hover: #1f1f1f;
+      --ink: #ede7db; --muted: #a3a19b; --faint: #62605b; --rule: #242424; --border: #2b2b2b;
+      --accent: #a8c6fe; --code: #232323;
+      --ok: #4ade80; --warn: #f5b83d; --warn-ink: #f5b83d; --danger: #f87171;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 13px/1.55 var(--sans); background: var(--canvas); color: var(--ink); -webkit-font-smoothing: antialiased; }
+  button { font: inherit; color: inherit; }
+  code { font: 12px var(--mono); padding: 1px 6px; border-radius: 5px; background: var(--code); white-space: nowrap; }
+  main { max-width: 1040px; margin: 0 auto; padding: 36px 32px 80px; }
+  .empty { color: var(--muted); padding: 60px 0; text-align: center; }
+  .muted { color: var(--muted); margin: 0; }
+
+  /* the workspace */
+  .head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .head h1 { font: 600 22px/1.2 var(--sans); margin: 0; letter-spacing: -.015em; }
+  .head .path { flex-basis: 100%; color: var(--faint); font: 12px var(--mono); overflow-wrap: anywhere; }
+  section { margin-top: 32px; }
+  section > h2 { display: flex; align-items: baseline; gap: 8px; font: 600 14px/1.3 var(--sans); margin: 0 0 12px; }
+  section > h2 small { font: 400 12.5px var(--sans); color: var(--muted); }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+
+  /* the import: the stages on one track */
+  .steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .step { position: relative; text-align: left; background: none; border: 0; padding: 18px 18px 16px; cursor: pointer;
+          display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .step:hover { background: var(--hover); }
+  .step.sel { background: var(--raised); }
+  .step.sel::after { content: ""; position: absolute; left: 18px; right: 18px; bottom: 0; height: 2px; border-radius: 2px; background: var(--ink); }
+  .track { display: flex; align-items: center; margin-bottom: 10px; }
+  .track .line { flex: 1; height: 2px; margin: 0 -18px 0 10px; background: var(--border); }
+  .step:last-child .line { visibility: hidden; }
+  .step.done:not(.stale) .line { background: color-mix(in srgb, var(--ok) 45%, var(--rule)); }
+  .icon { width: 22px; height: 22px; border-radius: 50%; flex: none; display: grid; place-items: center; position: relative; z-index: 1;
+          border: 1.5px solid var(--border); background: var(--surface); color: var(--faint); }
+  .icon svg { width: 12px; height: 12px; }
+  .done .icon { background: var(--ok); border-color: var(--ok); color: var(--surface); }
+  .stale .icon { background: var(--surface); border-color: var(--warn); color: var(--warn); }
+  .failed .icon { background: var(--danger); border-color: var(--danger); color: var(--surface); }
+  .running .icon { border-color: var(--accent); border-top-color: transparent; animation: spin .9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .step .name { font-weight: 600; font-size: 13.5px; }
+  .step .state { font-size: 12px; color: var(--muted); }
+  .stale .state { color: var(--warn-ink); } .failed .state { color: var(--danger); }
+  .step .when { font-size: 11.5px; color: var(--faint); }
+  .step .res { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .step .count { margin-top: 8px; font-size: 12px; font-weight: 500; color: var(--warn-ink); display: inline-flex; align-items: center; gap: 6px; }
+  .step .count::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--warn); }
+  .bar { height: 3px; border-radius: 2px; background: var(--rule); overflow: hidden; margin-top: 8px; }
+  .bar u { display: block; height: 100%; background: var(--accent); }
+
+  /* what to do next */
+  .next { display: flex; align-items: baseline; gap: 12px; padding: 12px 18px; border-top: 1px solid var(--rule); }
+  .next > b { font-size: 11.5px; font-weight: 600; color: var(--muted); flex: none; }
+  .next.todo > b { color: var(--warn-ink); }
+  .next.clear > b { color: var(--ok); }
+  .next span { min-width: 0; }
+
+  /* the chosen stage */
+  .detail { padding: 18px 18px 8px; border-top: 1px solid var(--rule); }
+  .detail h3 { font: 600 13px var(--sans); margin: 0 0 10px; display: flex; gap: 8px; align-items: baseline; }
+  .detail h3 small { font-weight: 400; color: var(--muted); font-size: 12px; }
+  .detail .none { color: var(--muted); margin: 0 0 10px; }
+  .detail .changed { color: var(--warn-ink); margin: 0 0 10px; }
+  .detail .err { color: var(--danger); white-space: pre-wrap; font: 12px/1.5 var(--mono); margin: 0 0 12px; padding: 10px 12px;
+                 border-radius: 8px; background: color-mix(in srgb, var(--danger) 8%, transparent); }
+  details { border-top: 1px solid var(--rule); }
+  details:last-child { margin-bottom: 8px; }
+  details > summary { cursor: pointer; padding: 10px 0; list-style: none; display: flex; gap: 10px; align-items: baseline; }
+  details > summary::-webkit-details-marker { display: none; }
+  details > summary::before { content: "›"; color: var(--faint); transition: transform .1s; display: inline-block; width: 8px; }
+  details[open] > summary::before { transform: rotate(90deg); }
+  details > summary b { font-weight: 500; flex: 1; }
+  details > summary span { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .grp { padding: 0 0 12px 18px; }
+  .howto { white-space: pre-wrap; color: var(--muted); margin: 0 0 10px; }
+  .prob { padding: 8px 0; border-top: 1px solid var(--rule); }
+  .prob > code { background: none; padding: 0; white-space: normal; overflow-wrap: anywhere; font-weight: 500; }
+  .prob div { color: var(--muted); padding-left: 12px; overflow-wrap: anywhere; }
+  .prob pre { margin: 6px 0 0 12px; padding: 8px 10px; background: var(--code); border-radius: 8px;
+              font: 12px/1.5 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .more { color: var(--muted); padding-top: 8px; border-top: 1px solid var(--rule); }
+
+  /* the maps it draws */
+  .maps { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+  .map { display: flex; align-items: center; gap: 12px; text-align: left; cursor: pointer; padding: 11px 14px;
+         background: var(--surface); border: 1px solid var(--border); border-radius: 10px; min-width: 0; }
+  .map:hover { border-color: var(--faint); }
+  .map svg { color: var(--accent); flex: none; }
+  .map span { min-width: 0; display: flex; flex-direction: column; }
+  .map b { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .map small { color: var(--muted); font-size: 12px; }
+  .map .go { margin-left: auto; color: var(--faint); }
+  .map:hover .go { color: var(--ink); }
+  .all { margin-top: 10px; font-size: 12.5px; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; }
+  .all:hover { text-decoration: underline; }
+  .warn { margin: 10px 0 0; color: var(--warn-ink); display: flex; gap: 8px; align-items: baseline; }
+  .warn::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--warn); flex: none; transform: translateY(-1px); }
+  @media (max-width: 860px) { .steps { grid-template-columns: 1fr; } .track .line { display: none; } }
+</style>
+</head>
+<body>
+<main id="main"><p class="empty">Loading…</p></main>
+<script>
+// The workspace's overview, shown by the page (split.html) in place of the
+// maps: the maps it draws (GET /api/dirs), and where importing its cloud
+// accounts stands (GET /api/status, internal/rea/status.go): a card per
+// stage with its state, whether an input changed since it ran, and what it
+// produced; below, the chosen stage's problems as the commands print them,
+// with their suggested fixes.
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const MAX_PROBLEMS = 50;
+let st = null, dirs = { dirs: [], problems: [] };
+let chosen = ''; // the stage whose problems are shown
+// Past this many maps the rest are behind "Show all", so the page stays short.
+const MAPS_SHOWN = 12;
+let allMaps = false;
+
+const MAP_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><path d="M10 6.5h4a3 3 0 0 1 3 3V14"/></svg>';
+
+function ago(t) {
+  const s = (Date.now() - new Date(t)) / 1000;
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.round(s / 60) + ' min ago';
+  if (s < 86400) return Math.round(s / 3600) + ' h ago';
+  return Math.round(s / 86400) + ' d ago';
+}
+function took(a, b) {
+  const s = Math.max(0, Math.round((new Date(b) - new Date(a)) / 1000));
+  if (s < 60) return s + ' s';
+  if (s < 3600) return Math.round(s / 60) + ' min';
+  return Math.floor(s / 3600) + ' h ' + Math.round(s % 3600 / 60) + ' min';
+}
+// Backquoted commands in the server's sentences, as code.
+const prose = t => esc(t).replace(/`([^`]+)`/g, '<code>$1</code>');
+// A brief group (types the provider can't list) is one thing to look at,
+// not one per type.
+const count = s => (s.problems || []).reduce((n, g) => n + (g.brief ? 1 : g.problems.length), 0);
+const stale = s => s.state === 'done' && s.changed && s.changed.length;
+const cls = s => s.state === 'not run' ? 'notrun' : stale(s) ? 'done stale' : s.state;
+const ICON = {
+  done: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  stale: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>',
+  failed: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"/></svg>',
+};
+
+// ---- the maps
+function maps() {
+  const list = dirs.dirs || [];
+  const label = d => d === '.' ? st.name : d;
+  const what = d => d === st.imported ? 'imported from ' + (st.provider || 'the account') : 'Terraform';
+  const shown = allMaps ? list : list.slice(0, MAPS_SHOWN);
+  const cards = shown.map(d => `<button class="map" data-dir="${esc(d)}" title="Open ${esc(label(d))}'s map">${MAP_ICON}` +
+    `<span><b>${esc(label(d))}</b><small>${esc(what(d))}</small></span><span class="go">→</span></button>`).join('');
+  const none = st.provider
+    ? `Nothing to draw yet: the imported Terraform shows up here once generate has written it, if desprawl.hcl's draw lists ${st.imported || '.desprawl/imported'}.`
+    : 'Nothing to draw yet: add a directory of Terraform to draw = [...] in desprawl.hcl.';
+  return `<section><h2>Maps <small>${list.length || ''}</small></h2>` +
+    (list.length ? `<div class="maps">${cards}</div>` : `<p class="muted">${esc(none)}</p>`) +
+    (list.length > MAPS_SHOWN ? `<button class="all">${allMaps ? 'Show fewer' : `Show all ${list.length} maps`}</button>` : '') +
+    (dirs.problems || []).map(p => `<p class="warn"><span><code>desprawl.hcl</code> ${esc(p)}</span></p>`).join('') + `</section>`;
+}
+
+// ---- the import
+function step(s, i) {
+  const n = count(s);
+  const state = s.state === 'done' ? (stale(s) ? 'out of date' : 'done') : s.state;
+  const when = s.finished ? `${ago(s.finished)} · took ${took(s.started, s.finished)}` : s.state === 'done' ? 'before runs were recorded' : '';
+  const icon = s.state === 'failed' ? ICON.failed : stale(s) ? ICON.stale : s.state === 'done' ? ICON.done : s.state === 'running' ? '' : i + 1;
+  return `<button class="step ${cls(s)}${chosen === s.name ? ' sel' : ''}" data-stage="${s.name}">` +
+    `<span class="track"><span class="icon">${icon}</span><span class="line"></span></span>` +
+    `<span class="name">${s.name}</span>` +
+    `<span class="state">${esc(state)}</span>` +
+    (when ? `<span class="when">${esc(when)}</span>` : '') +
+    (s.state === 'running' ? `<span class="res">${esc(s.progress || '')}</span>` + (s.percent ? `<span class="bar"><u style="width:${s.percent}%"></u></span>` : '') : '') +
+    (s.result ? `<span class="res">${esc(s.result)}</span>` : '') +
+    (n ? `<span class="count">${n} to look at</span>` : '') +
+    `</button>`;
+}
+function groups(gs) {
+  return gs.map(g => {
+    const list = g.brief ? '' : g.problems.slice(0, MAX_PROBLEMS).map(p =>
+      `<div class="prob"><code>${esc(p.subject)}</code>${(p.detail || []).map(d => `<div>${esc(d)}</div>`).join('')}` +
+      (p.fix !== undefined ? `<pre>${esc((p.key ? JSON.stringify(p.key) + ': ' : '') + JSON.stringify(p.fix))}</pre>` : '') + `</div>`).join('');
+    const brief = g.brief ? `<p class="howto">${esc(g.problems.length > 30 ? 'The full list is in ' + (g.listed || 'the workspace') + '.' : g.problems.map(p => p.subject).join(', '))}</p>` : '';
+    const more = !g.brief && g.problems.length > MAX_PROBLEMS ? `<p class="more">…and ${g.problems.length - MAX_PROBLEMS} more: run the stage's command to see them all.</p>` : '';
+    return `<details data-kind="${esc(g.kind)}"><summary><b>${esc(g.summary)}</b><span>${g.problems.length}</span></summary>` +
+      `<div class="grp"><p class="howto">${esc(g.howto)}</p>${brief}${list}${more}</div></details>`;
+  }).join('');
+}
+function detail() {
+  const s = st.stages.find(s => s.name === chosen);
+  if (!s) return '';
+  const n = count(s);
+  let body = '';
+  if (stale(s)) body += `<p class="changed">Changed since it ran: ${s.changed.map(c => `<code>${esc(c)}</code>`).join(' ')}</p>`;
+  if (s.error) body += `<p class="err">${esc(s.error)}</p>`;
+  if (s.problems && s.problems.length) body += groups(s.problems);
+  else if (s.state === 'not run') body += `<p class="none">It hasn't run yet.</p>`;
+  else if (s.state === 'running') body += `<p class="none">${esc(s.progress || 'Running…')}</p>`;
+  else if (!s.error) body += `<p class="none">Nothing to fix.</p>`;
+  return `<div class="detail"><h3>${s.name}<small>${n ? n + ' to look at' : ''}</small></h3>${body}</div>`;
+}
+// The stage to show first: the one the next step is about, else the first
+// with problems.
+function pick() {
+  if (chosen && st.stages.some(s => s.name === chosen)) return;
+  const named = st.stages.find(s => st.next.includes('desprawl ' + s.name + ' ') || st.next.includes('desprawl ' + s.name + '`') || st.next.startsWith(s.name + ' '));
+  const withProblems = st.stages.find(s => count(s) > 0);
+  chosen = (named || withProblems || st.stages[st.stages.length - 1]).name;
+}
+function importing() {
+  if (!st.provider) {
+    return `<section><h2>Import</h2><p class="muted">This workspace only draws. To import a cloud account as linked Terraform, ` +
+      `add a provider block to desprawl.hcl and run <code>desprawl init</code>.</p></section>`;
+  }
+  if (!st.stages || !st.stages.length) return '';
+  pick();
+  const clear = st.next.startsWith('nothing left'), running = st.stages.some(s => s.state === 'running');
+  return `<section><h2>Import <small>${esc(st.provider)}</small></h2><div class="panel">` +
+    `<div class="steps">${st.stages.map(step).join('')}</div>` +
+    `<div class="next ${clear ? 'clear' : running ? '' : 'todo'}"><b>${clear ? 'Done' : 'Next'}</b><span>${prose(st.next)}</span></div>` +
+    detail() +
+    (st.pack && st.pack.length ? `<div class="detail"><h3>Provider pack</h3>${groups(st.pack)}</div>` : '') +
+    `</div></section>`;
+}
+
+function render() {
+  if (!st) return;
+  // Keep open what was open.
+  const open = new Set([...document.querySelectorAll('details[open]')].map(d => d.closest('.detail').querySelector('h3').textContent + ' ' + d.dataset.kind));
+  $('main').innerHTML = `<div class="head"><h1>${esc(st.name)}</h1><div class="path">${esc(st.path)}</div></div>` +
+    // The import first when there is one: it's what changes, and the maps
+    // can be many.
+    (st.provider ? importing() + maps() : maps() + importing());
+  for (const d of document.querySelectorAll('details')) if (open.has(d.closest('.detail').querySelector('h3').textContent + ' ' + d.dataset.kind)) d.open = true;
+  for (const c of document.querySelectorAll('.step')) c.onclick = () => { chosen = c.dataset.stage; render(); };
+  for (const m of document.querySelectorAll('.map')) m.onclick = () => openMap(m.dataset.dir);
+  for (const b of document.querySelectorAll('.all')) b.onclick = () => { allMaps = !allMaps; render(); };
+}
+// A map opens in the page's windows.
+const openMap = dir => parent.postMessage({ desprawl: true, open: dir }, location.origin);
+
+async function refresh() {
+  try {
+    const [r, d] = await Promise.all([fetch('/api/status'), fetch('/api/dirs')]);
+    if (!r.ok) throw new Error(await r.text());
+    st = await r.json();
+    if (d.ok) dirs = await d.json();
+  } catch (err) {
+    $('main').innerHTML = `<p class="empty">Couldn't load the workspace: ${esc(err.message)}</p>`;
+    return;
+  }
+  render();
+}
+// Events come from the page, which holds the one event stream.
+const onEvent = e => { if (e === 'status' || e === 'progress' || e === 'change') refresh(); };
+window.addEventListener('message', ev => {
+  if (ev.origin === location.origin && ev.source === parent && ev.data?.desprawl && ev.data.event) onEvent(ev.data.event);
+});
+refresh();
+setInterval(() => { if (st) render(); }, 60000); // "3 min ago"
+</script>
+</body>
+</html>

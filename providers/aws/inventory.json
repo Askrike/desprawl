@@ -1,0 +1,728 @@
+{
+  "sources": [
+    {
+      "data_source": "aws_resourceexplorer2_search",
+      "config": {
+        "query_string": "\"*\""
+      },
+      "list": "resources",
+      "id": "arn",
+      "kind": "resource_type",
+      "complete": "resource_count[*].complete",
+      "partition": {
+        "arg": "query_string",
+        "only": "\"resourcetype:{kind}\"",
+        "except": "\"{kinds}\"",
+        "each": "-resourcetype:{kind}",
+        "sep": " ",
+        "note": "The query syntax in Resource Explorer supports `resourcetype:` filters to read one kind and negated `-resourcetype:` filters to leave kinds out, and `resource_count[*].complete` shows whether the result is complete."
+      },
+      "note": "Resource Explorer search returns resources of all types across the account (and regions with an aggregator index), making it the broadest inventory."
+    },
+    {
+      "data_source": "aws_resourcegroupstaggingapi_resources",
+      "list": "resource_tag_mapping_list",
+      "id": "resource_arn",
+      "kind_match": "^arn:[^:]+:([^:]+):[^:]*:[^:]*:(?:([^:/]+)[:/])?",
+      "note": "The tagging API lists tagged resources of every service in the region without any prior setup, with the kind derived from the ARN's service and resource-type segments."
+    }
+  ],
+  "kinds": {
+    "acm/certificate": {
+      "type": "aws_acm_certificate",
+      "origin": "llm",
+      "note": "ACM certificates are imported by their full ARN."
+    },
+    "acm:certificate": {
+      "type": "aws_acm_certificate",
+      "origin": "llm",
+      "note": "ACM certificates are imported by their full ARN."
+    },
+    "apigateway/": {
+      "type": "aws_apigatewayv2_api",
+      "match": "^arn:aws[^:]*:apigateway:[^:]*::/apis/(?P\u003capi_id\u003e[^/]+)$",
+      "id": "{api_id}",
+      "origin": "llm",
+      "note": "The /apis/ path is an HTTP or WebSocket API, which is imported by its API ID."
+    },
+    "apigateway:apis": {
+      "type": "aws_apigatewayv2_api",
+      "match": "^arn:aws[^:]*:apigateway:[^:]*::/apis/(?P\u003capi_id\u003e[^/]+)$",
+      "id": "{api_id}",
+      "origin": "llm",
+      "note": "API Gateway v2 APIs are imported by their API ID."
+    },
+    "apigateway:apis/integrations": {
+      "type": "aws_apigatewayv2_integration",
+      "match": "^arn:aws:apigateway:[^:]*::/apis/(?P\u003capi_id\u003e[^/]+)/integrations/(?P\u003cintegration_id\u003e[^/]+)$",
+      "id": "{api_id}/{integration_id}",
+      "origin": "llm",
+      "note": "HTTP/WebSocket API integrations are imported as api-id/integration-id."
+    },
+    "apigateway:apis/routes": {
+      "type": "aws_apigatewayv2_route",
+      "match": "^arn:aws[^:]*:apigateway:[^:]*::/apis/(?P\u003capi_id\u003e[^/]+)/routes/(?P\u003croute_id\u003e[^/]+)$",
+      "id": "{api_id}/{route_id}",
+      "origin": "llm",
+      "note": "API Gateway v2 routes are imported as api_id/route_id."
+    },
+    "apigateway:apis/stages": {
+      "type": "aws_apigatewayv2_stage",
+      "match": "^arn:aws:apigateway:[^:]*::/apis/(?P\u003capi_id\u003e[^/]+)/stages/(?P\u003cstage\u003e.+)$",
+      "id": "{api_id}/{stage}",
+      "origin": "llm",
+      "note": "API Gateway v2 stages are imported as api-id/stage-name."
+    },
+    "application-autoscaling/scalable-target": {
+      "type": "aws_appautoscaling_target",
+      "origin": "llm",
+      "note": "The import ID is service-namespace/resource-id/scalable-dimension, and the scalable-target ARN's opaque suffix contains none of these parts, so a lookup is required."
+    },
+    "apprunner:autoscalingconfiguration": {
+      "type": "aws_apprunner_auto_scaling_configuration_version",
+      "origin": "llm",
+      "note": "App Runner auto scaling configuration versions are imported by their ARN."
+    },
+    "athena:datacatalog": {
+      "type": "aws_athena_data_catalog",
+      "match": ":datacatalog/(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "Athena data catalogs are imported by catalog name."
+    },
+    "athena:workgroup": {
+      "type": "aws_athena_workgroup",
+      "match": ":workgroup/(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "Athena workgroups are imported by workgroup name."
+    },
+    "autoscaling:autoScalingGroup": {
+      "type": "aws_autoscaling_group",
+      "match": ":autoScalingGroupName/(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "Auto Scaling groups are imported by group name."
+    },
+    "cloudformation/stack": {
+      "type": "aws_cloudformation_stack",
+      "match": "^arn:aws[^:]*:cloudformation:[^:]*:[^:]*:stack/(?P\u003cname\u003e[^/]+)/.+$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "CloudFormation stacks are imported by stack name, which is the first segment after stack/."
+    },
+    "cloudformation:stack": {
+      "type": "aws_cloudformation_stack",
+      "match": "^arn:aws[^:]*:cloudformation:[^:]*:[^:]*:stack/(?P\u003cname\u003e[^/]+)/.+$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "CloudFormation stacks are imported by stack name, which is the first segment after stack/."
+    },
+    "cloudwatch/alarm": {
+      "type": "aws_cloudwatch_metric_alarm",
+      "match": "^arn:aws[^:]*:cloudwatch:[^:]*:[^:]*:alarm:(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "Metric alarms, the most common alarm type, are imported by alarm name, which is everything after :alarm:."
+    },
+    "cloudwatch:alarm": {
+      "type": "aws_cloudwatch_metric_alarm",
+      "match": "^arn:aws[^:]*:cloudwatch:[^:]*:[^:]*:alarm:(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "Metric alarms, the most common alarm type, are imported by alarm name, which is everything after :alarm:."
+    },
+    "ec2/instance": {
+      "type": "aws_instance",
+      "match": "^arn:aws[^:]*:ec2:[^:]*:[^:]*:instance/(?P\u003cresource_id\u003e[^/]+)$",
+      "id": "{resource_id}",
+      "origin": "llm",
+      "note": "EC2 instances are imported by instance ID."
+    },
+    "ec2/internet-gateway": {
+      "type": "aws_internet_gateway",
+      "match": "^arn:aws[^:]*:ec2:[^:]*:[^:]*:internet-gateway/(?P\u003cresource_id\u003e[^/]+)$",
+      "id": "{resource_id}",
+      "origin": "llm",
+      "note": "Internet gateways are imported by igw ID."
+    },
+    "ec2/launch-template": {
+      "type": "aws_launch_template",
+      "match": "^arn:aws[^:]*:ec2:[^:]*:[^:]*:launch-template/(?P\u003cresource_id\u003e[^/]+)$",
+      "id": "{resource_id}",
+      "origin": "llm",
+      "note": "Launch templates are imported by launch template ID."
+    },
+    "ec2/network-interface": {
+      "type": "aws_network_interface",
+      "match": "^arn:aws[^:]*:ec2:[^:]*:[^:]*:network-interface/(?P\u003cresource_id\u003e[^/]+)$",
+      "id": "{resource_id}",
+      "origin": "llm",
+      "note": "Network interfaces are imported by ENI ID."
+    },
+    "ec2/route-table": {
+      "type": "aws_route_table",
+      "match": "^arn:aws[^:]*:ec2:[^:]*:[^:]*:route-table/(?P\u003cresource_id\u003e[^/]+)$",
+      "id": "{resource_id}",
+      "origin": "llm",
+      "note": "Route tables are imported by route table ID."
+    },
+    "ec2/security-group": {
+      "type": "aws_security_group",
+      "match": "^arn:aws[^:]*:ec2:[^:]*:[^:]*:security-group/(?P\u003cresource_id\u003e[^/]+)$",
+      "id": "{resource_id}",
+      "origin": "llm",
+      "note": "Security groups are imported by group ID."
+    },
+    "ec2/subnet": {
+      "type": "aws_subnet",
+      "match": "^arn:aws[^:]*:ec2:[^:]*:[^:]*:subnet/(?P\u003cresource_id\u003e[^/]+)$",
+      "id": "{resource_id}",
+      "origin": "llm",
+      "note": "Subnets are imported by subnet ID."
+    },
+    "ec2/volume": {
+      "type": "aws_ebs_volume",
+      "match": "^arn:aws[^:]*:ec2:[^:]*:[^:]*:volume/(?P\u003cresource_id\u003e[^/]+)$",
+      "id": "{resource_id}",
+      "origin": "llm",
+      "note": "EBS volumes are imported by volume ID."
+    },
+    "ec2/vpc": {
+      "type": "aws_vpc",
+      "match": "^arn:aws[^:]*:ec2:[^:]*:[^:]*:vpc/(?P\u003cresource_id\u003e[^/]+)$",
+      "id": "{resource_id}",
+      "origin": "llm",
+      "note": "VPCs are imported by VPC ID."
+    },
+    "ec2/vpc-endpoint": {
+      "type": "aws_vpc_endpoint",
+      "match": "^arn:aws[^:]*:ec2:[^:]*:[^:]*:vpc-endpoint/(?P\u003cresource_id\u003e[^/]+)$",
+      "id": "{resource_id}",
+      "origin": "llm",
+      "note": "VPC endpoints are imported by vpce ID."
+    },
+    "ec2:dhcp-options": {
+      "type": "aws_vpc_dhcp_options",
+      "match": ":dhcp-options/(?P\u003cdopt_id\u003edopt-[0-9a-f]+)$",
+      "id": "{dopt_id}",
+      "origin": "llm",
+      "note": "DHCP option sets are imported by their dopt- ID."
+    },
+    "ec2:elastic-ip": {
+      "type": "aws_eip",
+      "match": "^arn:aws[^:]*:ec2:[^:]*:[^:]*:elastic-ip/(?P\u003cresource_id\u003e[^/]+)$",
+      "id": "{resource_id}",
+      "origin": "llm",
+      "note": "Elastic IPs are imported by allocation ID."
+    },
+    "ec2:instance": {
+      "type": "aws_instance",
+      "match": "^arn:aws[^:]*:ec2:[^:]*:[^:]*:instance/(?P\u003cresource_id\u003e[^/]+)$",
+      "id": "{resource_id}",
+      "origin": "llm",
+      "note": "EC2 instances are imported by instance ID."
+    },
+    "ec2:internet-gateway": {
+      "type": "aws_internet_gateway",
+      "match": "^arn:aws[^:]*:ec2:[^:]*:[^:]*:internet-gateway/(?P\u003cresource_id\u003e[^/]+)$",
+      "id": "{resource_id}",
+      "origin": "llm",
+      "note": "Internet gateways are imported by igw ID."
+    },
+    "ec2:key-pair": {
+      "type": "aws_key_pair",
+      "origin": "llm",
+      "note": "Key pairs are imported by key name, but the ARN only holds the key-pair ID, so the name has to be looked up separately."
+    },
+    "ec2:launch-template": {
+      "type": "aws_launch_template",
+      "match": "^arn:[^:]+:ec2:[^:]*:[^:]*:launch-template/(?P\u003clt_id\u003e.+)$",
+      "id": "{lt_id}",
+      "origin": "llm",
+      "note": "Launch templates are imported by their lt- ID, which is the last part of the ARN."
+    },
+    "ec2:network-acl": {
+      "type": "aws_network_acl",
+      "match": ":network-acl/(?P\u003cacl_id\u003eacl-[0-9a-f]+)$",
+      "id": "{acl_id}",
+      "origin": "llm",
+      "note": "Network ACLs are imported by their acl- ID."
+    },
+    "ec2:network-interface": {
+      "type": "aws_network_interface",
+      "match": "^arn:[^:]+:ec2:[^:]*:[^:]*:network-interface/(?P\u003ceni_id\u003e.+)$",
+      "id": "{eni_id}",
+      "origin": "llm",
+      "note": "Network interfaces are imported by their eni- ID."
+    },
+    "ec2:route-table": {
+      "type": "aws_route_table",
+      "match": ":route-table/(?P\u003crtb_id\u003ertb-[0-9a-f]+)$",
+      "id": "{rtb_id}",
+      "origin": "llm",
+      "note": "Route tables are imported by their rtb- ID."
+    },
+    "ec2:security-group": {
+      "type": "aws_security_group",
+      "match": "^arn:[^:]+:ec2:[^:]*:[^:]*:security-group/(?P\u003csg_id\u003e.+)$",
+      "id": "{sg_id}",
+      "origin": "llm",
+      "note": "Security groups are imported by their sg- ID."
+    },
+    "ec2:security-group-rule": {
+      "type": "aws_vpc_security_group_ingress_rule",
+      "match": "^arn:[^:]+:ec2:[^:]*:[^:]*:security-group-rule/(?P\u003csgr_id\u003e.+)$",
+      "id": "{sgr_id}",
+      "origin": "llm",
+      "note": "Individual rules are imported by sgr- ID; ingress is picked as the more common variant (egress rules use aws_vpc_security_group_egress_rule with the same ID)."
+    },
+    "ec2:subnet": {
+      "type": "aws_subnet",
+      "match": "^arn:[^:]+:ec2:[^:]*:[^:]*:subnet/(?P\u003csubnet_id\u003e.+)$",
+      "id": "{subnet_id}",
+      "origin": "llm",
+      "note": "Subnets are imported by their subnet- ID."
+    },
+    "ec2:volume": {
+      "type": "aws_ebs_volume",
+      "match": "^arn:[^:]+:ec2:[^:]*:[^:]*:volume/(?P\u003cvol_id\u003e.+)$",
+      "id": "{vol_id}",
+      "origin": "llm",
+      "note": "EBS volumes are imported by their vol- ID."
+    },
+    "ec2:vpc": {
+      "type": "aws_vpc",
+      "match": ":vpc/(?P\u003cvpc_id\u003evpc-[0-9a-f]+)$",
+      "id": "{vpc_id}",
+      "origin": "llm",
+      "note": "VPCs are imported by their vpc- ID."
+    },
+    "ec2:vpc-endpoint": {
+      "type": "aws_vpc_endpoint",
+      "match": "^arn:[^:]+:ec2:[^:]*:[^:]*:vpc-endpoint/(?P\u003cvpce_id\u003e.+)$",
+      "id": "{vpce_id}",
+      "origin": "llm",
+      "note": "VPC endpoints are imported by their vpce- ID."
+    },
+    "ecr/repository": {
+      "type": "aws_ecr_repository",
+      "match": "^arn:[^:]+:ecr:[^:]*:[^:]*:repository/(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "ECR repositories are imported by repository name."
+    },
+    "ecr:repository": {
+      "type": "aws_ecr_repository",
+      "match": ":repository/(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "ECR repositories are imported by repository name, which may contain slashes."
+    },
+    "ecs/capacity-provider": {
+      "type": "aws_ecs_capacity_provider",
+      "origin": "llm",
+      "note": "ECS capacity providers are imported by their ARN."
+    },
+    "ecs/cluster": {
+      "type": "aws_ecs_cluster",
+      "match": "^arn:[^:]+:ecs:[^:]*:[^:]*:cluster/(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "ECS clusters are imported by cluster name."
+    },
+    "ecs/service": {
+      "type": "aws_ecs_service",
+      "match": "^arn:[^:]+:ecs:[^:]*:[^:]*:service/(?P\u003ccluster\u003e[^/]+)/(?P\u003cservice\u003e.+)$",
+      "id": "{cluster}/{service}",
+      "origin": "llm",
+      "note": "ECS services are imported as cluster-name/service-name."
+    },
+    "ecs/task-definition": {
+      "type": "aws_ecs_task_definition",
+      "origin": "llm",
+      "note": "Task definitions are imported by their full revision ARN."
+    },
+    "ecs:capacity-provider": {
+      "type": "aws_ecs_capacity_provider",
+      "origin": "llm",
+      "note": "ECS capacity providers are imported by their ARN."
+    },
+    "ecs:cluster": {
+      "type": "aws_ecs_cluster",
+      "match": ":cluster/(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "ECS clusters are imported by cluster name."
+    },
+    "ecs:container-instance": {
+      "origin": "llm",
+      "note": "ECS container instances are EC2 hosts registered by the ECS agent, and the provider has no resource type for them."
+    },
+    "ecs:service": {
+      "type": "aws_ecs_service",
+      "match": "^arn:[^:]+:ecs:[^:]*:[^:]*:service/(?P\u003ccluster\u003e[^/]+)/(?P\u003cservice\u003e.+)$",
+      "id": "{cluster}/{service}",
+      "origin": "llm",
+      "note": "ECS services are imported as cluster-name/service-name."
+    },
+    "ecs:task-definition": {
+      "type": "aws_ecs_task_definition",
+      "origin": "llm",
+      "note": "Task definitions are imported by their full revision ARN."
+    },
+    "elasticache/cluster": {
+      "type": "aws_elasticache_cluster",
+      "match": "^arn:[^:]+:elasticache:[^:]*:[^:]*:cluster:(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "ElastiCache clusters are imported by cluster ID."
+    },
+    "elasticache/replicationgroup": {
+      "type": "aws_elasticache_replication_group",
+      "match": "^arn:[^:]+:elasticache:[^:]*:[^:]*:replicationgroup:(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "Replication groups are imported by replication group ID."
+    },
+    "elasticache/subnetgroup": {
+      "type": "aws_elasticache_subnet_group",
+      "match": "^arn:[^:]+:elasticache:[^:]*:[^:]*:subnetgroup:(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "ElastiCache subnet groups are imported by name."
+    },
+    "elasticache:cluster": {
+      "type": "aws_elasticache_cluster",
+      "match": ":cluster:(?P\u003ccluster_id\u003e.+)$",
+      "id": "{cluster_id}",
+      "origin": "llm",
+      "note": "ElastiCache cache clusters are imported by cluster ID."
+    },
+    "elasticache:replicationgroup": {
+      "type": "aws_elasticache_replication_group",
+      "match": ":replicationgroup:(?P\u003crg_id\u003e.+)$",
+      "id": "{rg_id}",
+      "origin": "llm",
+      "note": "ElastiCache replication groups are imported by replication group ID."
+    },
+    "elasticache:subnetgroup": {
+      "type": "aws_elasticache_subnet_group",
+      "match": "^arn:[^:]+:elasticache:[^:]*:[^:]*:subnetgroup:(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "ElastiCache subnet groups are imported by name."
+    },
+    "elasticache:user": {
+      "type": "aws_elasticache_user",
+      "match": "^arn:[^:]+:elasticache:[^:]*:[^:]*:user:(?P\u003cuser_id\u003e.+)$",
+      "id": "{user_id}",
+      "origin": "llm",
+      "note": "ElastiCache users are imported by user ID."
+    },
+    "elasticfilesystem/file-system": {
+      "type": "aws_efs_file_system",
+      "match": "^arn:[^:]+:elasticfilesystem:[^:]*:[^:]*:file-system/(?P\u003cfs_id\u003e.+)$",
+      "id": "{fs_id}",
+      "origin": "llm",
+      "note": "EFS file systems are imported by their fs- ID."
+    },
+    "elasticfilesystem:file-system": {
+      "type": "aws_efs_file_system",
+      "match": ":file-system/(?P\u003cfs_id\u003efs-[0-9a-f]+)$",
+      "id": "{fs_id}",
+      "origin": "llm",
+      "note": "EFS file systems are imported by their fs- ID."
+    },
+    "elasticloadbalancing/listener-rule": {
+      "type": "aws_lb_listener_rule",
+      "origin": "llm",
+      "note": "Listener rules are imported by their ARN."
+    },
+    "elasticloadbalancing/loadbalancer": {
+      "type": "aws_lb",
+      "origin": "llm",
+      "note": "Load balancers are imported by their ARN."
+    },
+    "elasticloadbalancing/targetgroup": {
+      "type": "aws_lb_target_group",
+      "origin": "llm",
+      "note": "Target groups are imported by their ARN."
+    },
+    "elasticloadbalancing:listener-rule/app": {
+      "type": "aws_lb_listener_rule",
+      "origin": "llm",
+      "note": "Listener rules are imported by their ARN."
+    },
+    "elasticloadbalancing:listener/app": {
+      "type": "aws_lb_listener",
+      "origin": "llm",
+      "note": "Load balancer listeners are imported by their full ARN."
+    },
+    "elasticloadbalancing:loadbalancer/app": {
+      "type": "aws_lb",
+      "origin": "llm",
+      "note": "Load balancers are imported by their full ARN."
+    },
+    "elasticloadbalancing:targetgroup": {
+      "type": "aws_lb_target_group",
+      "origin": "llm",
+      "note": "Target groups are imported by their ARN."
+    },
+    "events/rule": {
+      "type": "aws_cloudwatch_event_rule",
+      "match": "^arn:aws[\\w-]*:events:[^:]+:\\d+:rule/(?P\u003cbus_prefix\u003e(?P\u003cevent_bus_name\u003e[^/]+)/)?(?P\u003cname\u003e[^/]+)$",
+      "id": "{bus_prefix}{name}",
+      "origin": "llm",
+      "note": "Rules are imported as 'bus/rule', or just the rule name on the default bus, matching the ARN's path."
+    },
+    "events:event-bus": {
+      "type": "aws_cloudwatch_event_bus",
+      "match": ":event-bus/(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "EventBridge event buses are imported by bus name."
+    },
+    "events:rule": {
+      "type": "aws_cloudwatch_event_rule",
+      "match": "^arn:aws[\\w-]*:events:[^:]+:\\d+:rule/(?P\u003cbus_prefix\u003e(?P\u003cevent_bus_name\u003e[^/]+)/)?(?P\u003cname\u003e[^/]+)$",
+      "id": "{bus_prefix}{name}",
+      "origin": "llm",
+      "note": "Rules are imported as 'bus/rule', or just the rule name on the default bus, matching the ARN's path."
+    },
+    "guardduty:detector": {
+      "type": "aws_guardduty_detector",
+      "match": ":detector/(?P\u003cdetector_id\u003e[0-9a-f]+)$",
+      "id": "{detector_id}",
+      "origin": "llm",
+      "note": "GuardDuty detectors are imported by detector ID."
+    },
+    "kms/key": {
+      "type": "aws_kms_key",
+      "match": "^arn:aws[\\w-]*:kms:[^:]+:\\d+:key/(?P\u003ckey_id\u003e.+)$",
+      "id": "{key_id}",
+      "origin": "llm",
+      "note": "KMS keys are imported by key ID."
+    },
+    "kms:key": {
+      "type": "aws_kms_key",
+      "match": "^arn:aws[\\w-]*:kms:[^:]+:\\d+:key/(?P\u003ckey_id\u003e.+)$",
+      "id": "{key_id}",
+      "origin": "llm",
+      "note": "KMS keys are imported by key ID."
+    },
+    "lambda/event-source-mapping": {
+      "type": "aws_lambda_event_source_mapping",
+      "match": "^arn:aws[\\w-]*:lambda:[^:]+:\\d+:event-source-mapping:(?P\u003cuuid\u003e.+)$",
+      "id": "{uuid}",
+      "origin": "llm",
+      "note": "Event source mappings are imported by their UUID."
+    },
+    "lambda/function": {
+      "type": "aws_lambda_function",
+      "match": "^arn:aws[\\w-]*:lambda:[^:]+:\\d+:function:(?P\u003cname\u003e[^:]+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "Lambda functions are imported by function name."
+    },
+    "lambda:event-source-mapping": {
+      "type": "aws_lambda_event_source_mapping",
+      "match": ":event-source-mapping:(?P\u003cuuid\u003e[0-9a-f-]+)$",
+      "id": "{uuid}",
+      "origin": "llm",
+      "note": "Lambda event source mappings are imported by their UUID."
+    },
+    "lambda:function": {
+      "type": "aws_lambda_function",
+      "match": "^arn:aws[\\w-]*:lambda:[^:]+:\\d+:function:(?P\u003cname\u003e[^:]+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "Lambda functions are imported by function name."
+    },
+    "lambda:function/version": {
+      "origin": "llm",
+      "note": "Published function versions have no resource type of their own; aws_lambda_function creates them when publish is true."
+    },
+    "logs/log-group": {
+      "type": "aws_cloudwatch_log_group",
+      "match": "^arn:aws[\\w-]*:logs:[^:]+:\\d+:log-group:(?P\u003cname\u003e.+?)(?::\\*)?$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "Log groups are imported by name."
+    },
+    "logs:log-group": {
+      "type": "aws_cloudwatch_log_group",
+      "match": "^arn:aws[\\w-]*:logs:[^:]+:\\d+:log-group:(?P\u003cname\u003e.+?)(?::\\*)?$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "Log groups are imported by name."
+    },
+    "memorydb:acl": {
+      "type": "aws_memorydb_acl",
+      "match": "^arn:aws[\\w-]*:memorydb:[^:]+:\\d+:acl/(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "MemoryDB ACLs are imported by name."
+    },
+    "memorydb:parametergroup": {
+      "type": "aws_memorydb_parameter_group",
+      "match": "^arn:aws[\\w-]*:memorydb:[^:]+:\\d+:parametergroup/(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "MemoryDB parameter groups are imported by name."
+    },
+    "memorydb:user": {
+      "type": "aws_memorydb_user",
+      "match": ":user/(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "MemoryDB users are imported by user name."
+    },
+    "rds/db": {
+      "type": "aws_db_instance",
+      "match": "^arn:aws[\\w-]*:rds:[^:]+:\\d+:db:(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "RDS instances are imported by DB instance identifier."
+    },
+    "rds/pg": {
+      "type": "aws_db_parameter_group",
+      "match": "^arn:aws[\\w-]*:rds:[^:]+:\\d+:pg:(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "DB parameter groups are imported by name."
+    },
+    "rds/subgrp": {
+      "type": "aws_db_subnet_group",
+      "match": "^arn:aws[\\w-]*:rds:[^:]+:\\d+:subgrp:(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "DB subnet groups are imported by name."
+    },
+    "rds:auto-backup": {
+      "type": "aws_db_instance_automated_backups_replication",
+      "origin": "llm",
+      "note": "The only type that manages automated backups is the cross-region replication resource, which is imported by the automated backup ARN."
+    },
+    "rds:db": {
+      "type": "aws_db_instance",
+      "match": "^arn:aws[\\w-]*:rds:[^:]+:\\d+:db:(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "RDS instances are imported by DB instance identifier."
+    },
+    "rds:og": {
+      "type": "aws_db_option_group",
+      "match": ":og:(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "RDS option groups are imported by option group name."
+    },
+    "rds:pg": {
+      "type": "aws_db_parameter_group",
+      "match": ":pg:(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "RDS DB parameter groups are imported by parameter group name."
+    },
+    "rds:snapshot": {
+      "type": "aws_db_snapshot",
+      "match": "^arn:aws[\\w-]*:rds:[^:]+:\\d+:snapshot:(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "DB snapshots are imported by snapshot identifier, which can itself contain a colon (rds:...)."
+    },
+    "rds:subgrp": {
+      "type": "aws_db_subnet_group",
+      "match": ":subgrp:(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "RDS DB subnet groups are imported by subnet group name."
+    },
+    "resource-explorer-2:index": {
+      "type": "aws_resourceexplorer2_index",
+      "origin": "llm",
+      "note": "Resource Explorer indexes are imported by their full ARN."
+    },
+    "resource-explorer-2:view": {
+      "type": "aws_resourceexplorer2_view",
+      "origin": "llm",
+      "note": "Resource Explorer views are imported by ARN."
+    },
+    "s3/": {
+      "type": "aws_s3_bucket",
+      "match": "^arn:aws[\\w-]*:s3:::(?P\u003cbucket\u003e[^/]+)$",
+      "id": "{bucket}",
+      "origin": "llm",
+      "note": "S3 buckets are imported by bucket name."
+    },
+    "s3:bucket": {
+      "type": "aws_s3_bucket",
+      "match": "^arn:aws[\\w-]*:s3:::(?P\u003cbucket\u003e[^/]+)$",
+      "id": "{bucket}",
+      "origin": "llm",
+      "note": "S3 buckets are imported by bucket name."
+    },
+    "secretsmanager/secret": {
+      "type": "aws_secretsmanager_secret",
+      "origin": "llm",
+      "note": "Secrets are imported by ARN."
+    },
+    "secretsmanager:secret": {
+      "type": "aws_secretsmanager_secret",
+      "origin": "llm",
+      "note": "Secrets are imported by ARN."
+    },
+    "ses:identity": {
+      "type": "aws_sesv2_email_identity",
+      "match": "^arn:aws[a-z-]*:ses:[^:]+:[0-9]+:identity/(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "aws_sesv2_email_identity manages both email and domain SES identities and is imported by the identity name taken from the end of the ARN."
+    },
+    "sqs/": {
+      "type": "aws_sqs_queue",
+      "match": "^arn:aws[\\w-]*:sqs:(?P\u003cregion\u003e[^:]+):(?P\u003caccount\u003e\\d+):(?P\u003cname\u003e.+)$",
+      "id": "https://sqs.{region}.amazonaws.com/{account}/{name}",
+      "origin": "llm",
+      "note": "SQS queues are imported by queue URL, which is built from the region, account and queue name."
+    },
+    "sqs:queue": {
+      "type": "aws_sqs_queue",
+      "match": "^arn:aws[a-z-]*:sqs:(?P\u003cregion\u003e[^:]+):(?P\u003caccount\u003e\\d+):(?P\u003cname\u003e.+)$",
+      "id": "https://sqs.{region}.amazonaws.com/{account}/{name}",
+      "origin": "llm",
+      "note": "aws_sqs_queue is imported by queue URL, which is built from the region, account and queue name in the ARN."
+    },
+    "ssm/parameter": {
+      "type": "aws_ssm_parameter",
+      "match": "^arn:aws[a-z-]*:ssm:[^:]+:\\d+:parameter(?:(?P\u003cpath\u003e/.+/.+)|/(?P\u003cplain\u003e[^/]+))$",
+      "id": "{path}{plain}",
+      "origin": "llm",
+      "note": "aws_ssm_parameter is imported by parameter name, which keeps its leading slash for hierarchical names and has none for flat names."
+    },
+    "ssm:managed-instance": {
+      "origin": "llm",
+      "note": "No Terraform type manages an SSM managed-instance registration itself, since aws_ssm_activation only creates the activation code and aws_instance manages the underlying EC2 instance."
+    },
+    "ssm:parameter": {
+      "type": "aws_ssm_parameter",
+      "match": "^arn:aws[a-z-]*:ssm:[^:]+:\\d+:parameter(?:(?P\u003cpath\u003e/.+/.+)|/(?P\u003cplain\u003e[^/]+))$",
+      "id": "{path}{plain}",
+      "origin": "llm",
+      "note": "aws_ssm_parameter is imported by parameter name, which keeps its leading slash for hierarchical names and has none for flat names."
+    },
+    "xray:group": {
+      "type": "aws_xray_group",
+      "origin": "llm",
+      "note": "aws_xray_group is imported by its group ARN, which is the inventory ID."
+    },
+    "xray:sampling-rule": {
+      "type": "aws_xray_sampling_rule",
+      "match": "^arn:aws[a-z-]*:xray:[^:]+:\\d+:sampling-rule/(?P\u003cname\u003e.+)$",
+      "id": "{name}",
+      "origin": "llm",
+      "note": "aws_xray_sampling_rule is imported by the rule name, which is the last part of the ARN."
+    }
+  }
+}

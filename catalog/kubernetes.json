@@ -1,0 +1,489 @@
+{
+  "provider": "kubernetes",
+  "resources": {
+    "kubernetes_deployment": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Deployment"
+    },
+    "kubernetes_deployment_v1": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Deployment"
+    },
+    "kubernetes_stateful_set": {
+      "role": "primary",
+      "category": "compute",
+      "label": "StatefulSet"
+    },
+    "kubernetes_stateful_set_v1": {
+      "role": "primary",
+      "category": "compute",
+      "label": "StatefulSet"
+    },
+    "kubernetes_daemonset": {
+      "role": "primary",
+      "category": "compute",
+      "label": "DaemonSet"
+    },
+    "kubernetes_daemon_set_v1": {
+      "role": "primary",
+      "category": "compute",
+      "label": "DaemonSet"
+    },
+    "kubernetes_cron_job": {
+      "role": "primary",
+      "category": "compute",
+      "label": "CronJob"
+    },
+    "kubernetes_cron_job_v1": {
+      "role": "primary",
+      "category": "compute",
+      "label": "CronJob"
+    },
+    "kubernetes_job": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Job"
+    },
+    "kubernetes_job_v1": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Job"
+    },
+    "kubernetes_pod": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Pod"
+    },
+    "kubernetes_pod_v1": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Pod"
+    },
+    "kubernetes_replication_controller": {
+      "role": "primary",
+      "category": "compute",
+      "label": "ReplicationController"
+    },
+    "kubernetes_replication_controller_v1": {
+      "role": "primary",
+      "category": "compute",
+      "label": "ReplicationController"
+    },
+    "kubernetes_ingress": {
+      "role": "primary",
+      "category": "network",
+      "label": "Ingress"
+    },
+    "kubernetes_ingress_v1": {
+      "role": "primary",
+      "category": "network",
+      "label": "Ingress"
+    },
+    "kubernetes_persistent_volume_claim": {
+      "role": "primary",
+      "category": "storage",
+      "label": "Persistent volume claim"
+    },
+    "kubernetes_persistent_volume_claim_v1": {
+      "role": "primary",
+      "category": "storage",
+      "label": "Persistent volume claim"
+    },
+    "kubernetes_service": {
+      "role": "satellite",
+      "category": "network",
+      "label": "Service"
+    },
+    "kubernetes_service_v1": {
+      "role": "satellite",
+      "category": "network",
+      "label": "Service"
+    },
+    "kubernetes_endpoints": {
+      "role": "satellite",
+      "category": "network"
+    },
+    "kubernetes_endpoints_v1": {
+      "role": "satellite",
+      "category": "network"
+    },
+    "kubernetes_endpoint_slice_v1": {
+      "role": "satellite",
+      "category": "network"
+    },
+    "kubernetes_persistent_volume": {
+      "role": "satellite",
+      "category": "storage",
+      "label": "Persistent volume"
+    },
+    "kubernetes_persistent_volume_v1": {
+      "role": "satellite",
+      "category": "storage",
+      "label": "Persistent volume"
+    },
+    "kubernetes_config_map": {
+      "role": "satellite",
+      "category": "other",
+      "label": "ConfigMap"
+    },
+    "kubernetes_config_map_v1": {
+      "role": "satellite",
+      "category": "other",
+      "label": "ConfigMap"
+    },
+    "kubernetes_secret": {
+      "role": "satellite",
+      "category": "security",
+      "label": "Secret"
+    },
+    "kubernetes_secret_v1": {
+      "role": "satellite",
+      "category": "security",
+      "label": "Secret"
+    },
+    "kubernetes_service_account": {
+      "role": "satellite",
+      "category": "identity",
+      "label": "Service account"
+    },
+    "kubernetes_service_account_v1": {
+      "role": "satellite",
+      "category": "identity",
+      "label": "Service account"
+    },
+    "kubernetes_default_service_account": {
+      "role": "satellite",
+      "category": "identity"
+    },
+    "kubernetes_default_service_account_v1": {
+      "role": "satellite",
+      "category": "identity"
+    },
+    "kubernetes_role": {
+      "role": "satellite",
+      "category": "identity"
+    },
+    "kubernetes_role_v1": {
+      "role": "satellite",
+      "category": "identity"
+    },
+    "kubernetes_cluster_role": {
+      "role": "satellite",
+      "category": "identity"
+    },
+    "kubernetes_cluster_role_v1": {
+      "role": "satellite",
+      "category": "identity"
+    },
+    "kubernetes_role_binding": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "role_ref",
+      "to_attr": "subject",
+      "verb": "granted to",
+      "attaches": true
+    },
+    "kubernetes_role_binding_v1": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "role_ref",
+      "to_attr": "subject",
+      "verb": "granted to",
+      "attaches": true
+    },
+    "kubernetes_cluster_role_binding": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "role_ref",
+      "to_attr": "subject",
+      "verb": "granted to",
+      "attaches": true
+    },
+    "kubernetes_cluster_role_binding_v1": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "role_ref",
+      "to_attr": "subject",
+      "verb": "granted to",
+      "attaches": true
+    },
+    "kubernetes_horizontal_pod_autoscaler": {
+      "role": "child",
+      "category": "compute",
+      "parent_attr": "spec.scale_target_ref"
+    },
+    "kubernetes_horizontal_pod_autoscaler_v1": {
+      "role": "child",
+      "category": "compute",
+      "parent_attr": "spec.scale_target_ref"
+    },
+    "kubernetes_horizontal_pod_autoscaler_v2": {
+      "role": "child",
+      "category": "compute",
+      "parent_attr": "spec.scale_target_ref"
+    },
+    "kubernetes_horizontal_pod_autoscaler_v2beta2": {
+      "role": "child",
+      "category": "compute",
+      "parent_attr": "spec.scale_target_ref"
+    },
+    "kubernetes_pod_disruption_budget": {
+      "role": "satellite",
+      "category": "compute"
+    },
+    "kubernetes_pod_disruption_budget_v1": {
+      "role": "satellite",
+      "category": "compute"
+    },
+    "kubernetes_network_policy": {
+      "role": "satellite",
+      "category": "security"
+    },
+    "kubernetes_network_policy_v1": {
+      "role": "satellite",
+      "category": "security"
+    },
+    "kubernetes_config_map_v1_data": {
+      "role": "child",
+      "category": "other",
+      "parent_attr": "metadata"
+    },
+    "kubernetes_labels": {
+      "role": "satellite",
+      "category": "other"
+    },
+    "kubernetes_annotations": {
+      "role": "satellite",
+      "category": "other"
+    },
+    "kubernetes_env": {
+      "role": "satellite",
+      "category": "other"
+    },
+    "kubernetes_node_taint": {
+      "role": "helper",
+      "category": "compute"
+    },
+    "kubernetes_manifest": {
+      "role": "satellite",
+      "category": "other"
+    },
+    "kubernetes_mutating_webhook_configuration": {
+      "role": "satellite",
+      "category": "security"
+    },
+    "kubernetes_mutating_webhook_configuration_v1": {
+      "role": "satellite",
+      "category": "security"
+    },
+    "kubernetes_validating_webhook_configuration": {
+      "role": "satellite",
+      "category": "security"
+    },
+    "kubernetes_validating_webhook_configuration_v1": {
+      "role": "satellite",
+      "category": "security"
+    },
+    "kubernetes_validating_admission_policy_v1": {
+      "role": "helper",
+      "category": "security"
+    },
+    "kubernetes_api_service": {
+      "role": "satellite",
+      "category": "network"
+    },
+    "kubernetes_api_service_v1": {
+      "role": "satellite",
+      "category": "network"
+    },
+    "kubernetes_namespace": {
+      "role": "ignore",
+      "category": "network"
+    },
+    "kubernetes_namespace_v1": {
+      "role": "ignore",
+      "category": "network"
+    },
+    "kubernetes_storage_class": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_storage_class_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_ingress_class": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_ingress_class_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_csi_driver": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_csi_driver_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_runtime_class_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_priority_class": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_priority_class_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_limit_range": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_limit_range_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_resource_quota": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_resource_quota_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_certificate_signing_request": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_certificate_signing_request_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_token_request_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_secret_v1_data": {
+      "role": "child",
+      "category": "security",
+      "parent_attr": "metadata"
+    }
+  },
+  "data_sources": {
+    "kubernetes_all_namespaces": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_config_map": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_config_map_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_endpoint_slice_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_endpoints_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_ingress": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_ingress_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_mutating_webhook_configuration_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_namespace": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_namespace_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_nodes": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_persistent_volume_claim": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_persistent_volume_claim_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_persistent_volume_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_pod": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_pod_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_resource": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_resources": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_secret": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_secret_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_server_version": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_service": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_service_account": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_service_account_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_service_v1": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_storage_class": {
+      "role": "helper",
+      "category": "other"
+    },
+    "kubernetes_storage_class_v1": {
+      "role": "helper",
+      "category": "other"
+    }
+  }
+}

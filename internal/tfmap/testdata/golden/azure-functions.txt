@@ -1,0 +1,3 @@
+component Function app azurerm_function_app_flex_consumption.example
+component Storage account azurerm_storage_account.example
+connection azurerm_function_app_flex_consumption.example -> azurerm_storage_account.example [uses]

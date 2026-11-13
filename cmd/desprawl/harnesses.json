@@ -1,0 +1,29 @@
+[
+  {
+    "name": "Claude Code",
+    "detect": "~/.claude",
+    "skills": "~/.claude/skills",
+    "run": [
+      ["claude", "mcp", "remove", "--scope", "user", "desprawl"],
+      ["claude", "mcp", "add", "--scope", "user", "desprawl", "--", "{exe}", "mcp"]
+    ]
+  },
+  {
+    "name": "Cursor",
+    "detect": "~/.cursor",
+    "skills": "~/.agents/skills",
+    "json": "~/.cursor/mcp.json"
+  },
+  {
+    "name": "Gemini CLI",
+    "detect": "~/.gemini",
+    "skills": "~/.agents/skills",
+    "json": "~/.gemini/settings.json"
+  },
+  {
+    "name": "Codex",
+    "detect": "~/.codex",
+    "skills": "~/.agents/skills",
+    "toml": "~/.codex/config.toml"
+  }
+]

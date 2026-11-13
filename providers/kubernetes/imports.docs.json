@@ -1,0 +1,335 @@
+{
+  "kubernetes_api_service": {
+    "ids": [
+      "v1.terraform-name.k8s.io"
+    ]
+  },
+  "kubernetes_api_service_v1": {
+    "ids": [
+      "v1.terraform-name.k8s.io"
+    ]
+  },
+  "kubernetes_cluster_role": {
+    "ids": [
+      "terraform-name"
+    ]
+  },
+  "kubernetes_cluster_role_binding": {
+    "ids": [
+      "terraform-name"
+    ]
+  },
+  "kubernetes_cluster_role_binding_v1": {
+    "ids": [
+      "terraform-name"
+    ]
+  },
+  "kubernetes_cluster_role_v1": {
+    "ids": [
+      "terraform-name"
+    ]
+  },
+  "kubernetes_config_map": {
+    "ids": [
+      "default/my-config"
+    ]
+  },
+  "kubernetes_config_map_v1": {
+    "ids": [
+      "default/example",
+      "default/my-config"
+    ]
+  },
+  "kubernetes_csi_driver": {
+    "ids": [
+      "terraform-example"
+    ]
+  },
+  "kubernetes_csi_driver_v1": {
+    "ids": [
+      "terraform-example"
+    ]
+  },
+  "kubernetes_daemon_set_v1": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_daemonset": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_default_service_account": {
+    "ids": [
+      "terraform-example/default"
+    ]
+  },
+  "kubernetes_default_service_account_v1": {
+    "ids": [
+      "terraform-example/default"
+    ]
+  },
+  "kubernetes_deployment": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_deployment_v1": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_endpoints": {
+    "ids": [
+      "default/terraform-name"
+    ]
+  },
+  "kubernetes_endpoints_v1": {
+    "ids": [
+      "default/terraform-name"
+    ]
+  },
+  "kubernetes_horizontal_pod_autoscaler": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_horizontal_pod_autoscaler_v1": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_horizontal_pod_autoscaler_v2": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_horizontal_pod_autoscaler_v2beta2": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_ingress": {
+    "ids": [
+      "\u003cKUBE_NAMESPACE\u003e/\u003cKUBE_INGRESS_NAME\u003e",
+      "default/terraform-name"
+    ]
+  },
+  "kubernetes_ingress_class": {
+    "ids": [
+      "example"
+    ]
+  },
+  "kubernetes_ingress_class_v1": {
+    "ids": [
+      "example"
+    ]
+  },
+  "kubernetes_ingress_v1": {
+    "ids": [
+      "\u003cKUBE_NAMESPACE\u003e/\u003cKUBE_INGRESS_NAME\u003e",
+      "default/terraform-name"
+    ]
+  },
+  "kubernetes_limit_range": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_limit_range_v1": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_manifest": {
+    "ids": [
+      "apiVersion=v1,kind=Secret,namespace=default,name=sample"
+    ]
+  },
+  "kubernetes_mutating_webhook_configuration": {
+    "ids": [
+      "terraform-example"
+    ]
+  },
+  "kubernetes_mutating_webhook_configuration_v1": {
+    "ids": [
+      "terraform-example"
+    ]
+  },
+  "kubernetes_namespace": {
+    "ids": [
+      "terraform-example-namespace"
+    ]
+  },
+  "kubernetes_namespace_v1": {
+    "ids": [
+      "terraform-example-namespace"
+    ]
+  },
+  "kubernetes_network_policy": {
+    "ids": [
+      "default/terraform-example-network-policy"
+    ]
+  },
+  "kubernetes_network_policy_v1": {
+    "ids": [
+      "default/terraform-example-network-policy"
+    ]
+  },
+  "kubernetes_persistent_volume": {
+    "ids": [
+      "terraform-example"
+    ]
+  },
+  "kubernetes_persistent_volume_claim": {
+    "ids": [
+      "default/example-name"
+    ]
+  },
+  "kubernetes_persistent_volume_claim_v1": {
+    "ids": [
+      "default/example-name"
+    ]
+  },
+  "kubernetes_persistent_volume_v1": {
+    "ids": [
+      "terraform-example"
+    ]
+  },
+  "kubernetes_pod": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_pod_security_policy": {
+    "ids": [
+      "terraform-example"
+    ]
+  },
+  "kubernetes_pod_security_policy_v1beta1": {
+    "ids": [
+      "terraform-example"
+    ]
+  },
+  "kubernetes_pod_v1": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_priority_class": {
+    "ids": [
+      "terraform-example"
+    ]
+  },
+  "kubernetes_priority_class_v1": {
+    "ids": [
+      "terraform-example"
+    ]
+  },
+  "kubernetes_replication_controller": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_replication_controller_v1": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_resource_quota": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_resource_quota_v1": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_role": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_role_binding": {
+    "ids": [
+      "default/terraform-name"
+    ]
+  },
+  "kubernetes_role_binding_v1": {
+    "ids": [
+      "default/terraform-name"
+    ]
+  },
+  "kubernetes_role_v1": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_runtime_class_v1": {
+    "ids": [
+      "myclass"
+    ]
+  },
+  "kubernetes_secret": {
+    "ids": [
+      "default/my-secret"
+    ]
+  },
+  "kubernetes_secret_v1": {
+    "ids": [
+      "default/my-secret"
+    ]
+  },
+  "kubernetes_service": {
+    "ids": [
+      "default/terraform-name"
+    ]
+  },
+  "kubernetes_service_account": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_service_account_v1": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_service_v1": {
+    "ids": [
+      "default/terraform-name"
+    ]
+  },
+  "kubernetes_stateful_set": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_stateful_set_v1": {
+    "ids": [
+      "default/terraform-example"
+    ]
+  },
+  "kubernetes_storage_class": {
+    "ids": [
+      "terraform-example"
+    ]
+  },
+  "kubernetes_storage_class_v1": {
+    "ids": [
+      "terraform-example"
+    ]
+  },
+  "kubernetes_validating_webhook_configuration": {
+    "ids": [
+      "terraform-example"
+    ]
+  },
+  "kubernetes_validating_webhook_configuration_v1": {
+    "ids": [
+      "terraform-example"
+    ]
+  }
+}

@@ -1,0 +1,179 @@
+{
+ "resources": {
+  "aws_iam_role": {
+   "attributes": {
+    "arn": {
+     "type": "string",
+     "computed": true
+    },
+    "id": {
+     "type": "string",
+     "optional": true,
+     "computed": true
+    },
+    "name": {
+     "type": "string",
+     "optional": true,
+     "computed": false
+    }
+   }
+  },
+  "aws_iam_role_policy_attachment": {
+   "attributes": {
+    "id": {
+     "type": "string",
+     "optional": true,
+     "computed": true
+    }
+   }
+  },
+  "aws_iam_role_policy": {
+   "attributes": {
+    "id": {
+     "type": "string",
+     "optional": true,
+     "computed": true
+    }
+   }
+  },
+  "aws_sqs_queue": {
+   "attributes": {
+    "arn": {
+     "type": "string",
+     "computed": true
+    },
+    "id": {
+     "type": "string",
+     "optional": true,
+     "computed": true
+    },
+    "url": {
+     "type": "string",
+     "computed": true
+    },
+    "name": {
+     "type": "string",
+     "optional": true,
+     "computed": false
+    }
+   }
+  },
+  "aws_cloudwatch_log_group": {
+   "attributes": {
+    "arn": {
+     "type": "string",
+     "computed": true
+    },
+    "id": {
+     "type": "string",
+     "optional": true,
+     "computed": true
+    },
+    "name": {
+     "type": "string",
+     "optional": true,
+     "computed": false
+    }
+   }
+  },
+  "aws_lambda_function": {
+   "attributes": {
+    "arn": {
+     "type": "string",
+     "computed": true
+    },
+    "id": {
+     "type": "string",
+     "optional": true,
+     "computed": true
+    },
+    "function_name": {
+     "type": "string",
+     "optional": true,
+     "computed": false
+    },
+    "qualified_arn": {
+     "type": "string",
+     "computed": true
+    }
+   }
+  },
+  "aws_lambda_event_source_mapping": {
+   "attributes": {
+    "arn": {
+     "type": "string",
+     "computed": true
+    },
+    "id": {
+     "type": "string",
+     "optional": true,
+     "computed": true
+    }
+   }
+  },
+  "aws_security_group": {
+   "attributes": {
+    "arn": {
+     "type": "string",
+     "computed": true
+    },
+    "id": {
+     "type": "string",
+     "optional": true,
+     "computed": true
+    }
+   }
+  },
+  "aws_s3_bucket": {
+   "attributes": {
+    "arn": {
+     "type": "string",
+     "computed": true
+    },
+    "id": {
+     "type": "string",
+     "optional": true,
+     "computed": true
+    },
+    "bucket": {
+     "type": "string",
+     "optional": true,
+     "computed": false
+    }
+   }
+  },
+  "aws_s3_bucket_policy": {
+   "attributes": {
+    "id": {
+     "type": "string",
+     "optional": true,
+     "computed": true
+    }
+   }
+  },
+  "aws_ecs_task_definition": {
+   "attributes": {
+    "arn": {
+     "type": "string",
+     "computed": true
+    },
+    "id": {
+     "type": "string",
+     "optional": true,
+     "computed": true
+    },
+    "family": {
+     "type": "string",
+     "optional": true,
+     "computed": false
+    },
+    "arn_without_revision": {
+     "type": "string",
+     "computed": true
+    }
+   }
+  }
+ },
+ "lists": {},
+ "identities": {}
+}

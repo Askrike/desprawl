@@ -1,0 +1,368 @@
+{
+  "provider": "auth0",
+  "resources": {
+    "auth0_client": {
+      "role": "primary",
+      "category": "identity",
+      "label": "Auth0 application"
+    },
+    "auth0_resource_server": {
+      "role": "primary",
+      "category": "identity",
+      "label": "Auth0 API"
+    },
+    "auth0_connection": {
+      "role": "primary",
+      "category": "identity",
+      "label": "Auth0 connection"
+    },
+    "auth0_user": {
+      "role": "primary",
+      "category": "identity",
+      "label": "Auth0 user"
+    },
+    "auth0_action": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Auth0 action"
+    },
+    "auth0_rule": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Auth0 rule"
+    },
+    "auth0_hook": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Auth0 hook"
+    },
+    "auth0_flow": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Auth0 flow"
+    },
+    "auth0_log_stream": {
+      "role": "primary",
+      "category": "messaging",
+      "label": "Auth0 log stream"
+    },
+    "auth0_event_stream": {
+      "role": "primary",
+      "category": "messaging",
+      "label": "Auth0 event stream"
+    },
+    "auth0_custom_domain": {
+      "role": "primary",
+      "category": "network",
+      "label": "Auth0 custom domain"
+    },
+    "auth0_client_grant": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "client_id",
+      "to_attr": "audience"
+    },
+    "auth0_connection_client": {
+      "role": "connector",
+      "category": "integration",
+      "from_attr": "client_id",
+      "to_attr": "connection_id",
+      "verb": "signs in with"
+    },
+    "auth0_connection_clients": {
+      "role": "connector",
+      "category": "integration",
+      "from_attr": "enabled_clients",
+      "to_attr": "connection_id",
+      "verb": "signs in with"
+    },
+    "auth0_client_credentials": {
+      "role": "child",
+      "category": "security",
+      "parent_attr": "client_id"
+    },
+    "auth0_connection_keys": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "connection_id"
+    },
+    "auth0_connection_directory": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "connection_id"
+    },
+    "auth0_connection_directory_synchronized_groups": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "connection_id"
+    },
+    "auth0_connection_scim_configuration": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "connection_id"
+    },
+    "auth0_connection_scim_token": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "connection_id"
+    },
+    "auth0_custom_domain_verification": {
+      "role": "child",
+      "category": "network",
+      "parent_attr": "custom_domain_id"
+    },
+    "auth0_custom_domain_default": {
+      "role": "child",
+      "category": "network",
+      "parent_attr": "domain"
+    },
+    "auth0_resource_server_scope": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "resource_server_identifier"
+    },
+    "auth0_resource_server_scopes": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "resource_server_identifier"
+    },
+    "auth0_trigger_action": {
+      "role": "child",
+      "category": "compute",
+      "parent_attr": "action_id"
+    },
+    "auth0_role_permission": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "role_id"
+    },
+    "auth0_role_permissions": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "role_id"
+    },
+    "auth0_user_permission": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "user_id"
+    },
+    "auth0_user_permissions": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "user_id"
+    },
+    "auth0_user_role": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "user_id"
+    },
+    "auth0_user_roles": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "user_id"
+    },
+    "auth0_organization_client": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "organization_id"
+    },
+    "auth0_organization_client_grant": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "organization_id"
+    },
+    "auth0_organization_clients": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "organization_id"
+    },
+    "auth0_organization_connection": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "organization_id"
+    },
+    "auth0_organization_connections": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "organization_id"
+    },
+    "auth0_organization_discovery_domain": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "organization_id"
+    },
+    "auth0_organization_discovery_domains": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "organization_id"
+    },
+    "auth0_organization_member": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "organization_id"
+    },
+    "auth0_organization_member_role": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "organization_id"
+    },
+    "auth0_organization_member_roles": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "organization_id"
+    },
+    "auth0_organization_members": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "organization_id"
+    },
+    "auth0_organization": {
+      "role": "satellite",
+      "category": "identity"
+    },
+    "auth0_role": {
+      "role": "satellite",
+      "category": "identity"
+    },
+    "auth0_tenant": {
+      "role": "satellite",
+      "category": "other"
+    },
+    "auth0_action_module": {
+      "role": "satellite",
+      "category": "compute"
+    },
+    "auth0_trigger_actions": {
+      "role": "satellite",
+      "category": "compute"
+    },
+    "auth0_form": {
+      "role": "satellite",
+      "category": "other"
+    },
+    "auth0_flow_vault_connection": {
+      "role": "satellite",
+      "category": "security"
+    },
+    "auth0_attack_protection": {
+      "role": "satellite",
+      "category": "security"
+    },
+    "auth0_guardian": {
+      "role": "satellite",
+      "category": "security"
+    },
+    "auth0_network_acl": {
+      "role": "satellite",
+      "category": "security"
+    },
+    "auth0_network_acl_key": {
+      "role": "satellite",
+      "category": "security"
+    },
+    "auth0_rate_limit_policy": {
+      "role": "satellite",
+      "category": "security"
+    },
+    "auth0_risk_assessments": {
+      "role": "satellite",
+      "category": "security"
+    },
+    "auth0_risk_assessments_new_device": {
+      "role": "satellite",
+      "category": "security"
+    },
+    "auth0_supplemental_signals": {
+      "role": "satellite",
+      "category": "security"
+    },
+    "auth0_encryption_key_manager": {
+      "role": "satellite",
+      "category": "security"
+    },
+    "auth0_branding": {
+      "role": "satellite",
+      "category": "other"
+    },
+    "auth0_branding_theme": {
+      "role": "satellite",
+      "category": "other"
+    },
+    "auth0_branding_phone_notification_template": {
+      "role": "satellite",
+      "category": "other"
+    },
+    "auth0_phone_notification_template": {
+      "role": "satellite",
+      "category": "other"
+    },
+    "auth0_phone_provider": {
+      "role": "satellite",
+      "category": "messaging"
+    },
+    "auth0_email_provider": {
+      "role": "satellite",
+      "category": "messaging"
+    },
+    "auth0_email_template": {
+      "role": "satellite",
+      "category": "messaging"
+    },
+    "auth0_pages": {
+      "role": "satellite",
+      "category": "other"
+    },
+    "auth0_prompt": {
+      "role": "satellite",
+      "category": "other"
+    },
+    "auth0_prompt_custom_text": {
+      "role": "satellite",
+      "category": "other"
+    },
+    "auth0_prompt_partials": {
+      "role": "satellite",
+      "category": "other"
+    },
+    "auth0_prompt_screen_partial": {
+      "role": "satellite",
+      "category": "other"
+    },
+    "auth0_prompt_screen_partials": {
+      "role": "satellite",
+      "category": "other"
+    },
+    "auth0_prompt_screen_renderer": {
+      "role": "satellite",
+      "category": "other"
+    },
+    "auth0_rule_config": {
+      "role": "satellite",
+      "category": "compute"
+    },
+    "auth0_self_service_profile": {
+      "role": "satellite",
+      "category": "identity"
+    },
+    "auth0_self_service_profile_custom_text": {
+      "role": "satellite",
+      "category": "identity"
+    },
+    "auth0_user_attribute_profile": {
+      "role": "satellite",
+      "category": "identity"
+    },
+    "auth0_connection_profile": {
+      "role": "satellite",
+      "category": "identity"
+    },
+    "auth0_token_exchange_profile": {
+      "role": "satellite",
+      "category": "identity"
+    },
+    "auth0_client_cimd": {
+      "role": "satellite",
+      "category": "identity"
+    }
+  }
+}

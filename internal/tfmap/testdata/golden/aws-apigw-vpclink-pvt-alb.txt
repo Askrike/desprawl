@@ -1,0 +1,6 @@
+component ECS service aws_ecs_service.demo-ecs-service
+component HTTP API aws_apigatewayv2_api.apigw_http_endpoint
+component Load balancer aws_lb.ecs_alb
+connection aws_apigatewayv2_api.apigw_http_endpoint -> aws_lb.ecs_alb [routes to]
+connection aws_ecs_service.demo-ecs-service -> aws_lb.ecs_alb [network]
+connection aws_lb.ecs_alb -> aws_ecs_service.demo-ecs-service [routes to · network]

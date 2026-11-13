@@ -1,0 +1,4 @@
+component Kinesis stream aws_kinesis_stream.sample_stream
+component Lambda function aws_lambda_function.sample_lambda
+connection aws_kinesis_stream.sample_stream -> aws_lambda_function.sample_lambda [triggers]
+connection aws_lambda_function.sample_lambda -> aws_kinesis_stream.sample_stream [access]

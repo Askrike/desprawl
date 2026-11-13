@@ -1,0 +1,45 @@
+{
+  "provider": "fastly",
+  "resources": {
+    "fastly_service_vcl": {
+      "role": "primary",
+      "category": "network",
+      "label": "Fastly service"
+    },
+    "fastly_service_compute": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Fastly Compute service"
+    },
+    "fastly_kvstore": {
+      "role": "primary",
+      "category": "database",
+      "label": "Fastly KV store"
+    },
+    "fastly_configstore": {
+      "role": "satellite",
+      "category": "other",
+      "label": "Config store"
+    },
+    "fastly_secretstore": {
+      "role": "satellite",
+      "category": "security",
+      "label": "Secret store"
+    },
+    "fastly_domain": {
+      "role": "satellite",
+      "category": "network",
+      "label": "Domain"
+    },
+    "fastly_domain_v1": {
+      "role": "satellite",
+      "category": "network",
+      "label": "Domain"
+    },
+    "fastly_tls_subscription": {
+      "role": "satellite",
+      "category": "security",
+      "label": "TLS subscription"
+    }
+  }
+}

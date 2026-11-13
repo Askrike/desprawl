@@ -1,0 +1,8 @@
+component Auth0 API auth0_resource_server.api
+component Auth0 action auth0_action.enrich
+component Auth0 application auth0_client.web
+component Auth0 application auth0_client.worker
+component Auth0 connection auth0_connection.users
+component Auth0 log stream auth0_log_stream.events
+connection auth0_client.web -> auth0_connection.users [signs in with]
+connection auth0_client.worker -> auth0_resource_server.api [access]

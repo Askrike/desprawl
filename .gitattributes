@@ -1,0 +1,4 @@
+# Check out text files with LF everywhere: golden files and embedded assets are compared
+# byte for byte, so Windows checkouts with CRLF fail the tests.
+* text=auto eol=lf
+

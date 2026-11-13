@@ -1,0 +1,6 @@
+{
+  "exclude_types": {
+    "kubernetes_secret_v1_data": "Manages only the secret values inside an existing Secret, not infrastructure.",
+    "kubernetes_token_request_v1": "Issues a service account token, which is a credential."
+  }
+}

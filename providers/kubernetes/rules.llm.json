@@ -1,0 +1,810 @@
+[
+  {
+    "source": "kubernetes_cluster_role_binding_v1",
+    "path": "role_ref.name",
+    "target": "kubernetes_cluster_role_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 86,
+    "note": "role_ref.name holds the name of the ClusterRole being bound, so it identifies the cluster role."
+  },
+  {
+    "source": "kubernetes_cluster_role_binding_v1",
+    "path": "subject.name",
+    "target": "kubernetes_service_account_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 48,
+    "note": "subject.name holds the name of the ServiceAccount the binding grants permissions to."
+  },
+  {
+    "source": "kubernetes_cluster_role_binding_v1",
+    "path": "subject.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 63,
+    "note": "subject.namespace names the namespace the subject ServiceAccount lives in."
+  },
+  {
+    "source": "kubernetes_cluster_role_v1",
+    "path": "rule.resource_names",
+    "target": "kubernetes_config_map_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 2
+  },
+  {
+    "source": "kubernetes_config_map_v1",
+    "path": "data.config",
+    "target": "kubernetes_priority_class_v1",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_config_map_v1",
+    "path": "data.repo.server",
+    "target": "kubernetes_service_v1",
+    "attr": "metadata.0.name",
+    "match": "embedded",
+    "origin": "llm",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_config_map_v1",
+    "path": "data.values",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "support": 3
+  },
+  {
+    "source": "kubernetes_config_map_v1",
+    "path": "data.values",
+    "target": "kubernetes_priority_class_v1",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "support": 2
+  },
+  {
+    "source": "kubernetes_config_map_v1",
+    "path": "metadata.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 47,
+    "note": "metadata.namespace names the namespace the ConfigMap lives in."
+  },
+  {
+    "source": "kubernetes_daemon_set_v1",
+    "path": "metadata.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 15,
+    "note": "metadata.namespace names the namespace the DaemonSet lives in."
+  },
+  {
+    "source": "kubernetes_daemon_set_v1",
+    "path": "spec.template.spec.init_container.env.value_from.config_map_key_ref.name",
+    "target": "kubernetes_config_map_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 2,
+    "note": "config_map_key_ref.name names the ConfigMap that the env value is read from."
+  },
+  {
+    "source": "kubernetes_daemon_set_v1",
+    "path": "spec.template.spec.priority_class_name",
+    "target": "kubernetes_priority_class_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 15,
+    "note": "priority_class_name names the PriorityClass object the pod uses."
+  },
+  {
+    "source": "kubernetes_daemon_set_v1",
+    "path": "spec.template.spec.service_account_name",
+    "target": "kubernetes_service_account_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 13,
+    "note": "service_account_name names the ServiceAccount the pods run as."
+  },
+  {
+    "source": "kubernetes_daemon_set_v1",
+    "path": "spec.template.spec.volume.config_map.name",
+    "target": "kubernetes_config_map_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 5,
+    "note": "volume.config_map.name names the ConfigMap that is mounted as a volume."
+  },
+  {
+    "source": "kubernetes_daemon_set_v1",
+    "path": "spec.template.spec.volume.projected.sources.config_map.name",
+    "target": "kubernetes_config_map_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 1,
+    "note": "The projected config_map source name names the ConfigMap that is projected into the volume."
+  },
+  {
+    "source": "kubernetes_deployment_v1",
+    "path": "metadata.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 16,
+    "note": "A deployment's metadata.namespace identifies the namespace it lives in."
+  },
+  {
+    "source": "kubernetes_deployment_v1",
+    "path": "spec.template.spec.container.args",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "support": 7
+  },
+  {
+    "source": "kubernetes_deployment_v1",
+    "path": "spec.template.spec.container.args",
+    "target": "kubernetes_runtime_class_v1",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "support": 2,
+    "note": "The -runtime-class argument names the RuntimeClass resource."
+  },
+  {
+    "source": "kubernetes_deployment_v1",
+    "path": "spec.template.spec.container.args",
+    "target": "kubernetes_secret_v1",
+    "attr": "metadata.0.name",
+    "match": "embedded",
+    "origin": "llm",
+    "support": 3,
+    "note": "--dynamic-serving-ca-secret-name explicitly names the cert-manager-webhook-ca Secret."
+  },
+  {
+    "source": "kubernetes_deployment_v1",
+    "path": "spec.template.spec.container.args",
+    "target": "kubernetes_service_v1",
+    "attr": "metadata.0.name",
+    "match": "embedded",
+    "origin": "llm",
+    "support": 14
+  },
+  {
+    "source": "kubernetes_deployment_v1",
+    "path": "spec.template.spec.container.command",
+    "target": "kubernetes_config_map_v1",
+    "attr": "metadata.0.name",
+    "match": "embedded",
+    "origin": "llm",
+    "support": 3
+  },
+  {
+    "source": "kubernetes_deployment_v1",
+    "path": "spec.template.spec.container.command",
+    "target": "kubernetes_deployment_v1",
+    "attr": "metadata.0.name",
+    "match": "embedded",
+    "origin": "llm",
+    "support": 2,
+    "note": "The --target=deployment/\u003cname\u003e argument names the deployment that the autoscaler scales."
+  },
+  {
+    "source": "kubernetes_deployment_v1",
+    "path": "spec.template.spec.container.command",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "support": 2,
+    "note": "The --namespace=kube-system flag names the namespace."
+  },
+  {
+    "source": "kubernetes_deployment_v1",
+    "path": "spec.template.spec.container.env.value",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "support": 5,
+    "note": "The namespace segment in service DNS names and namespace/name values names the target namespace."
+  },
+  {
+    "source": "kubernetes_deployment_v1",
+    "path": "spec.template.spec.container.env.value",
+    "target": "kubernetes_service_v1",
+    "attr": "metadata.0.name",
+    "match": "embedded",
+    "origin": "llm",
+    "support": 7
+  },
+  {
+    "source": "kubernetes_deployment_v1",
+    "path": "spec.template.spec.container.env.value",
+    "target": "kubernetes_service_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 5
+  },
+  {
+    "source": "kubernetes_deployment_v1",
+    "path": "spec.template.spec.container.env.value_from.config_map_key_ref.name",
+    "target": "kubernetes_config_map_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 113,
+    "note": "config_map_key_ref.name is the name of the ConfigMap the env var reads from."
+  },
+  {
+    "source": "kubernetes_deployment_v1",
+    "path": "spec.template.spec.container.env.value_from.secret_key_ref.name",
+    "target": "kubernetes_secret_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 4,
+    "note": "secret_key_ref.name is the name of the Secret the env var reads from."
+  },
+  {
+    "source": "kubernetes_deployment_v1",
+    "path": "spec.template.spec.container.env_from.secret_ref.name",
+    "target": "kubernetes_secret_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 2,
+    "note": "env_from.secret_ref.name identifies the Secret whose keys are loaded as environment variables."
+  },
+  {
+    "source": "kubernetes_deployment_v1",
+    "path": "spec.template.spec.priority_class_name",
+    "target": "kubernetes_priority_class_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 9,
+    "note": "priority_class_name names the PriorityClass object that the pod uses."
+  },
+  {
+    "source": "kubernetes_deployment_v1",
+    "path": "spec.template.spec.service_account_name",
+    "target": "kubernetes_service_account_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 6,
+    "note": "service_account_name identifies the ServiceAccount that the pod runs as."
+  },
+  {
+    "source": "kubernetes_deployment_v1",
+    "path": "spec.template.spec.volume.config_map.name",
+    "target": "kubernetes_config_map_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 14,
+    "note": "A config_map volume name identifies the ConfigMap that gets mounted."
+  },
+  {
+    "source": "kubernetes_deployment_v1",
+    "path": "spec.template.spec.volume.persistent_volume_claim.claim_name",
+    "target": "kubernetes_persistent_volume_claim_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 2,
+    "note": "claim_name is the name of the PersistentVolumeClaim the pod mounts, so it refers to this PVC resource."
+  },
+  {
+    "source": "kubernetes_deployment_v1",
+    "path": "spec.template.spec.volume.secret.secret_name",
+    "target": "kubernetes_secret_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 2,
+    "note": "secret_name identifies the Secret that gets mounted as a volume."
+  },
+  {
+    "source": "kubernetes_endpoints_v1",
+    "path": "metadata.name",
+    "target": "kubernetes_service_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 6,
+    "note": "An Endpoints object is tied to the Service with the same name, so its name identifies that Service."
+  },
+  {
+    "source": "kubernetes_endpoints_v1",
+    "path": "metadata.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 12,
+    "note": "metadata.namespace identifies the namespace that contains the Endpoints object."
+  },
+  {
+    "source": "kubernetes_horizontal_pod_autoscaler_v2",
+    "path": "metadata.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 2,
+    "note": "metadata.namespace identifies the namespace that contains the HPA."
+  },
+  {
+    "source": "kubernetes_horizontal_pod_autoscaler_v2",
+    "path": "spec.scale_target_ref.name",
+    "target": "kubernetes_deployment_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 2,
+    "note": "scale_target_ref.name names the workload (a Deployment) that the HPA scales."
+  },
+  {
+    "source": "kubernetes_mutating_webhook_configuration_v1",
+    "path": "webhook.client_config.service.name",
+    "target": "kubernetes_service_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 1,
+    "note": "client_config.service.name identifies the webhook's backing Service."
+  },
+  {
+    "source": "kubernetes_mutating_webhook_configuration_v1",
+    "path": "webhook.client_config.service.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 1,
+    "note": "client_config.service.namespace identifies the namespace of the webhook's Service."
+  },
+  {
+    "source": "kubernetes_network_policy_v1",
+    "path": "metadata.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 8,
+    "note": "metadata.namespace names the namespace the policy lives in."
+  },
+  {
+    "source": "kubernetes_network_policy_v1",
+    "path": "spec.egress.to.namespace_selector.match_labels.kubernetes.io/metadata.name",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 2,
+    "note": "The kubernetes.io/metadata.name label selector picks a namespace by its name."
+  },
+  {
+    "source": "kubernetes_network_policy_v1",
+    "path": "spec.egress.to.pod_selector.match_labels.*",
+    "target": "kubernetes_deployment_v1",
+    "attr": "spec.0.selector.0.match_labels.*",
+    "match": "exact",
+    "origin": "llm",
+    "support": 3,
+    "note": "The egress pod selector picks the deployment's pods by the same labels the deployment uses to select them."
+  },
+  {
+    "source": "kubernetes_network_policy_v1",
+    "path": "spec.egress.to.pod_selector.match_labels.*",
+    "target": "kubernetes_deployment_v1",
+    "attr": "spec.0.template.0.metadata.0.labels.*",
+    "match": "exact",
+    "origin": "llm",
+    "support": 3,
+    "note": "The egress pod selector matches the labels on the deployment's pod template, so it targets that workload's pods."
+  },
+  {
+    "source": "kubernetes_network_policy_v1",
+    "path": "spec.egress.to.pod_selector.match_labels.*",
+    "target": "kubernetes_stateful_set_v1",
+    "attr": "spec.0.selector.0.match_labels.*",
+    "match": "exact",
+    "origin": "llm",
+    "support": 1,
+    "note": "The egress pod selector picks the stateful set's pods by the stateful set's selector labels."
+  },
+  {
+    "source": "kubernetes_network_policy_v1",
+    "path": "spec.egress.to.pod_selector.match_labels.*",
+    "target": "kubernetes_stateful_set_v1",
+    "attr": "spec.0.template.0.metadata.0.labels.*",
+    "match": "exact",
+    "origin": "llm",
+    "support": 1,
+    "note": "The egress pod selector matches the labels on the stateful set's pod template."
+  },
+  {
+    "source": "kubernetes_network_policy_v1",
+    "path": "spec.ingress.from.pod_selector.match_labels.*",
+    "target": "kubernetes_deployment_v1",
+    "attr": "spec.0.selector.0.match_labels.*",
+    "match": "exact",
+    "origin": "llm",
+    "support": 26,
+    "note": "The ingress pod selector picks the deployment's pods by the deployment's selector labels."
+  },
+  {
+    "source": "kubernetes_network_policy_v1",
+    "path": "spec.ingress.from.pod_selector.match_labels.*",
+    "target": "kubernetes_deployment_v1",
+    "attr": "spec.0.template.0.metadata.0.labels.*",
+    "match": "exact",
+    "origin": "llm",
+    "support": 26,
+    "note": "An ingress from.pod_selector picks peer pods, and the deployment's pod template labels are exactly the labels those pods carry."
+  },
+  {
+    "source": "kubernetes_network_policy_v1",
+    "path": "spec.ingress.from.pod_selector.match_labels.*",
+    "target": "kubernetes_stateful_set_v1",
+    "attr": "spec.0.template.0.metadata.0.labels.*",
+    "match": "exact",
+    "origin": "llm",
+    "support": 20,
+    "note": "An ingress from.pod_selector picks peer pods, and the statefulset's pod template labels define those pods."
+  },
+  {
+    "source": "kubernetes_network_policy_v1",
+    "path": "spec.pod_selector.match_labels.*",
+    "target": "kubernetes_deployment_v1",
+    "attr": "spec.0.template.0.metadata.0.labels.*",
+    "match": "exact",
+    "origin": "llm",
+    "support": 10,
+    "note": "The policy's pod_selector chooses the pods it applies to, and those pods carry the deployment's pod template labels."
+  },
+  {
+    "source": "kubernetes_network_policy_v1",
+    "path": "spec.pod_selector.match_labels.*",
+    "target": "kubernetes_stateful_set_v1",
+    "attr": "spec.0.template.0.metadata.0.labels.*",
+    "match": "exact",
+    "origin": "llm",
+    "support": 8,
+    "note": "The policy's pod_selector chooses the pods it applies to, and those pods carry the statefulset's pod template labels."
+  },
+  {
+    "source": "kubernetes_persistent_volume_claim_v1",
+    "path": "metadata.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 2,
+    "note": "metadata.namespace names the namespace the PVC lives in."
+  },
+  {
+    "source": "kubernetes_persistent_volume_v1",
+    "path": "spec.claim_ref.name",
+    "target": "kubernetes_persistent_volume_claim_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 2,
+    "note": "claim_ref.name names the PersistentVolumeClaim bound to this volume."
+  },
+  {
+    "source": "kubernetes_persistent_volume_v1",
+    "path": "spec.claim_ref.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 2,
+    "note": "claim_ref.namespace names the namespace the bound claim lives in."
+  },
+  {
+    "source": "kubernetes_persistent_volume_v1",
+    "path": "spec.persistent_volume_source.csi.driver",
+    "target": "kubernetes_csi_driver_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 4,
+    "note": "The CSI driver field names the CSI driver object that provides the volume."
+  },
+  {
+    "source": "kubernetes_pod_disruption_budget_v1",
+    "path": "metadata.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 6,
+    "note": "metadata.namespace identifies the namespace the PDB lives in."
+  },
+  {
+    "source": "kubernetes_pod_disruption_budget_v1",
+    "path": "spec.selector.match_labels.*",
+    "target": "kubernetes_deployment_v1",
+    "attr": "spec.0.template.0.metadata.0.labels.*",
+    "match": "exact",
+    "origin": "llm",
+    "support": 7,
+    "note": "The PDB selector picks the pods made from the deployment's pod template by their labels."
+  },
+  {
+    "source": "kubernetes_resource_quota_v1",
+    "path": "metadata.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 1,
+    "note": "metadata.namespace identifies the namespace the resource quota lives in."
+  },
+  {
+    "source": "kubernetes_role_binding_v1",
+    "path": "metadata.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 21,
+    "note": "metadata.namespace names the namespace the role binding lives in."
+  },
+  {
+    "source": "kubernetes_role_binding_v1",
+    "path": "role_ref.name",
+    "target": "kubernetes_cluster_role_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 2,
+    "note": "A RoleBinding's role_ref can name a ClusterRole, and the values match exactly."
+  },
+  {
+    "source": "kubernetes_role_binding_v1",
+    "path": "role_ref.name",
+    "target": "kubernetes_role_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 7,
+    "note": "role_ref.name identifies the Role being bound."
+  },
+  {
+    "source": "kubernetes_role_binding_v1",
+    "path": "subject.name",
+    "target": "kubernetes_service_account_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 6,
+    "note": "The binding subject name identifies the service account being bound."
+  },
+  {
+    "source": "kubernetes_role_binding_v1",
+    "path": "subject.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 17,
+    "note": "The subject namespace identifies the namespace the subject lives in."
+  },
+  {
+    "source": "kubernetes_role_v1",
+    "path": "metadata.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 19,
+    "note": "The role's namespace identifies the namespace that contains it."
+  },
+  {
+    "source": "kubernetes_role_v1",
+    "path": "rule.resource_names",
+    "target": "kubernetes_config_map_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 3
+  },
+  {
+    "source": "kubernetes_role_v1",
+    "path": "rule.resource_names",
+    "target": "kubernetes_deployment_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 1
+  },
+  {
+    "source": "kubernetes_role_v1",
+    "path": "rule.resource_names",
+    "target": "kubernetes_endpoints_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 3,
+    "note": "The rule's resource_names lists the specific objects the role grants access to, so it can name these endpoints objects."
+  },
+  {
+    "source": "kubernetes_role_v1",
+    "path": "rule.resource_names",
+    "target": "kubernetes_secret_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 1,
+    "note": "cert-manager's role allows access to the cert-manager-webhook-ca Secret by name."
+  },
+  {
+    "source": "kubernetes_secret_v1",
+    "path": "metadata.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 18,
+    "note": "metadata.namespace names the namespace the secret lives in."
+  },
+  {
+    "source": "kubernetes_service_account_v1",
+    "path": "metadata.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 65,
+    "note": "metadata.namespace names the namespace the service account lives in."
+  },
+  {
+    "source": "kubernetes_service_v1",
+    "path": "metadata.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 12,
+    "note": "metadata.namespace names the namespace the service lives in."
+  },
+  {
+    "source": "kubernetes_service_v1",
+    "path": "spec.selector.*",
+    "target": "kubernetes_deployment_v1",
+    "attr": "spec.0.template.0.metadata.0.labels.*",
+    "match": "exact",
+    "origin": "llm",
+    "support": 27,
+    "note": "The service selector routes traffic to pods carrying these labels, which the deployment's pod template defines."
+  },
+  {
+    "source": "kubernetes_service_v1",
+    "path": "spec.selector.*",
+    "target": "kubernetes_stateful_set_v1",
+    "attr": "spec.0.template.0.metadata.0.labels.*",
+    "match": "exact",
+    "origin": "llm",
+    "support": 8,
+    "note": "The service selector routes to pods labelled by the stateful set's pod template."
+  },
+  {
+    "source": "kubernetes_stateful_set_v1",
+    "path": "metadata.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 1,
+    "note": "The metadata namespace identifies the namespace the stateful set lives in."
+  },
+  {
+    "source": "kubernetes_stateful_set_v1",
+    "path": "spec.service_name",
+    "target": "kubernetes_service_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 2,
+    "note": "service_name names the governing headless Service of the StatefulSet."
+  },
+  {
+    "source": "kubernetes_stateful_set_v1",
+    "path": "spec.template.spec.container.env.value_from.config_map_key_ref.name",
+    "target": "kubernetes_config_map_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 42,
+    "note": "config_map_key_ref.name names the ConfigMap the environment variable value is read from."
+  },
+  {
+    "source": "kubernetes_stateful_set_v1",
+    "path": "spec.template.spec.container.env.value_from.secret_key_ref.name",
+    "target": "kubernetes_secret_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 2,
+    "note": "secret_key_ref.name names the Secret the environment variable value is read from."
+  },
+  {
+    "source": "kubernetes_stateful_set_v1",
+    "path": "spec.template.spec.service_account_name",
+    "target": "kubernetes_service_account_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 2,
+    "note": "service_account_name names the ServiceAccount the pod runs as."
+  },
+  {
+    "source": "kubernetes_stateful_set_v1",
+    "path": "spec.template.spec.volume.config_map.name",
+    "target": "kubernetes_config_map_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 1,
+    "note": "volume.config_map.name names the ConfigMap that is mounted as a volume."
+  },
+  {
+    "source": "kubernetes_stateful_set_v1",
+    "path": "spec.template.spec.volume.persistent_volume_claim.claim_name",
+    "target": "kubernetes_persistent_volume_claim_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 2,
+    "note": "claim_name names the PersistentVolumeClaim that backs the volume."
+  },
+  {
+    "source": "kubernetes_validating_webhook_configuration_v1",
+    "path": "webhook.client_config.service.name",
+    "target": "kubernetes_service_v1",
+    "attr": "metadata.0.name",
+    "match": "exact",
+    "origin": "llm",
+    "support": 1,
+    "note": "client_config.service.name names the Service that receives the webhook calls."
+  },
+  {
+    "source": "kubernetes_validating_webhook_configuration_v1",
+    "path": "webhook.client_config.service.namespace",
+    "target": "kubernetes_namespace_v1",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "support": 1,
+    "note": "client_config.service.namespace names the namespace of the webhook Service, which is this namespace resource."
+  }
+]

@@ -1,0 +1,1548 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>desprawl</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600&family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
+<script src="https://unpkg.com/dagre@0.8.5/dist/dagre.min.js"></script>
+<script src="https://unpkg.com/cytoscape-dagre@2.5.0/cytoscape-dagre.js"></script>
+<script src="https://unpkg.com/elkjs@0.9.3/lib/elk.bundled.js"></script>
+<script src="https://unpkg.com/cytoscape-elk@2.2.0/dist/cytoscape-elk.js"></script>
+<style>
+  /* #ede7db = oklch(93% .018 88), the dark text colour. The light palette uses shadcn's :root tokens. */
+  :root {
+    --canvas: #f8f8f8; --dot: #d4d4d8; --panel: #ffffff; --surface: #ffffff; --raised: #f4f4f5; --input: #ffffff;
+    --node: #ffffff; --node-border: #d4d4d8; --node-border-hover: #a1a1aa;
+    --ink: #090909; --muted: #71717a; --faint: #a1a1aa; --rule: #e4e4e7; --border: #d4d4d8;
+    --edge: #a1a1aa; --edge-hover: #71717a; --accent: #2563eb; --accent-ink: #ffffff;
+    --cta: #090909; --cta-ink: #ffffff; --code: #f8f8f8;
+    --warn-bg: #fef3c7; --warn: #92400e; --danger: #f04238;
+    --tok-key: #0451a5; --tok-str: #a31515; --tok-kw: #3d5394; --tok-num: #098658; --tok-cmt: #8a8a8a;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.06);
+    --sans: "Geist", "sohne", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --canvas: #141414; --dot: #353535; --panel: #111110; --surface: #1c1c1c; --raised: #222222; --input: #111110;
+      --node: #1c1c1c; --node-border: #363636; --node-border-hover: #555555;
+      --ink: #ede7db; --muted: #b5b3ad; --faint: #62605b; --rule: #1e1e1e; --border: #2b2b2b;
+      --edge: #6e6e6e; --edge-hover: #888888; --accent: #a8c6fe; --accent-ink: #090909;
+      --cta: #ede7db; --cta-ink: #0d0d0c; --code: #161616;
+      --warn-bg: #442003; --warn: #efb100; --danger: #f04238;
+      --tok-key: #9cdcfe; --tok-str: #ce9178; --tok-kw: #569cd6; --tok-num: #b5cea8; --tok-cmt: #858585;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; height: 100vh; display: grid; grid-template-columns: 1fr; overflow: hidden;
+         font: 13px/1.5 var(--sans); background: var(--canvas); color: var(--ink);
+         -webkit-font-smoothing: antialiased; }
+  /* The header must not live inside #cy: cy.destroy() removes every child of its container. */
+  #stage { position: relative; min-width: 0; overflow: hidden; } /* a narrow window clips the zoom bar rather than spill over the panel */
+  #cy { position: absolute; inset: 0; background-color: var(--canvas);
+        background-image: radial-gradient(circle, var(--dot) 1px, transparent 1.2px); background-size: 22px 22px; }
+
+  /* toolbar */
+  header { position: absolute; top: 14px; left: 14px; right: 14px; z-index: 2; display: flex; gap: 6px; align-items: center;
+           flex-wrap: wrap; pointer-events: none; }
+  header > * { pointer-events: auto; }
+  .brand { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px 5px 8px; margin-right: 4px;
+           background: var(--surface); border: 1px solid var(--border); border-radius: 999px; box-shadow: var(--shadow); }
+  .brand svg { color: var(--accent); }
+  header b { font: 600 15px/1 "DM Sans", var(--sans); letter-spacing: -.01em; }
+  header .dir { color: var(--muted); font: 12px var(--mono); background: transparent; border: 0; outline: none; cursor: pointer; }
+  input, button, label.chip { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--border);
+         border-radius: 999px; padding: 5px 12px; line-height: 1.4; box-shadow: var(--shadow); }
+  button { cursor: pointer; transition: background .15s, border-color .15s, color .15s; }
+  button:hover, label.chip:hover { border-color: var(--node-border-hover); }
+  button.cta { background: var(--cta); color: var(--cta-ink); border-color: var(--cta); }
+  button.cta:hover { opacity: .9; }
+  input#search { background: var(--input); padding-left: 30px; width: 190px; outline: none;
+         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E");
+         background-repeat: no-repeat; background-position: 11px center; }
+  input#search::placeholder { color: var(--faint); }
+  input#search:focus { border-color: var(--accent); }
+  label.chip { display: inline-flex; gap: 7px; align-items: center; cursor: pointer; color: var(--muted); user-select: none; }
+  label.chip:has(input:checked) { color: var(--ink); }
+  label.chip input { appearance: none; margin: 0; width: 14px; height: 14px; padding: 0; border-radius: 4px; box-shadow: none;
+         border: 1px solid var(--node-border-hover); background: transparent; cursor: pointer; display: grid; place-items: center; }
+  label.chip input:checked { background: var(--accent); border-color: var(--accent); }
+  label.chip input:checked::after { content: ""; width: 7px; height: 4px; border: 2px solid var(--accent-ink); border-top: 0; border-right: 0;
+         transform: translateY(-1px) rotate(-45deg); }
+  .seg { display: inline-flex; gap: 2px; padding: 3px; background: var(--surface); border: 1px solid var(--border);
+         border-radius: 999px; box-shadow: var(--shadow); }
+  .seg button { border: 0; box-shadow: none; background: transparent; color: var(--muted); padding: 3px 12px; }
+  .seg button:hover { color: var(--ink); }
+  .seg button.on { background: var(--raised); color: var(--ink); }
+  @media (prefers-color-scheme: dark) { .seg button.on { background: #2a2a29; } }
+  .brand .sep { width: 1px; height: 16px; background: var(--border); }
+  .spacer { flex: 1; }
+  button.icon { width: 32px; height: 32px; padding: 0; display: inline-grid; place-items: center; color: var(--muted); }
+  button.icon:hover { color: var(--ink); }
+  /* options menu */
+  .menu { position: relative; }
+  .pop { position: absolute; right: 0; top: 40px; min-width: 250px; padding: 6px; display: none; flex-direction: column; gap: 2px;
+         background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); }
+  .menu.open .pop { display: flex; }
+  .pop label, .pop button { display: flex; align-items: center; gap: 9px; width: 100%; text-align: left; padding: 7px 10px;
+         border: 0; border-radius: 8px; box-shadow: none; background: transparent; color: var(--ink); cursor: pointer; }
+  .pop label:hover, .pop button:hover { background: var(--raised); }
+  .pop hr { border: 0; border-top: 1px solid var(--rule); margin: 4px 0; width: 100%; }
+  .pop small { display: block; color: var(--muted); font-size: 11.5px; }
+  .pop input { appearance: none; margin: 0; width: 14px; height: 14px; padding: 0; flex: none; border-radius: 4px; box-shadow: none;
+         border: 1px solid var(--node-border-hover); background: transparent; cursor: pointer; display: grid; place-items: center; }
+  .pop input:checked { background: var(--accent); border-color: var(--accent); }
+  .pop input:checked::after { content: ""; width: 7px; height: 4px; border: 2px solid var(--accent-ink); border-top: 0; border-right: 0;
+         transform: translateY(-1px) rotate(-45deg); }
+  /* zoom controls */
+  .zoom { position: absolute; left: 14px; bottom: 14px; z-index: 2; display: flex; flex-direction: column; gap: 6px; }
+  .zoom .lodbar { position: absolute; left: 42px; bottom: 0; white-space: nowrap; }
+  .toast { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 2; padding: 6px 14px; border-radius: 999px;
+           background: var(--cta); color: var(--cta-ink); font-size: 12px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  .toast.on { opacity: 1; }
+  /* A window of the page (split.html): its title bar and the page's bar
+     hold the controls, so of the header only what an agent marked stays. */
+  body.embed header > :not(#viewPill) { display: none; }
+
+  /* side panel */
+  /* Hidden until something is clicked or help is opened. */
+  body.panel { grid-template-columns: 1fr min(420px, 50vw); }
+  aside { display: none; position: relative; background: var(--panel); border-left: 1px solid var(--rule); overflow: auto; padding: 22px 22px 40px; }
+  body.panel aside { display: block; }
+  aside #close { position: absolute; top: 14px; right: 14px; box-shadow: none; border-color: transparent; background: transparent; }
+  aside #close:hover { background: var(--raised); }
+  #panelBody > :first-child { padding-right: 36px; }
+  button.icon.on { color: var(--ink); border-color: var(--node-border-hover); }
+  #help { position: relative; }
+  #help.alert::after { content: ""; position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; border-radius: 50%; background: var(--warn); }
+  aside h2 { font: 500 17px/1.3 var(--sans); letter-spacing: -.01em; margin: 0 0 6px; overflow-wrap: anywhere; }
+  .eyebrow { display: flex; align-items: center; gap: 7px; font: 500 11px var(--sans); text-transform: uppercase;
+             letter-spacing: .08em; color: var(--muted); margin-bottom: 8px; }
+  .hint { background: var(--raised); border: 1px solid var(--rule); border-radius: 10px; padding: 10px 12px; margin-top: 18px; }
+  details { margin-top: 6px; }
+  details > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 6px; padding: 7px 10px;
+                      border-radius: 8px; font: 12px/1.5 var(--mono); overflow-wrap: anywhere; }
+  details > summary::-webkit-details-marker { display: none; }
+  details > summary::before { content: "›"; color: var(--faint); transition: transform .12s; flex: none; width: 8px; }
+  details[open] > summary::before { transform: rotate(90deg); }
+  details > summary:hover { background: var(--raised); }
+  details > summary .ref { color: var(--faint); margin-left: auto; padding-left: 8px; white-space: nowrap; }
+  details.section > summary { font: 500 11px var(--sans); text-transform: uppercase; letter-spacing: .08em; color: var(--faint);
+                              padding: 6px 0; margin-top: 18px; }
+  details.section > summary:hover { background: none; color: var(--muted); }
+  details pre { margin: 4px 0 10px; }
+  aside h3 { font: 500 11px var(--sans); text-transform: uppercase; letter-spacing: .08em; color: var(--faint); margin: 24px 0 8px; }
+  aside p { color: var(--muted); margin: 0 0 8px; }
+  aside p b { color: var(--ink); font-weight: 500; }
+  aside a { color: var(--accent); text-decoration: none; }
+  aside a:hover { text-decoration: underline; }
+  .meta { color: var(--muted); font: 12px/1.6 var(--mono); }
+  pre { background: var(--code); border: 1px solid var(--rule); padding: 12px 14px; border-radius: 10px; overflow: auto;
+        font: 12px/1.6 var(--mono); margin: 0; color: var(--ink); }
+  pre .k { color: var(--tok-key); } pre .s { color: var(--tok-str); } pre .w { color: var(--tok-kw); }
+  pre .n { color: var(--tok-num); } pre .c { color: var(--tok-cmt); font-style: italic; }
+  ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; }
+  li { padding: 7px 10px; border-radius: 8px; cursor: pointer; font: 12px/1.5 var(--mono); border: 1px solid transparent;
+       transition: background .12s, border-color .12s; overflow-wrap: anywhere; }
+  li:hover { background: var(--raised); border-color: var(--rule); }
+  li b { font-weight: 500; }
+  li .attr { color: var(--tok-key); }
+  li .ref { color: var(--faint); display: block; padding-left: 12px; }
+  .tag { font: 500 10px/1 var(--sans); padding: 3px 7px; border-radius: 999px; background: var(--raised); color: var(--muted);
+         border: 1px solid var(--border); margin-left: 6px; vertical-align: 1px; white-space: nowrap; }
+  .tag.guess { background: var(--warn-bg); color: var(--warn); border-color: transparent; }
+  .empty { color: var(--faint); }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+  .stats div { background: var(--code); border: 1px solid var(--rule); border-radius: 10px; padding: 10px 12px; }
+  .stats b { display: block; font: 500 20px/1.2 var(--sans); letter-spacing: -.02em; }
+  .stats span { color: var(--muted); font-size: 12px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px 4px 8px; border-radius: 999px;
+                 border: 1px solid var(--border); background: var(--raised); color: var(--muted); font-size: 12px; }
+  .legend svg { flex: none; }
+  .legend.edges span { background: none; border: 0; padding: 2px 10px 2px 0; }
+  .diag { color: var(--danger); white-space: pre-wrap; font: 12px var(--mono); }
+  /* the agent's view (view.go) */
+  .viewpill { display: inline-flex; align-items: center; gap: 2px; padding: 3px; background: var(--surface); border: 1px solid var(--accent);
+              border-radius: 999px; box-shadow: var(--shadow); }
+  .viewpill[hidden] { display: none; }
+  .viewpill button { border: 0; box-shadow: none; background: transparent; padding: 3px 10px; display: inline-flex; align-items: center; gap: 7px; max-width: 320px; }
+  .viewpill button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .viewpill button:hover { background: var(--raised); }
+  .viewpill i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
+  .viewpill #viewClear { padding: 3px 8px; color: var(--muted); }
+  .note { color: var(--ink); white-space: pre-wrap; margin: 10px 0 0; }
+  .mk { display: inline-grid; place-items: center; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; margin-right: 6px;
+        font: 600 10px/1 var(--sans); color: var(--accent-ink); vertical-align: 1px; }
+  li .why { display: block; color: var(--muted); font-family: var(--sans); padding-left: 22px; }
+  pre.diff .add { background: rgba(34,197,94,.16); display: block; } pre.diff .del { background: rgba(239,68,68,.16); display: block; }
+  pre.diff .ctx { display: block; }
+  pre .hot { display: block; margin: 0 -14px; padding: 0 11px; border-left: 3px solid var(--hot);
+             background: color-mix(in srgb, var(--hot) 16%, transparent); }
+</style>
+</head>
+<body>
+<main id="stage">
+<div id="cy"></div>
+  <header>
+    <span class="brand">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><path d="M10 6.5h4a3 3 0 0 1 3 3V14"/></svg>
+      <b>desprawl</b><span class="sep"></span><select class="dir" id="dir" title="Terraform project"></select>
+    </span>
+    <span class="seg"><button id="lvlArch" class="on" title="Components and how they connect">Architecture</button><button id="lvlRaw" title="Every Terraform block and reference">Resources</button></span>
+    <input id="search" placeholder="Search…  ( / )" size="16" aria-label="Search components">
+    <span class="viewpill" id="viewPill" hidden><button id="viewOpen" title="What your agent is showing"><i></i><span id="viewTitle"></span></button><button id="viewClear" title="Clear the marks">✕</button></span>
+    <span class="spacer"></span>
+    <span class="menu" id="menu">
+      <button id="help" class="icon" title="Legend and project info (?)" aria-label="Legend and project info"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></button>
+      <button id="menuBtn" class="icon" title="View options" aria-label="View options"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+      <span class="pop">
+        <label><input type="checkbox" id="showLabels" checked> Connection labels</label>
+        <label id="metaChip"><input type="checkbox" id="showMeta"> Variables, locals &amp; outputs</label>
+        <hr>
+        <button id="autoLayout"><span>Reset layout<small>Arrange components automatically</small></span></button>
+      </span>
+    </span>
+  </header>
+  <div class="zoom">
+    <button id="zoomIn" class="icon" title="Zoom in (+)" aria-label="Zoom in"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button id="zoomOut" class="icon" title="Zoom out (−)" aria-label="Zoom out"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+    <span class="seg lodbar" id="lodbar" title="Level of detail: zoom out for providers, in for the resources inside each component"><button id="lodProviders">Providers</button><button id="lodComponents">Components</button><button id="lodDetails">Resources inside</button></span>
+    <button id="fit" class="icon" title="Fit to screen (F)" aria-label="Fit to screen"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+  </div>
+  <div class="toast" id="toast"></div>
+</main>
+<aside><button id="close" class="icon" title="Close (Esc)" aria-label="Close panel"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button><div id="panelBody"></div></aside>
+
+<!--desprawl:static-->
+<script>
+// A map saved with `desprawl html` carries every config's graph here and
+// talks to no server: no live updates, no saving, no agent views.
+const STATIC = window.DESPRAWL_STATIC || null;
+// A window of the page (split.html, screen.go) is this page in an iframe,
+// /map?embed&pane=ID, on one config for good. The page holds the one event
+// stream and passes its events on, and has the controls: the search and
+// display options for every window (opts), the view level, help and layout
+// reset in each window's title bar. PANE is the window's id, for the agent's
+// commands to it and its reports of what it shows.
+const EMBED = !STATIC && window.parent !== window && new URLSearchParams(location.search).has('embed');
+const PANE = EMBED && new URLSearchParams(location.search).get('pane');
+const toHost = msg => EMBED && parent.postMessage({ desprawl: true, ...msg }, location.origin);
+if (EMBED) document.body.classList.add('embed');
+// A window draws once the page's options (setOpts) arrived, so it doesn't draw twice.
+let optsArrived;
+const optsReady = EMBED ? Promise.race([new Promise(r => optsArrived = r), new Promise(r => setTimeout(r, 1500))]) : null;
+// Category tints (compute, storage, network, security, messaging);
+// the remaining categories use sky / clay / violet / yellow scales. [light, dark]
+const CATEGORY_COLORS = {
+  compute:       ['#c47a26', '#f7a040'],
+  storage:       ['#327797', '#67adc9'],
+  database:      ['#4b6cc8', '#7ea7ff'],
+  network:       ['#c46570', '#ef7892'],
+  identity:      ['#a77a00', '#efb100'],
+  security:      ['#2a7755', '#5cd49a'],
+  messaging:     ['#8b6cc8', '#b394ff'],
+  integration:   ['#b35543', '#cc866b'],
+  observability: ['#5d8a35', '#b2df8a'],
+  module:        ['#3d5394', '#a8c6fe'],
+  other:         ['#71717a', '#b5b3ad'],
+};
+const META_COLORS = ['#71717a', '#868686'];
+const dark = matchMedia('(prefers-color-scheme: dark)');
+const pick = pair => pair[dark.matches ? 1 : 0];
+const color = c => pick(CATEGORY_COLORS[c] || CATEGORY_COLORS.other);
+
+// Lucide-style 24×24 stroke icons per category.
+const ICONS = {
+  compute: '<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',
+  storage: '<path d="M22 12H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><path d="M6 16h.01"/><path d="M10 16h.01"/>',
+  database: '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/>',
+  network: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
+  identity: '<path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/><path d="m21 2-9.6 9.6"/><circle cx="7.5" cy="15.5" r="5.5"/>',
+  security: '<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><path d="M9 16.5h.01M12 16.5h.01M15 16.5h.01"/>',
+  messaging: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+  integration: '<path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/>',
+  observability: '<path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/>',
+  module: '<path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
+  other: '<rect width="16" height="16" x="4" y="4" rx="3"/>',
+  meta: '<path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/>',
+};
+const icon = (key, size, stroke, x = 0, y = 0) =>
+  `<svg x="${x}" y="${y}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[key] || ICONS.other}</svg>`;
+
+let cy, graph, level = 'arch';
+const side = document.getElementById('panelBody');
+
+// The side panel shows details ('detail') or the legend ('help'), or is closed (null).
+let panelView = null;
+function setPanel(view) {
+  const was = panelView;
+  panelView = view;
+  document.body.classList.toggle('panel', !!view);
+  $('help').classList.toggle('on', view === 'help');
+  if (!!was !== !!view && cy) cy.resize(); // the canvas changed width
+}
+const $ = id => document.getElementById(id);
+const nodeById = id => graph.nodes.find(n => n.id === id);
+const archById = id => graph.arch.nodes.find(n => n.id === id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const cssVar = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+// ---- The agent's view (view.go): a configuration to show, marks on its
+// components, resources and connections, and a note for the side panel.
+// Marks on resources are drawn on the component they're folded into.
+const MARK_COLORS = { added: ['#16a34a', '#4ade80'], changed: ['#d97706', '#fbbf24'], removed: ['#dc2626', '#f87171'],
+  warning: ['#ea580c', '#fb923c'] };
+const MARK_SIGNS = { added: '+', changed: '~', removed: '−', warning: '!', highlight: '•' };
+const DIFF_KINDS = new Set(['added', 'changed', 'removed']);
+const markColor = k => MARK_COLORS[k] ? pick(MARK_COLORS[k]) : cssVar('--accent');
+let view = { seq: 0 }, viewSeen = 0;
+let marked = { nodes: new Map(), edges: new Map(), off: [], byId: new Map() };
+const viewHere = () => !!view && view.dir === shownDir &&
+  !!(view.marks?.length || view.focus?.length || view.title || view.note);
+// What a mark's id is drawn on in the current view: a component (or the
+// component a resource is folded into), or in the resources view the block itself.
+function markTarget(id) {
+  if (level !== 'arch') return nodeById(id) ? id : null;
+  if (archById(id)) return id;
+  return graph.arch.nodes.find(a => a.members.includes(id))?.id || null;
+}
+function viewMarks() {
+  const out = { nodes: new Map(), edges: new Map(), off: [], byId: new Map() };
+  if (!viewHere()) return out;
+  const add = (map, k, m) => (map.get(k) || map.set(k, []).get(k)).push(m);
+  for (const m of view.marks || []) {
+    out.byId.set(m.id, m);
+    const conn = m.id.split(' -> ');
+    if (conn.length === 2) {
+      const [a, b] = conn.map(markTarget);
+      if (a && b && a !== b && m.kind !== 'removed') add(out.edges, a + '|' + b, m); else out.off.push(m);
+      continue;
+    }
+    const t = markTarget(m.id) || (m.owner && markTarget(m.owner));
+    t ? add(out.nodes, t, m) : out.off.push(m);
+  }
+  return out;
+}
+const kindOf = m => m.kind || 'highlight';
+// How a marked card is drawn: its colour, and the few words on its tag.
+function nodeStatus(id, ms) {
+  const direct = ms.filter(m => m.id === id), others = ms.filter(m => m.id !== id);
+  const kind = direct.length ? kindOf(direct[0])
+    : others.some(m => DIFF_KINDS.has(kindOf(m))) ? 'changed' : kindOf(others[0]);
+  let text = direct.find(m => m.note)?.note || (ms.length === 1 && ms[0].note) || '';
+  if (!text) {
+    const parts = [];
+    direct.forEach(m => {
+      if (m.attrs?.length) parts.push(m.attrs.slice(0, 2).join(', ') + (m.attrs.length > 2 ? ` +${m.attrs.length - 2}` : ''));
+      else if (kindOf(m) === 'added') parts.push('new');
+      else if (kindOf(m) === 'removed') parts.push('removed');
+    });
+    const one = others.length === 1 && others[0], type = one && (nodeById(one.id)?.type || one.id.split('.').slice(-2, -1)[0]);
+    if (one && one.attrs?.length) parts.push(`${one.attrs.slice(0, 2).join(', ')} (${type})`);
+    else if (one) parts.push(`${kindOf(one) === 'highlight' ? '' : kindOf(one) + ' '}${type}`);
+    else if (others.length) parts.push(plural(others.length, 'resource'));
+    text = parts.join(' · ');
+  }
+  return { kind, text: text && `${MARK_SIGNS[kind]} ${text}` };
+}
+const markClass = id => { const ms = marked.nodes.get(id); return ms ? 'mark-' + nodeStatus(id, ms).kind : ''; };
+const edgeMark = (from, to) => marked.edges.get(from + '|' + to)?.[0];
+const edgeLabel = (label, m) => !m ? label
+  : `${MARK_SIGNS[kindOf(m)]} ${m.note && m.note !== label ? `${label} · ${m.note}` : label}`;
+
+// Tags sit on the top edge of marked cards and follow them when dragged.
+const tagPos = (n, w) => ({ x: n.position('x') - n.width() / 2 + w / 2 + 8, y: n.position('y') - n.height() / 2 });
+function addTags() {
+  cy.remove('.tag');
+  const font = `600 10px ${SANS}`;
+  marked.nodes.forEach((ms, id) => {
+    const n = cy.getElementById(id), { kind, text } = nodeStatus(id, ms);
+    if (!n.length || !text || n.hasClass('hidden')) return;
+    const name = wrapText(text, font, 176, 1)[0], w = Math.ceil(textWidth(name, font)) + 16;
+    cy.add({ group: 'nodes', classes: 'tag' + (n.hasClass('faded') ? ' faded' : ''), position: tagPos(n, w),
+             data: { id: 'tag:' + id, of: id, name, label: '', full: text, w, h: 18, ty: 0, color: markColor(kind) } });
+  });
+}
+// Focus fades everything but the given components and the connections between them.
+function focusTargets() { return new Set((viewHere() && view.focus || []).map(markTarget).filter(Boolean)); }
+function applyFocus() {
+  const ids = focusTargets();
+  if (!ids.size) return;
+  const keep = cy.nodes().filter(n => ids.has(n.id()) || ids.has(n.data('of')));
+  cy.elements().not(keep.union(keep.edgesWith(keep))).not('[?isModule]').addClass('faded');
+}
+// Zoom to what the view is about: the focus, else everything marked.
+function frameView() {
+  if (!cy || !viewHere()) return;
+  if (view.zoom === 'providers') return zoomToLOD('providers');
+  let ids = focusTargets();
+  if (!ids.size) ids = new Set([...marked.nodes.keys(), ...[...marked.edges.keys()].flatMap(k => k.split('|'))]);
+  const eles = cy.nodes().filter(n => ids.has(n.id()));
+  if (!eles.length) { if (view.zoom === 'resources') zoomToLOD('details'); return; }
+  // One animation to a computed viewport: fit, but no closer than 100%
+  // unless the view asks for the resources inside the cards.
+  const bb = eles.boundingBox(), pad = 100;
+  let z = Math.min((cy.width() - 2 * pad) / Math.max(bb.w, 1), (cy.height() - 2 * pad) / Math.max(bb.h, 1));
+  z = view.zoom === 'resources' ? Math.max(z, DETAIL_ZOOM * 1.1) : Math.min(z, 1);
+  cy.animate({ zoom: z, pan: { x: cy.width() / 2 - (bb.x1 + bb.x2) / 2 * z, y: cy.height() / 2 - (bb.y1 + bb.y2) / 2 * z }, duration: 350 });
+}
+const diffHTML = d => `<pre class="diff">${d.replace(/\n$/, '').split('\n').map(l =>
+  `<span class="${l[0] === '+' ? 'add' : l[0] === '-' ? 'del' : 'ctx'}">${esc(l)}</span>`).join('')}</pre>`;
+// The top-level attribute or nested block each line of a block belongs to
+// ('' for its header and closing brace), as internal/tfmap/diff.go's keyedLines.
+function lineKeys(src) {
+  let depth = 0, key = '';
+  return src.split('\n').map(l => {
+    if (depth === 1 && l.trim()) key = (l.match(/^\s*([A-Za-z_][\w-]*)\s*(?:=|\{|"[^"]*"\s*\{)/) || [])[1] || '';
+    if (depth === 0) key = '';
+    const k = key, count = re => (l.match(re) || []).length;
+    depth += count(/[{[(]/g) - count(/[}\])]/g);
+    if (depth === 0) key = '';
+    return k;
+  });
+}
+// A block's source with the lines of the given attributes highlighted;
+// excerpt keeps only those lines, a line around them and the header.
+function hotSource(src, attrs, kind, excerpt) {
+  const keys = lineKeys(src), html = hcl(src).split('\n'), hot = keys.map(k => !!k && attrs.includes(k));
+  const near = i => hot.slice(Math.max(0, i - 1), i + 2).some(Boolean);
+  let out = '', gap = false;
+  html.forEach((h, i) => {
+    if (excerpt && i > 0 && !near(i)) { gap = true; return; }
+    if (gap) { out += '<span class="c">  …</span>\n'; gap = false; }
+    out += hot[i] ? `<span class="hot" style="--hot:${markColor(kind)}">${h}</span>` : h + '\n';
+  });
+  return `<pre>${out}${gap ? '<span class="c">  …</span>' : ''}</pre>`;
+}
+const hotAttrs = id => { const m = marked.byId.get(id); return m?.attrs?.length ? m : null; };
+const sourceHTML = n => { const m = hotAttrs(n.id); return m ? hotSource(n.source, m.attrs, kindOf(m), false) : `<pre>${hcl(n.source)}</pre>`; };
+const markBadge = m => `<span class="mk" style="background:${markColor(kindOf(m))}">${MARK_SIGNS[kindOf(m)]}</span>`;
+function markItem(m, clickable = true, open = false) {
+  const t = m.id.includes(' -> ') ? null : markTarget(m.id) || (m.owner && markTarget(m.owner));
+  const click = clickable && t ? (level === 'arch' ? `data-arch="${esc(t)}"` : `data-drill="${esc(t)}"`) : '';
+  const why = [m.attrs?.length && m.attrs.join(', '), m.note].filter(Boolean).join(' — ');
+  const head = `${markBadge(m)}${esc(m.id)}${t && t !== m.id && level === 'arch' ? `<span class="ref">in ${esc(archById(t)?.name || t)}</span>` : ''}`;
+  return m.diff
+    ? `<details ${open ? 'open' : ''}><summary ${click}>${head}</summary>${why ? `<p>${esc(why)}</p>` : ''}${diffHTML(m.diff)}</details>`
+    : m.attrs?.length && nodeById(m.id)
+    ? `<details ${open ? 'open' : ''}><summary ${click}>${head}</summary>${m.note ? `<p>${esc(m.note)}</p>` : ''}${hotSource(nodeById(m.id).source, m.attrs, kindOf(m), true)}</details>`
+    : `<ul><li ${click}>${head}${why ? `<span class="why">${esc(why)}</span>` : ''}</li></ul>`;
+}
+function showView() {
+  setPanel('view');
+  viewSeen = view.seq;
+  const on = (view.marks || []).filter(m => !marked.off.includes(m));
+  side.innerHTML = `
+    <div class="eyebrow">Shown by your agent</div>
+    <h2>${esc(view.title || 'Marked on the map')}</h2>
+    ${view.note ? `<p class="note">${esc(view.note)}</p>` : ''}
+    ${on.length ? `<h3>On the map (${on.length})</h3>${on.map(m => markItem(m, true, on.length <= 3)).join('')}` : ''}
+    ${marked.off.length ? `<h3>Not on the map (${marked.off.length})</h3>${marked.off.map(m => markItem(m, false)).join('')}` : ''}
+    <ul style="margin-top:18px"><li id="viewClearPanel">Clear the marks</li></ul>`;
+  bindLinks();
+  $('viewClearPanel').onclick = clearView;
+}
+// The marks on one component or block, at the top of its details.
+function markSection(ms) {
+  return ms?.length ? `<h3>Marked by your agent</h3>${ms.map(m => markItem(m, false, true)).join('')}` : '';
+}
+function clearView() {
+  fetch('/api/view/clear', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+}
+// follow: switch to the view's config. A pane of the split view does only
+// when the split page picks it (no other pane shows that config).
+async function onView(follow = true) {
+  const before = viewHere();
+  try { view = await getJSON('/api/view'); } catch { return; }
+  // A window the view isn't about, that had nothing of it, stays as it is.
+  if (!follow && !before && !viewHere()) return;
+  await loadDirs();
+  const pick = $('dir');
+  if (view.level) level = view.level;
+  const zoom = cy && cy.zoom(), pan = cy && cy.pan(), same = shownDir === pick.value;
+  await load();
+  await laidOut;
+  if (viewHere()) frameView();
+  else if (cy && same && zoom) { cy.zoom(zoom); cy.pan(pan); syncDots(); }
+}
+
+// ---- node cards: Cytoscape draws the card and the name label; an SVG data URI adds icon, type line and badge.
+const SANS = 'Geist, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+const SVG_SANS = '-apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif';
+const SVG_MONO = 'SFMono-Regular, Menlo, Consolas, monospace';
+const measureCtx = document.createElement('canvas').getContext('2d');
+function textWidth(text, font, tracking = 0) {
+  measureCtx.font = font;
+  return measureCtx.measureText(text).width + tracking * text.length;
+}
+const svgURI = (w, h, body, scale = 1) => 'data:image/svg+xml;utf8,' + encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" width="${w * scale}" height="${h * scale}" viewBox="0 0 ${w} ${h}">${body}</svg>`);
+
+// Fit text into maxW px: break after _ - . / or spaces, hard-break long runs,
+// and end the last allowed line with an ellipsis.
+function wrapText(text, font, maxW, maxLines, tracking = 0) {
+  if (maxW <= 0) return [''];
+  const fits = t => textWidth(t, font, tracking) <= maxW;
+  const lines = [];
+  let cur = '';
+  for (const part of text.match(/[^_\-./ ]+[_\-./ ]*|[_\-./ ]+/g) || [text]) {
+    if (fits(cur + part)) { cur += part; continue; }
+    if (cur) lines.push(cur);
+    cur = part;
+    while (!fits(cur)) {
+      let k = Math.max(1, cur.length - 1); // at worst one character a line, so the loop ends
+      while (k > 1 && !fits(cur.slice(0, k))) k--;
+      lines.push(cur.slice(0, k)); cur = cur.slice(k);
+    }
+  }
+  if (cur) lines.push(cur);
+  if (lines.length > maxLines) {
+    let last = lines.slice(maxLines - 1).join('');
+    while (last.length > 1 && !fits(last + '…')) last = last.slice(0, -1);
+    lines.splice(maxLines - 1, lines.length, last + '…');
+  }
+  return lines;
+}
+
+// Every card is CARD_W wide, the width internal/tfmap/route.go assumes (cardW), so edges
+// meet the card's sides. Long names wrap onto a second line, then truncate.
+const CARD_W = 200, CARD_H = 108;
+function archCard(n) {
+  const tint = color(n.category), muted = cssVar('--muted'), faint = cssVar('--faint');
+  const count = n.members.length, w = CARD_W, h = CARD_H;
+  const type = wrapText(n.label.toUpperCase(), `500 9.5px ${SVG_SANS}`, w - 32, 1, 1)[0];
+  const name = wrapText(n.name, `500 14px ${SANS}`, w - 28, 2);
+  const dy = name.length > 1 ? -8 : 0; // two-line names move icon and type up
+  // Same-named components (three ECS services called "main") get their module as a caption.
+  const shared = n.module && !drawnModule(n.module) && graph.arch.nodes.some(o => o !== n && o.name === n.name);
+  const mod = shared ? wrapText(n.module.split('.').pop(), `400 10px ${SVG_MONO}`, w / 2 - 34, 1)[0] : '';
+  const badgeText = String(count), bw = 26 + badgeText.length * 6.5;
+  const body =
+    icon(n.category, 24, tint, w / 2 - 12, 20 + dy) +
+    `<text x="${w / 2}" y="${66 + dy}" text-anchor="middle" font-family='${SVG_SANS}' font-size="9.5" font-weight="500" letter-spacing="1" fill="${muted}">${esc(type)}</text>` +
+    (mod ? `<text x="12" y="23" font-family='${SVG_MONO}' font-size="10" fill="${faint}">${esc(mod)}</text>` : '') +
+    `<g transform="translate(${w - bw - 10} 10)"><rect width="${bw}" height="18" rx="9" fill="none" stroke="${cssVar('--node-border')}"/>` +
+    icon('module', 10, faint, 7, 4) +
+    `<text x="${bw - 8}" y="12.5" text-anchor="end" font-family='${SVG_SANS}' font-size="10" font-weight="500" fill="${muted}">${badgeText}</text></g>`;
+  return { w, h, bg: svgURI(w, h, body), name: name.join('\n'), ty: name.length > 1 ? 30 : 28, ...detailCard(n) };
+}
+
+// Zoomed in, the same card shows the component's settings (the literal
+// arguments in its block: image, engine, instance class…) and the Terraform
+// resources folded into it, in type sizes that are readable at that zoom.
+const ROLE_ORDER = { child: 0, connector: 1, satellite: 2, helper: 3 };
+const DETAIL_LINES = 7, DETAIL_SETTINGS = 4;
+const SKIP_SETTINGS = new Set(['name', 'bucket', 'function_name', 'identifier', 'cluster_identifier', 'description']);
+function settings(src) {
+  const out = [];
+  for (const m of (src || '').matchAll(/^\s*([a-z_][\w]*)\s*=\s*("[^"$]*"|-?\d+(?:\.\d+)?|true|false)\s*$/gm))
+    if (!SKIP_SETTINGS.has(m[1]) && !out.some(o => o[0] === m[1])) out.push([m[1], m[2].replace(/^"|"$/g, '')]);
+  return out;
+}
+// An attribute's value as written (a reference, an expression), or {…} for a nested block.
+function attrValue(src, k) {
+  const a = src.match(new RegExp(`^\\s*${k}\\s*=\\s*(.+)$`, 'm'));
+  if (a) return a[1].trim().replace(/^"([^"]*)"$/, '$1');
+  return new RegExp(`^\\s*${k}\\s*(?:"[^"]*"\\s*)*\\{`, 'm').test(src) ? '{…}' : null;
+}
+function detailCard(n) {
+  const tint = color(n.category), muted = cssVar('--muted'), faint = cssVar('--faint'), w = CARD_W, h = CARD_H;
+  const others = n.members.filter(m => m !== n.id).map(nodeById).filter(Boolean)
+    .sort((a, b) => (ROLE_ORDER[a.role] ?? 9) - (ROLE_ORDER[b.role] ?? 9) || a.id.localeCompare(b.id));
+  const src = nodeById(n.id)?.source || '', hot = marked.byId.get(n.id)?.attrs || [];
+  const sets = [...hot.map(k => [k, attrValue(src, k)]).filter(([, v]) => v != null), ...settings(src).filter(([k]) => !hot.includes(k))]
+    .slice(0, Math.min(DETAIL_SETTINGS, DETAIL_LINES - Math.min(others.length, 2)));
+  const room = DETAIL_LINES - sets.length;
+  const shown = others.length > room ? others.slice(0, room - 1) : others;
+  const font = `400 6.5px ${SVG_MONO}`, own = marked.byId.get(n.id);
+  const line = (y, fill, text, x = 19) => `<text x="${x}" y="${y}" font-family='${SVG_MONO}' font-size="6.5" fill="${fill}">${esc(text)}</text>`;
+  let body =
+    icon(n.category, 10, tint, 10, 9) +
+    `<text x="24" y="16.5" font-family='${SVG_SANS}' font-size="6.5" font-weight="500" letter-spacing=".6" fill="${muted}">${esc(wrapText(n.label.toUpperCase(), `500 6.5px ${SVG_SANS}`, 110, 1, .6)[0])}</text>` +
+    `<text x="${w - 10}" y="16.5" text-anchor="end" font-family='${SVG_SANS}' font-size="6" fill="${faint}">${esc(plural(n.members.length, 'resource'))}</text>` +
+    `<path d="M10 40.5h${w - 20}" stroke="${cssVar('--rule')}"/>`;
+  sets.forEach(([k, v], i) => {
+    const key = wrapText(k, font, w / 2, 1)[0], y = 51 + i * 8.5, kw = textWidth(key, font);
+    const hot = own?.attrs?.includes(k);
+    body += line(y, hot ? markColor(kindOf(own)) : faint, key, 10) + line(y, cssVar('--ink'), wrapText(v, font, w - 26 - kw, 1)[0], 16 + kw);
+  });
+  shown.forEach((m, j) => {
+    const i = j + sets.length, y = 51 + i * 8.5, short = m.module ? m.id.slice(m.module.length + 1) : m.id;
+    const mk = marked.byId.get(m.id), mc = mk && markColor(kindOf(mk));
+    body += `<circle cx="13" cy="${y - 2.2}" r="1.6" fill="${mc || color(m.category)}"/>` +
+      line(y, mc || muted, wrapText((mk ? MARK_SIGNS[kindOf(mk)] + ' ' : '') + short, font, w - 30, 1)[0]);
+  });
+  if (others.length > shown.length) body += line(51 + (sets.length + shown.length) * 8.5, faint, `+${others.length - shown.length} more`);
+  if (!others.length && !sets.length) body += line(51, faint, 'no other resources', 10);
+  return { dbg: svgURI(w, h, body), dname: wrapText(n.name, `500 12px ${SANS}`, w - 20, 1)[0] };
+}
+
+// ---- Zoomed out, components gather into one card per provider (AWS,
+// Auth0, Kubernetes…) and the arrows into the connections between providers.
+const PROVIDER_NAMES = { aws: 'AWS', google: 'Google Cloud', azurerm: 'Azure', azuread: 'Entra ID', auth0: 'Auth0',
+  kubernetes: 'Kubernetes', helm: 'Helm', cloudflare: 'Cloudflare', github: 'GitHub', datadog: 'Datadog',
+  digitalocean: 'DigitalOcean', mongodbatlas: 'MongoDB Atlas', confluent: 'Confluent', snowflake: 'Snowflake',
+  vercel: 'Vercel', module: 'Modules' };
+const PROVIDER_KINDS = { aws: 'cloud', google: 'cloud', azurerm: 'cloud', digitalocean: 'cloud', kubernetes: 'cluster', helm: 'cluster' };
+const PROV_S = 3, PROV_W = 220, PROV_H = 132; // drawn at PROV_S times a normal card, to be read zoomed out
+const providerOf = id => { const r = nodeById(id); return r && r.type ? r.type.split('_')[0] : 'module'; };
+
+function providerGroups() {
+  const groups = new Map();
+  graph.arch.nodes.forEach(n => {
+    const p = providerOf(n.id);
+    groups.has(p) ? groups.get(p).push(n) : groups.set(p, [n]);
+  });
+  return groups;
+}
+
+// Where a provider runs, from its provider block: the region, domain or
+// project it's configured with, and the resource it's hosted on when the
+// block references one (kubernetes' host = aws_eks_cluster.x.endpoint).
+function providerHome(p) {
+  const blocks = graph.nodes.filter(n => n.kind === 'provider' && n.name === p);
+  const setting = blocks.map(b => (b.source.match(/\b(?:region|location|domain|project)\s*=\s*"([^"]+)"/) || [])[1]).find(Boolean);
+  const host = graph.edges.map(e => blocks.some(b => b.id === e.from) && nodeById(e.to)).find(n => n && n.kind === 'resource');
+  return { setting, host };
+}
+
+function providerCard(p, members) {
+  const w = PROV_W, h = PROV_H, muted = cssVar('--muted'), faint = cssVar('--faint');
+  const { setting, host } = providerHome(p);
+  const hostWords = host && `on ${host.type.split('_').slice(1).join(' ')} ${host.name}`;
+  const eyebrow = [PROVIDER_KINDS[p] || 'service', hostWords || setting]
+    .filter(Boolean).join(' · ').toUpperCase();
+  const counts = {};
+  members.forEach(n => counts[n.category] = (counts[n.category] || 0) + 1);
+  const cats = Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 6);
+  const resources = members.reduce((k, n) => k + n.members.length, 0);
+  let body = `<text x="${w / 2}" y="22" text-anchor="middle" font-family='${SVG_SANS}' font-size="7.5" font-weight="500" letter-spacing=".8" fill="${muted}">${esc(wrapText(eyebrow, `500 7.5px ${SVG_SANS}`, w - 28, 1, .8)[0])}</text>`;
+  // Category chips, as many to a row as fit.
+  const chipFont = `400 7.5px ${SVG_SANS}`, chips = cats.map(([c, k]) => ({ c, k, cw: 24 + textWidth(`${k} ${c}`, chipFont) }));
+  const rows = [[]];
+  chips.forEach(ch => {
+    const row = rows[rows.length - 1];
+    if (row.length && row.reduce((t, x) => t + x.cw + 4, 0) + ch.cw > w - 20) rows.push([ch]); else row.push(ch);
+  });
+  rows.slice(0, 2).forEach((row, r) => {
+    let x = w / 2 - (row.reduce((t, ch) => t + ch.cw + 4, 0) - 4) / 2;
+    const y = 68 + r * 20;
+    row.forEach(({ c, k, cw }) => {
+      body += `<rect x="${x}" y="${y}" width="${cw}" height="16" rx="8" fill="none" stroke="${cssVar('--node-border')}"/>` +
+        icon(c, 9, color(c), x + 6, y + 3.5) +
+        `<text x="${x + 18}" y="${y + 10.8}" font-family='${SVG_SANS}' font-size="7.5" fill="${muted}"><tspan font-weight="600" fill="${cssVar('--ink')}">${k}</tspan> ${esc(c)}</text>`;
+      x += cw + 4;
+    });
+  });
+  body += `<text x="${w / 2}" y="${h - 12}" text-anchor="middle" font-family='${SVG_SANS}' font-size="7" fill="${faint}">${plural(members.length, 'component')} · ${plural(resources, 'resource')}</text>`;
+  return { w: w * PROV_S, h: h * PROV_S, bg: svgURI(w, h, body, PROV_S), host };
+}
+
+// Provider cards start where their components are, then push apart until
+// none overlap, so zooming out keeps things roughly where they were.
+function addProviders() {
+  cy.remove('.prov');
+  const groups = providerGroups();
+  if (level !== 'arch' || groups.size < 2) return;
+  const groupOf = {};
+  const cards = [...groups].map(([p, members]) => {
+    members.forEach(n => groupOf[n.id] = p);
+    const ps = members.map(n => cy.getElementById(n.id).position());
+    return { p, members, ...providerCard(p, members),
+             x: ps.reduce((s, q) => s + q.x, 0) / ps.length, y: ps.reduce((s, q) => s + q.y, 0) / ps.length };
+  }).sort((a, b) => a.p.localeCompare(b.p));
+  const gap = 300;
+  for (let iter = 0; iter < 200; iter++) {
+    let moved = false;
+    cards.forEach((a, i) => cards.slice(i + 1).forEach(b => {
+      const ox = (a.w + b.w) / 2 + gap - Math.abs(a.x - b.x), oy = (a.h + b.h) / 2 + gap - Math.abs(a.y - b.y);
+      if (ox <= 0 || oy <= 0) return;
+      moved = true;
+      // Separate along the axis that needs less movement, keeping their order.
+      if (ox / (a.w + b.w) < oy / (a.h + b.h)) { const d = (a.x <= b.x ? 1 : -1) * ox / 2; a.x -= d; b.x += d; }
+      else { const d = (a.y <= b.y ? 1 : -1) * oy / 2; a.y -= d; b.y += d; }
+    }));
+    if (!moved) break;
+  }
+  const links = new Map();
+  const link = (from, to, label, kind) => {
+    const k = [from, to, kind].join('|');
+    if (!links.has(k)) links.set(k, { from, to, kind, labels: new Set(), count: 0 });
+    const l = links.get(k); l.labels.add(label); l.count++;
+  };
+  graph.arch.edges.forEach(e => { if (groupOf[e.from] !== groupOf[e.to]) link(groupOf[e.from], groupOf[e.to], e.label, 'reference'); });
+  cards.forEach(c => { if (c.host && groups.has(providerOf(c.host.id)) && providerOf(c.host.id) !== c.p) link(c.p, providerOf(c.host.id), 'runs on', 'connector'); });
+  // An arrow whose straight line would cross another card arcs around it.
+  const byP = Object.fromEntries(cards.map(c => [c.p, c]));
+  const bend = (a, b) => {
+    let out = 0;
+    cards.forEach(o => {
+      if (o === a || o === b) return;
+      const dx = b.x - a.x, dy = b.y - a.y, t = Math.max(0, Math.min(1, ((o.x - a.x) * dx + (o.y - a.y) * dy) / (dx * dx + dy * dy)));
+      const px = a.x + t * dx, py = a.y + t * dy;
+      if (Math.abs(px - o.x) > o.w / 2 + 40 || Math.abs(py - o.y) > o.h / 2 + 40) return;
+      const side = Math.sign(dx * (o.y - a.y) - dy * (o.x - a.x)) || 1; // which side of the line the card is on
+      out = -side * (Math.max(o.w, o.h) / 2 + 160);
+    });
+    return out;
+  };
+  cy.add([
+    ...cards.map(c => ({ group: 'nodes', classes: 'prov', position: { x: c.x, y: c.y },
+      data: { id: 'prov:' + c.p, provider: c.p, name: PROVIDER_NAMES[c.p] || cap(c.p), full: PROVIDER_NAMES[c.p] || c.p,
+              label: c.p, w: c.w, h: c.h, bg: c.bg, ty: -18 * PROV_S } })),
+    ...[...links.values()].map((l, i) => ({ group: 'edges', classes: 'prov ' + l.kind,
+      data: { id: 'prov-e' + i, source: 'prov:' + l.from, target: 'prov:' + l.to, bend: bend(byP[l.from], byP[l.to]),
+              label: l.kind === 'connector' ? 'runs on' : `${[...l.labels].join(' · ')}  ×${l.count}` } })),
+  ]);
+}
+
+// The level of detail follows the zoom: providers below overviewZoom (set
+// relative to the fitted view, so fitting always shows components), the
+// resources inside each card from DETAIL_ZOOM.
+const DETAIL_ZOOM = 1.6;
+let overviewZoom = 0.4, lod = null;
+function lodFor(z) {
+  if (level !== 'arch') return null;
+  if (z < overviewZoom && cy.$('.prov').length) return 'providers';
+  return z >= DETAIL_ZOOM ? 'details' : 'components';
+}
+function applyLOD() {
+  const next = lodFor(cy.zoom());
+  if (next === lod) return;
+  lod = next;
+  cy.batch(() => {
+    cy.elements().not('.prov').toggleClass('lod-off', lod === 'providers');
+    cy.$('.prov').toggleClass('lod-off', lod !== 'providers');
+    leaves().toggleClass('detail', lod === 'details');
+  });
+  $('lodbar').style.display = level === 'arch' ? '' : 'none';
+  $('lodProviders').style.display = cy.$('.prov').length ? '' : 'none';
+  ['providers', 'components', 'details'].forEach(l => $('lod' + cap(l)).classList.toggle('on', lod === l));
+}
+// Zoom to a level, about the centre of the screen (or of what's given).
+function zoomToLOD(l, eles) {
+  if (l === 'components' && !eles) return fit();
+  const z = l === 'providers' ? overviewZoom * 0.75 : l === 'details' ? DETAIL_ZOOM * 1.25 : null;
+  if (eles) return cy.animate({ fit: { eles, padding: 80 }, duration: 350,
+                               complete: () => { if (cy.zoom() > 1) zoomToLOD('components-at-1'); } });
+  if (l === 'components-at-1') return cy.animate({ zoom: { level: 1, renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 } }, duration: 200 });
+  cy.animate({ zoom: { level: z, renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 } }, duration: 300 });
+}
+
+function resourceCard(n) {
+  const meta = n.role === 'meta';
+  const tint = meta ? pick(META_COLORS) : color(n.category);
+  const rawType = n.kind === 'data' ? `data.${n.type}` : (n.type || n.kind);
+  const typeFont = `400 9.5px ${SVG_MONO}`;
+  const w = 190 + (meta ? 14 : 0), h = 58;
+  const type = wrapText(rawType, typeFont, 150, 1)[0], tw = textWidth(type, typeFont);
+  const cx = (w - (meta ? 14 : 0)) / 2, gx = cx - (tw + 17) / 2;
+  const body = icon(meta ? 'meta' : n.category, 12, tint, gx, 12) +
+    `<text x="${gx + 17}" y="21.5" font-family='${SVG_MONO}' font-size="9.5" fill="${cssVar('--muted')}">${esc(type)}</text>`;
+  return { w, h, bg: svgURI(w, h, body), name: wrapText(n.name, `500 12.5px ${SANS}`, 170, 1)[0], ty: 9 };
+}
+
+async function fontsReady() {
+  if (!document.fonts) return;
+  const want = ['500 14px Geist', '500 12.5px Geist', '400 10px "JetBrains Mono"'].map(f => document.fonts.load(f));
+  await Promise.race([Promise.all(want), new Promise(r => setTimeout(r, 1500))]).catch(() => {});
+}
+
+async function getJSON(url) {
+  if (STATIC) {
+    const u = new URL(url, 'http://static');
+    if (u.pathname === '/api/dirs') return STATIC.dirs;
+    if (u.pathname === '/api/graph') {
+      const g = STATIC.graphs[u.searchParams.get('dir')];
+      if (!g) throw new Error('This configuration is not in the file.');
+      return g;
+    }
+    if (u.pathname === '/api/view') return { seq: 0 };
+    return null;
+  }
+  const r = await fetch(url);
+  if (!r.ok) throw new Error((await r.text()).trim() || r.statusText);
+  return r.json();
+}
+
+// Configs are paths in the workspace. A window is opened on one (?dir=);
+// the file desprawl html saves picks from all of them.
+async function loadDirs() {
+  const pick = $('dir');
+  const { root, current, dirs } = await getJSON('/api/dirs');
+  const want = pick.value || new URLSearchParams(location.search).get('dir') || view.dir;
+  const sel = dirs.includes(want) ? want : current;
+  const rootName = root.split(/[\\/]/).pop();
+  pick.innerHTML = dirs.length
+    ? dirs.map(d => `<option value="${esc(d)}" ${d === sel ? 'selected' : ''}>${esc(d === '.' ? rootName : d)}</option>`).join('')
+    : `<option value="">no .tf files in ${esc(rootName)}</option>`;
+  pick.dataset.root = rootName;
+  toHost({ dir: pick.value, name: sel === '.' ? rootName : sel });
+}
+
+// Loads can overlap (a config switch, a live update, the reload after a
+// drag): only the latest one is drawn. shownDir is the config on screen,
+// which is where a drag saves.
+let loadGen = 0, shownDir = null, loadError = '';
+async function fetchGraph() {
+  const gen = ++loadGen, dir = $('dir').value;
+  const g = await getJSON('/api/graph?dir=' + encodeURIComponent(dir));
+  return gen === loadGen ? { g, dir } : null;
+}
+
+async function load() {
+  const pick = $('dir');
+  let got;
+  try {
+    if (!pick.options.length) await loadDirs();
+    if (!pick.value) {
+      side.innerHTML = `<h2>No Terraform here</h2><p>desprawl didn't find any <b>.tf</b> files in <b>${esc(pick.dataset.root)}</b>
+        or below it. Start it in your Terraform repository, or pass the directory: <code>desprawl path/to/infra</code>.</p>`;
+      setPanel('detail');
+      return;
+    }
+    if (!(got = await fetchGraph())) return;
+  } catch (err) {
+    // Don't leave the previous config's diagram up, where a drag would save
+    // it under this one's name.
+    if (cy) { cy.destroy(); cy = null; }
+    graph = null; shownDir = null; loadError = err.message;
+    side.innerHTML = `<h2>Couldn't load this project</h2><p>${esc(err.message)}</p>`;
+    setPanel('detail');
+    return;
+  }
+  ({ g: graph, dir: shownDir } = got);
+  loadError = '';
+  await fontsReady();
+  render();
+  laidOut.then(nextCommand);
+}
+
+$('dir').onchange = () => {
+  level = 'arch';
+  load();
+};
+
+// Live view: the server reports .tf changes (serve.go); re-render in place,
+// keeping zoom, pan and selection. A failed parse mid-edit keeps the last diagram.
+let selected = null;
+function listen() {
+  if (EMBED) {
+    window.addEventListener('message', ev => {
+      if (ev.origin !== location.origin || ev.source !== parent || !ev.data?.desprawl) return;
+      const m = ev.data;
+      if (m.opts) setOpts(m.opts);
+      if (m.level && m.level !== level && cy) { level = m.level; render(); }
+      if (m.help && cy) toggleHelp();
+      if (m.resetLayout) $('autoLayout').onclick();
+      if (m.event === 'view') onView(m.follow);
+      else if (m.event === 'window') nextCommand();
+      else if (m.event) onEvent(m.event);
+    });
+    document.addEventListener('pointerdown', () => toHost({ focus: true }), true);
+    toHost({ ready: true });
+  }
+}
+async function onEvent(data) {
+  if (data === 'view') return onView();
+  try {
+    await loadDirs();
+    const got = await fetchGraph();
+    if (!got) return;
+    if (!cy) { ({ g: graph, dir: shownDir } = got); render(); toast('Updated from disk'); return; }
+    const zoom = cy.zoom(), pan = cy.pan(), sel = selected;
+    ({ g: graph, dir: shownDir } = got); render();
+    await laidOut;
+    cy.zoom(zoom); cy.pan(pan); syncDots();
+    if (sel && cy.getElementById(sel).length) select(sel);
+    toast('Updated from disk');
+  } catch (err) {
+    toast("Couldn't parse the change: " + err.message.split('\n')[0]);
+  }
+}
+
+// Expanded local modules are drawn as containers around their contents.
+// "module.app.module.app" nests inside "module.app".
+function moduleContainers(mods) {
+  const all = new Set();
+  mods.filter(Boolean).forEach(m => {
+    const parts = m.split('.');
+    for (let i = 2; i <= parts.length; i += 2) all.add(parts.slice(0, i).join('.'));
+  });
+  return [...all].filter(m => !drawnModules || drawnModules.has(m)).map(m => {
+    const parent = drawnModule(m.split('.').slice(0, -2).join('.'));
+    return { data: { id: 'mod:' + m, label: m.split('.').pop(), isModule: true, w: 1, h: 1, bg: 'none',
+                     ...(parent ? { parent: 'mod:' + parent } : {}) } };
+  });
+}
+// With a saved layout arranged by flow, a module's components may be spread
+// out; its box is only drawn when nothing else sits inside it.
+let drawnModules = null; // null = draw every module
+function contiguousModules() {
+  if (level !== 'arch' || !graph.layout) return null;
+  const grid = graph.layout.grid, boxes = {};
+  graph.arch.nodes.forEach(n => {
+    const p = grid[n.id];
+    if (!p || !n.module) return;
+    const parts = n.module.split('.');
+    for (let i = 2; i <= parts.length; i += 2) {
+      const m = parts.slice(0, i).join('.'), b = boxes[m];
+      boxes[m] = b ? [Math.min(b[0], p[0]), Math.min(b[1], p[1]), Math.max(b[2], p[0]), Math.max(b[3], p[1])] : [p[0], p[1], p[0], p[1]];
+    }
+  });
+  return new Set(Object.keys(boxes).filter(m => !graph.arch.nodes.some(n => {
+    const p = grid[n.id];
+    if (!p || n.module === m || (n.module || '').startsWith(m + '.')) return false;
+    const b = boxes[m];
+    return p[0] >= b[0] && p[0] <= b[2] && p[1] >= b[1] && p[1] <= b[3];
+  })));
+}
+// The innermost drawn module a component belongs to.
+function drawnModule(mod) {
+  if (!mod) return null;
+  const parts = mod.split('.');
+  for (let i = parts.length; i >= 2; i -= 2) {
+    const m = parts.slice(0, i).join('.');
+    if (!drawnModules || drawnModules.has(m)) return m;
+  }
+  return null;
+}
+const inModule = n => { const m = drawnModule(n.module); return m ? { parent: 'mod:' + m } : {}; };
+
+// Routes come from the server (internal/tfmap/route.go) as absolute corner points on the
+// layout grid; Cytoscape's segments are relative to the line between the two
+// node centres, so convert: weight along that line, distance across it.
+function routeStyle(e) {
+  if (!e.route || !graph.layout) return {};
+  const [c1, r1] = graph.layout.grid[e.from], [c2, r2] = graph.layout.grid[e.to];
+  const sx = c1 * CELL_W, sy = r1 * CELL_H, dx = c2 * CELL_W - sx, dy = r2 * CELL_H - sy;
+  const len2 = dx * dx + dy * dy, len = Math.sqrt(len2);
+  const w = [], d = [];
+  e.route.points.forEach(([px, py]) => {
+    const vx = px - sx, vy = py - sy;
+    w.push(((vx * dx + vy * dy) / len2).toFixed(4));
+    d.push(((vy * dx - vx * dy) / len).toFixed(2));
+  });
+  const end = p => `${p.side * 50}% ${p.offset.toFixed(1)}px`;
+  return { routed: true, sw: w.join(' '), sd: d.join(' '), se: end(e.route.src), te: end(e.route.dst) };
+}
+
+function elements() {
+  drawnModules = contiguousModules();
+  marked = viewMarks();
+  if (level === 'arch') {
+    const pairs = {};
+    graph.arch.edges.forEach(e => { const k = [e.from, e.to].sort().join('|'); pairs[k] = (pairs[k] || 0) + 1; });
+    return [
+      ...moduleContainers(graph.arch.nodes.map(n => n.module)),
+      ...graph.arch.nodes.map(n => {
+        const c = archCard(n);
+        return { classes: markClass(n.id), data: { id: n.id, label: `${n.label}\n${n.name}`, name: c.name, full: n.name, color: color(n.category),
+                         count: n.members.length, w: c.w, h: c.h, ty: c.ty, bg: c.bg, dbg: c.dbg, dname: c.dname, ...inModule(n) } };
+      }),
+      ...graph.arch.edges.map((e, i) => ({ data: { id: 'a' + i, source: e.from, target: e.to, label: edgeLabel(e.label, edgeMark(e.from, e.to)), both: !!e.both, ...routeStyle(e) },
+                                           classes: [e.kind, e.directed ? '' : 'undirected', edgeMark(e.from, e.to) ? 'mark-' + kindOf(edgeMark(e.from, e.to)) : '',
+                                                     !e.route && pairs[[e.from, e.to].sort().join('|')] > 1 ? 'multi' : ''].join(' ') })),
+    ];
+  }
+  return [
+    ...moduleContainers(graph.nodes.map(n => n.module)),
+    ...graph.nodes.map(n => {
+      const c = resourceCard(n);
+      return { classes: markClass(n.id), data: { id: n.id, label: n.id, name: c.name, full: n.id, ty: c.ty, kind: n.kind,
+                       color: n.role === 'meta' ? pick(META_COLORS) : color(n.category),
+                       meta: n.role === 'meta', w: c.w, h: c.h, bg: c.bg, ...inModule(n) } };
+    }),
+    ...graph.edges.map((e, i) => ({ data: { id: 'e' + i, source: e.from, target: e.to, label: edgeLabel(e.attr, edgeMark(e.from, e.to)) },
+                                    classes: edgeMark(e.from, e.to) ? 'mark-' + kindOf(edgeMark(e.from, e.to)) : '' })),
+  ];
+}
+
+function syncDots() {
+  let z = cy.zoom(), size = 22 * z;
+  while (size < 11) size *= 2;
+  const p = cy.pan();
+  $('cy').style.backgroundSize = `${size}px ${size}px`;
+  $('cy').style.backgroundPosition = `${p.x}px ${p.y}px`;
+}
+
+function render() {
+  toHost({ level });
+  $('lvlArch').classList.toggle('on', level === 'arch');
+  $('lvlRaw').classList.toggle('on', level === 'raw');
+  $('metaChip').style.display = level === 'raw' ? '' : 'none';
+  if (cy) cy.destroy();
+  selected = null; // a selection from another config or view
+  const arch = level === 'arch';
+  const v = name => cssVar(name);
+  cy = cytoscape({
+    container: $('cy'), minZoom: 0.05, maxZoom: 4,
+    elements: elements(),
+    wheelSensitivity: 0.3,
+    style: [
+      { selector: 'node', style: {
+          shape: 'round-rectangle', 'corner-radius': 12, width: 'data(w)', height: 'data(h)',
+          'background-color': v('--node'), 'border-width': 1, 'border-color': v('--node-border'),
+          'background-image': 'data(bg)', 'background-fit': 'contain', 'background-clip': 'none',
+          'background-image-smoothing': 'yes', 'background-image-crossorigin': 'null',
+          label: 'data(name)', 'font-family': SANS, 'font-weight': 500, 'font-size': arch ? 14 : 12.5,
+          color: v('--ink'), 'text-valign': 'center', 'text-halign': 'center',
+          'text-margin-y': 'data(ty)', 'text-wrap': 'wrap', 'text-max-width': 400, 'line-height': 1.25,
+          'transition-property': 'border-color, opacity', 'transition-duration': 160 } },
+      { selector: 'node[kind = "data"]', style: { 'border-style': 'dashed', 'border-width': 1.5 } },
+      { selector: 'node[?meta]', style: { shape: 'round-tag', 'corner-radius': 10, 'background-color': v('--raised') } },
+      { selector: 'node.hover', style: { 'border-color': v('--node-border-hover') } },
+      { selector: 'edge', style: {
+          width: 1.5, 'curve-style': arch ? 'round-taxi' : 'bezier', 'taxi-direction': 'horizontal', 'taxi-radius': 10,
+          'taxi-turn': '50%', 'line-color': v('--edge'), 'line-cap': 'round',
+          'source-arrow-shape': 'square', 'source-arrow-color': v('--edge'), 'source-distance-from-node': 0,
+          'target-arrow-shape': 'triangle', 'target-arrow-color': v('--edge'), 'arrow-scale': 0.7,
+          label: 'data(label)', 'font-size': 10, 'font-family': 'JetBrains Mono, ui-monospace, monospace', color: v('--muted'),
+          'text-background-color': v('--surface'), 'text-background-opacity': 1, 'text-background-padding': 4,
+          'text-background-shape': 'round-rectangle', 'text-border-width': 1, 'text-border-color': v('--node-border'),
+          'text-border-opacity': 1, 'text-rotation': arch ? 'none' : 'autorotate',
+          'transition-property': 'line-color, target-arrow-color, source-arrow-color, opacity', 'transition-duration': 160 } },
+      { selector: 'edge.multi', style: { 'curve-style': 'bezier', 'control-point-step-size': 56 } },
+      { selector: 'edge[?routed]', style: { 'curve-style': 'round-segments', 'segment-radii': 8, 'edge-distances': 'node-position',
+          'segment-weights': 'data(sw)', 'segment-distances': 'data(sd)', 'source-endpoint': 'data(se)', 'target-endpoint': 'data(te)' } },
+      { selector: 'edge[?both]', style: { 'source-arrow-shape': 'triangle' } },
+      { selector: 'edge.connector', style: { 'line-style': 'dashed', 'line-dash-pattern': [6, 4], 'font-family': SANS,
+          'font-size': 11, color: v('--ink') } },
+      { selector: 'edge.undirected', style: { 'target-arrow-shape': 'square' } },
+      { selector: 'edge.hover', style: { 'line-color': v('--edge-hover'), 'source-arrow-color': v('--edge-hover'),
+          'target-arrow-color': v('--edge-hover') } },
+      { selector: '.nolabel', style: { label: '' } },
+      { selector: '.faded', style: { opacity: 0.18 } },
+      { selector: 'node[?isModule]', style: {
+          shape: 'round-rectangle', 'corner-radius': 16, 'background-color': v('--node'), 'background-opacity': 0.35,
+          'background-image': 'none', 'border-width': 1, 'border-style': 'dashed', 'border-color': v('--node-border-hover'),
+          label: 'data(label)', 'text-valign': 'top', 'text-halign': 'center', 'text-margin-y': -6,
+          'font-family': 'JetBrains Mono, ui-monospace, monospace', 'font-size': 12, 'font-weight': 400,
+          color: v('--muted'), padding: '28px', 'text-margin-y': -6 } },
+      { selector: 'node[?isModule].faded', style: { opacity: 1 } },
+      { selector: 'edge.hl', style: { 'line-color': v('--accent'), 'target-arrow-color': v('--accent'),
+          'source-arrow-color': v('--accent'), width: 2, color: v('--ink'), 'text-border-color': v('--accent'), 'z-index': 9 } },
+      ...['highlight', ...Object.keys(MARK_COLORS)].flatMap(k => [
+        { selector: `node.mark-${k}`, style: { 'border-width': 2.5, 'border-color': markColor(k), 'underlay-color': markColor(k),
+            'underlay-opacity': 0.14, 'underlay-padding': 7, 'underlay-shape': 'round-rectangle' } },
+        { selector: `edge.mark-${k}`, style: { 'line-color': markColor(k), 'target-arrow-color': markColor(k), 'source-arrow-color': markColor(k),
+            width: 2.5, color: v('--ink'), 'text-border-color': markColor(k), 'z-index': 8 } },
+      ]),
+      { selector: 'node:selected', style: { 'border-width': 2, 'border-color': v('--accent') } },
+      { selector: 'node.detail', style: { 'background-image': 'data(dbg)', label: 'data(dname)', 'font-size': 12, 'text-margin-y': -23 } },
+      { selector: 'node.prov', style: { 'corner-radius': 12 * PROV_S, 'border-width': PROV_S, 'font-size': 20 * PROV_S, 'font-weight': 600,
+          'text-max-width': PROV_W * PROV_S } },
+      { selector: 'edge.prov', style: { width: 1.5 * PROV_S, 'curve-style': 'bezier', 'control-point-step-size': 60 * PROV_S,
+          'font-size': 10 * PROV_S, 'text-background-padding': 4 * PROV_S, 'text-border-width': PROV_S, 'line-dash-pattern': [6 * PROV_S, 4 * PROV_S] } },
+      { selector: 'edge.prov[bend != 0]', style: { 'curve-style': 'unbundled-bezier', 'control-point-distances': 'data(bend)',
+          'control-point-weights': 0.5 } },
+      { selector: 'node.tag', style: { shape: 'round-rectangle', 'corner-radius': 9, 'background-color': 'data(color)', 'background-image': 'none',
+          'border-width': 0, color: v('--accent-ink'), 'font-size': 10, 'font-weight': 600, 'text-margin-y': 0, events: 'no', 'z-index': 20,
+          'z-compound-depth': 'top' } },
+      { selector: '.lod-off', style: { opacity: 0, events: 'no' } },
+      { selector: '.hidden', style: { display: 'none' } },
+    ],
+  });
+  cy.on('tap', 'node', e => {
+    if (e.target.hasClass('prov')) zoomToLOD('components', cy.nodes().filter(n => providerOf(n.id()) === e.target.data('provider') && archById(n.id())));
+    else if (!e.target.data('isModule')) select(e.target.id());
+  });
+  cy.on('tap', 'edge', e => level === 'arch' && !e.target.hasClass('prov') && showArchEdge(e.target));
+  cy.on('tap', e => { if (e.target === cy) clearSel(); });
+  cy.on('mouseover', 'node, edge', e => {
+    e.target.addClass('hover'); $('cy').style.cursor = 'pointer'; $('cy').title = e.target.data('full') || '';
+  });
+  cy.on('mouseout', 'node, edge', e => { e.target.removeClass('hover'); $('cy').style.cursor = ''; $('cy').title = ''; });
+  cy.on('viewport', syncDots);
+  cy.on('zoom', applyLOD);
+  lod = undefined;
+  cy.on('position', 'node', e => {
+    const t = cy.getElementById('tag:' + e.target.id());
+    if (t.length) t.position(tagPos(e.target, t.data('w')));
+  });
+  if (STATIC) cy.autoungrabify(true); // desprawl routes the edges, so a moved box would leave them behind
+  else cy.on('dragfree', 'node', e => { if (level === 'arch' && !e.target.hasClass('prov')) snapAndSave(e.target); });
+  applyFilters();
+  $('viewPill').hidden = !viewHere();
+  $('viewTitle').textContent = view.title || 'Marked by your agent';
+  if (panelView === 'help') showOverview();
+  else if (viewHere() && (panelView === 'view' || view.seq !== viewSeen)) showView();
+  else setPanel(null);
+  $('help').classList.toggle('alert', !!graph.diagnostics || graph.nodes.some(n => !n.classified && n.role !== 'meta'));
+}
+
+// Saved layouts are a coarse grid (layouts/<example>.json, id -> [col, row]) so
+// they can be edited by hand or by Claude; see `desprawl -ascii`.
+const CELL_W = 300, CELL_H = 170;
+const leaves = () => cy.nodes().not('[?isModule]').not('.prov').not('.tag');
+
+function saveGrid(grid) {
+  return fetch('/api/layout?dir=' + encodeURIComponent(shownDir),
+               { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ grid }) });
+}
+
+// Snap every component to the nearest free cell and persist the grid. The
+// dropped component goes last, so it moves aside rather than the others.
+function snapAndSave(dropped) {
+  const grid = {}, taken = new Set();
+  leaves().sort((a, b) => (a === dropped) - (b === dropped)).forEach(n => {
+    let c = Math.round(n.position('x') / CELL_W), r = Math.round(n.position('y') / CELL_H);
+    while (taken.has(c + ',' + r)) r++;
+    taken.add(c + ',' + r);
+    grid[n.id()] = [c, r];
+    n.position({ x: c * CELL_W, y: r * CELL_H });
+  });
+  graph.layout = { grid };
+  saveGrid(grid)
+    .then(async r => { if (!r.ok) throw new Error((await r.text()).trim() || r.statusText); })
+    .then(reloadKeepingView).then(() => toast('Layout saved'))
+    .catch(err => toast("Couldn't save the layout: " + err.message));
+}
+
+// Re-fetch (routes depend on positions) but keep the user's zoom and pan.
+async function reloadKeepingView() {
+  const zoom = cy.zoom(), pan = cy.pan();
+  await load();
+  await laidOut;
+  if (cy) { cy.zoom(zoom); cy.pan(pan); syncDots(); }
+}
+
+function presetLayout(grid) {
+  const rows = Object.values(grid).map(p => p[1]);
+  let spare = 0;
+  const below = (rows.length ? Math.max(...rows) : 0) + 2;
+  leaves().forEach(n => {
+    const [c, r] = grid[n.id()] || [spare++, below]; // components new since the layout was saved
+    n.position({ x: c * CELL_W, y: r * CELL_H });
+  });
+}
+
+// Cytoscape puts an edge's label at its midpoint, so edges sharing a gap
+// stack their labels. Slide each label along its own segment until it
+// clears cards, module captions and the labels placed before it; labels on
+// the shortest segments, with the least room, go first.
+function spreadLabels() {
+  const boxes = leaves().map(n => n.boundingBox({ includeLabels: false }));
+  // Module captions sit centred above the box, which pads its contents by 28px.
+  cy.nodes('[?isModule]').forEach(n => {
+    const kids = n.descendants().not('[?isModule]');
+    if (!kids.length) return;
+    const b = kids.boundingBox({ includeLabels: false }), cx = (b.x1 + b.x2) / 2, w = n.data('label').length * 4 + 8;
+    boxes.push({ x1: cx - w, x2: cx + w, y1: b.y1 - 52, y2: b.y1 - 26 });
+  });
+  const hits = b => boxes.some(o => b.x1 < o.x2 + 2 && o.x1 < b.x2 + 2 && b.y1 < o.y2 + 2 && o.y1 < b.y2 + 2);
+  const labels = cy.edges('[?routed]').filter(e => e.data('label')).map(e => {
+    const m = e.midpoint(), pts = [e.sourceEndpoint(), ...(e.segmentPoints() || []), e.targetEndpoint()];
+    let seg = [m, m];
+    for (let i = 1; i < pts.length; i++) {
+      const [p, q] = [pts[i - 1], pts[i]];
+      if (Math.min(p.x, q.x) - 1 <= m.x && m.x <= Math.max(p.x, q.x) + 1 && Math.min(p.y, q.y) - 1 <= m.y && m.y <= Math.max(p.y, q.y) + 1) { seg = [p, q]; break; }
+    }
+    const axis = Math.abs(seg[0].x - seg[1].x) < 1 ? 'y' : 'x';
+    return { e, m, axis, lo: Math.min(seg[0][axis], seg[1][axis]), hi: Math.max(seg[0][axis], seg[1][axis]),
+             b: e.boundingBox({ includeNodes: false, includeEdges: false, includeLabels: true }) };
+  }).sort((a, b) => (a.hi - a.lo) - (b.hi - b.lo));
+  labels.forEach(({ e, m, axis, lo, hi, b }) => {
+    const half = (b[axis + '2'] - b[axis + '1']) / 2;
+    for (const d of [0, 1, -1, 2, -2, 3, -3, 4, -4].map(k => k * (axis === 'y' ? 20 : 26))) {
+      if (d && (m[axis] + d - half < lo || m[axis] + d + half > hi)) continue; // stay on its own segment
+      const moved = { ...b, [axis + '1']: b[axis + '1'] + d, [axis + '2']: b[axis + '2'] + d };
+      if (!hits(moved)) {
+        if (d) e.style('text-margin-' + axis, d);
+        boxes.push(moved);
+        return;
+      }
+    }
+    boxes.push(b);
+  });
+}
+
+// Fit everything on screen, but never zoom past 100%: small diagrams stay readable sizes.
+function fit() {
+  const comps = cy.elements().not('.prov');
+  cy.fit(comps, 80);
+  if (cy.zoom() > 1) { cy.zoom(1); cy.center(comps); }
+  overviewZoom = Math.min(0.45, cy.zoom() * 0.7);
+  syncDots();
+  applyLOD();
+}
+
+let toastTimer;
+function toast(msg) {
+  $('toast').textContent = msg; $('toast').classList.add('on');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').classList.remove('on'), 1600);
+}
+
+// laidOut resolves once the current layout has placed everything: ELK runs
+// asynchronously, and its final fit would undo a view set before then.
+let laidOut = Promise.resolve();
+function layout() {
+  const arch = level === 'arch', mine = cy;
+  cy.remove('.prov');
+  let resolve;
+  laidOut = new Promise(r => { resolve = r; });
+  const done = () => {
+    if (cy === mine) { addProviders(); addTags(); fit(); } // not a layout of a replaced diagram
+    resolve();
+  };
+  if (arch && graph.layout) {
+    presetLayout(graph.layout.grid);
+    spreadLabels();
+    done();
+    return;
+  }
+  // Dagre can't lay out nested module containers; ELK's layered algorithm can.
+  if (cy.nodes('[?isModule]').length) {
+    cy.elements(':visible').layout({ name: 'elk', animate: false, nodeDimensionsIncludeLabels: true, stop: done, elk: {
+      algorithm: 'layered', 'elk.direction': arch ? 'RIGHT' : 'LEFT', 'elk.hierarchyHandling': 'INCLUDE_CHILDREN',
+      'elk.layered.spacing.nodeNodeBetweenLayers': arch ? 90 : 60, 'elk.spacing.nodeNode': arch ? 36 : 18,
+      'elk.padding': '[top=40,left=24,bottom=24,right=24]' } }).run();
+    return;
+  }
+  cy.elements(':visible').layout({ name: 'dagre', rankDir: arch ? 'LR' : 'RL', nodeSep: arch ? 60 : 22,
+                                   rankSep: arch ? 170 : 110, edgeSep: 14, animate: false }).run();
+  done();
+}
+
+function applyFilters() {
+  const showMeta = $('showMeta').checked;
+  const q = $('search').value.trim().toLowerCase();
+  cy.batch(() => {
+    cy.nodes().forEach(n => n.toggleClass('hidden', !!n.data('meta') && !showMeta));
+    cy.edges().toggleClass('nolabel', !$('showLabels').checked);
+    cy.elements().removeClass('faded hl');
+    if (q) {
+      const hits = cy.nodes().filter(n => n.data('label').toLowerCase().includes(q) || n.id().toLowerCase().includes(q));
+      const keep = hits.union(hits.connectedEdges()).union(hits.neighborhood('node'));
+      cy.elements().not(keep).addClass('faded');
+    } else applyFocus();
+  });
+  layout();
+}
+
+function clearSel() {
+  selected = null;
+  cy.nodes().unselect();
+  cy.elements().removeClass('faded hl');
+  applyFocus();
+  viewHere() ? showView() : setPanel(null);
+}
+
+function select(id) {
+  selected = id;
+  const n = cy.getElementById(id);
+  cy.nodes().unselect(); n.select();
+  cy.elements().addClass('faded').removeClass('hl');
+  n.closedNeighborhood().removeClass('faded');
+  n.connectedEdges().addClass('hl');
+  level === 'arch' ? showArchNode(archById(id)) : showNode(nodeById(id));
+  const b = n.renderedBoundingBox();
+  if (b.x2 > cy.width() || b.x1 < 0 || b.y1 < 0 || b.y2 > cy.height()) cy.animate({ center: { eles: n }, duration: 200 });
+}
+
+// Jump from the architecture view to one underlying resource.
+function drill(id) {
+  if (level !== 'raw') { level = 'raw'; render(); }
+  const n = nodeById(id);
+  if (n && n.role === 'meta' && !$('showMeta').checked) { $('showMeta').checked = true; applyFilters(); }
+  laidOut.then(() => {
+    select(id);
+    cy.animate({ center: { eles: cy.getElementById(id) }, duration: 200 });
+  });
+}
+
+// Plain words for the catalog roles (README, "Classify").
+const ROLE_WORDS = {
+  primary: ['component', 'runs code, stores data or takes traffic'],
+  child: ['configuration', 'configures the component it belongs to'],
+  connector: ['connection', 'drawn as an arrow between two components'],
+  satellite: ['wiring', 'supporting resource, folded into the component that uses it'],
+  helper: ['helper', 'no architectural meaning; hidden'],
+  ignore: ['network', 'networking is left out of the diagram'],
+  meta: ['input / output', 'variable, local or output'],
+};
+function roleTag(n) {
+  const [word, why] = ROLE_WORDS[n.role] || [n.role, ''];
+  return n.classified || n.role === 'meta'
+    ? `<span class="tag" title="${esc(why)}">${esc(word)}</span>`
+    : `<span class="tag guess" title="desprawl doesn't recognise this resource type yet, so its role is a guess">${esc(word)}?</span>`;
+}
+
+// Minimal HCL highlighter: tokenise the raw source, escape every piece.
+const HCL = /(#[^\n]*|\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:[^"\\\n]|\\.)*")|\b(resource|data|variable|output|locals|module|provider|terraform|dynamic|content)\b(?=\s*["{])|\b([A-Za-z_][\w-]*)(?=\s*=(?!=))|\b(true|false|null|\d+(?:\.\d+)?)\b/g;
+function hcl(src) {
+  let out = '', last = 0, m;
+  HCL.lastIndex = 0;
+  while ((m = HCL.exec(src))) {
+    out += esc(src.slice(last, m.index));
+    const cls = m[1] ? 'c' : m[2] ? 's' : m[3] ? 'w' : m[4] ? 'k' : 'n';
+    out += `<span class="${cls}">${esc(m[0])}</span>`;
+    last = HCL.lastIndex;
+  }
+  return out + esc(src.slice(last));
+}
+
+const catIcon = c => icon(c, 14, color(c));
+
+function bindLinks() {
+  side.querySelectorAll('[data-drill]').forEach(el => el.onclick = () => drill(el.dataset.drill));
+  side.querySelectorAll('[data-arch]').forEach(el => el.onclick = () => select(el.dataset.arch));
+}
+
+const plural = (k, word) => `${k} ${word}${k === 1 ? '' : 's'}`;
+const where = n => `${n.file}:${n.line}`;
+const sourceBlock = (n, open) => `<details ${open ? 'open' : ''}><summary>${esc(n.id)} ${roleTag(n)}<span class="ref">${esc(where(n))}</span></summary>
+  ${sourceHTML(n)}<ul><li data-drill="${esc(n.id)}">Show in resources view →</li></ul></details>`;
+
+function showArchNode(a) {
+  setPanel('detail');
+  const out = graph.arch.edges.filter(e => e.from === a.id);
+  const inc = graph.arch.edges.filter(e => e.to === a.id);
+  const conn = (e, other) => `<li data-arch="${esc(e[other])}"><span class="attr">${esc(e.label)}</span>
+      ${other === 'to' ? '→' : '←'} ${esc(archById(e[other]).label)} <b>${esc(archById(e[other]).name)}</b></li>`;
+  const conns = [...out.map(e => conn(e, 'to')), ...inc.map(e => conn(e, 'from'))];
+  side.innerHTML = `
+    <div class="eyebrow"><svg width="14" height="14">${catIcon(a.category)}</svg>${esc(a.label)}</div>
+    <h2>${esc(a.name)}</h2>
+    <div class="meta">${a.module ? esc(a.module) + ' · ' : ''}${plural(a.members.length, 'Terraform resource')}</div>
+    ${markSection(marked.nodes.get(a.id))}
+    <h3>Connections (${conns.length})</h3>${conns.length ? '<ul>' + conns.join('') + '</ul>' : '<p class="empty">Not connected to other components.</p>'}
+    <h3>Terraform</h3>
+    ${[a.id, ...a.members.filter(m => m !== a.id)].map(nodeById).map((n, i) => sourceBlock(n, i === 0)).join('')}`;
+  bindLinks();
+}
+
+function showArchEdge(edge) {
+  setPanel('detail');
+  const e = graph.arch.edges[Number(edge.id().slice(1))];
+  cy.elements().addClass('faded').removeClass('hl');
+  edge.removeClass('faded').addClass('hl'); edge.connectedNodes().removeClass('faded');
+  const from = archById(e.from), to = archById(e.to);
+  side.innerHTML = `
+    <div class="eyebrow">Connection · ${esc(e.label)}</div>
+    <h2>${esc(from.name)} ${e.both ? '↔' : '→'} ${esc(to.name)}</h2>
+    <div class="meta">${esc(from.label)} ${e.both ? '↔' : '→'} ${esc(to.label)}</div>
+    ${markSection(marked.edges.get(e.from + '|' + e.to))}
+    <h3>Defined by</h3><ul>${e.via.map(v => `<li data-drill="${esc(v.node)}">${esc(v.node)}
+      ${v.attr ? `<span class="attr">.${esc(v.attr)}</span><span class="ref">${esc(v.ref)}</span>` : ''}</li>`).join('')}</ul>
+    <h3>Terraform</h3>
+    ${e.via.map(v => nodeById(v.node)).filter((n, i, xs) => xs.indexOf(n) === i).map((n, i) => sourceBlock(n, i === 0)).join('')}`;
+  bindLinks();
+}
+
+function edgeList(edges, other, attrFirst) {
+  if (!edges.length) return '<p class="empty">none</p>';
+  return '<ul>' + edges.map(e => `<li data-drill="${esc(e[other])}">
+      ${attrFirst ? `<span class="attr">${esc(e.attr)}</span> → ${esc(e[other])}`
+                  : `${esc(e[other])} <span class="attr">.${esc(e.attr)}</span>`}
+      <span class="ref">${esc(e.ref)}</span></li>`).join('') + '</ul>';
+}
+
+function showNode(n) {
+  setPanel('detail');
+  const out = graph.edges.filter(e => e.from === n.id);
+  const inc = graph.edges.filter(e => e.to === n.id);
+  const owner = graph.arch.nodes.find(a => a.members.includes(n.id));
+  side.innerHTML = `
+    <div class="eyebrow">${esc(n.kind === 'data' ? 'data source' : n.kind)} ${roleTag(n)}</div>
+    <h2>${esc(n.id)}</h2>
+    <div class="meta">${esc(where(n))}</div>
+    ${owner && owner.id !== n.id ? `<div class="meta">part of <a href="#" data-owner="${esc(owner.id)}">${esc(owner.label)} ${esc(owner.name)}</a></div>` : ''}
+    ${markSection(marked.nodes.get(n.id))}
+    <h3>Uses (${out.length})</h3>${edgeList(out, 'to', true)}
+    <h3>Used by (${inc.length})</h3>${edgeList(inc, 'from', false)}
+    <h3>Source</h3>${sourceHTML(n)}`;
+  bindLinks();
+  side.querySelectorAll('[data-owner]').forEach(el => el.onclick = ev => {
+    ev.preventDefault(); level = 'arch'; render(); select(el.dataset.owner);
+  });
+}
+
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const edgeSwatch = dashed => `<svg width="28" height="10"><path d="M1 5h21" stroke="${cssVar('--edge')}" stroke-width="1.5" ${dashed ? 'stroke-dasharray="4 3"' : ''}/><path d="M21 1.5 27 5l-6 3.5z" fill="${cssVar('--edge')}"/></svg>`;
+
+function showOverview() {
+  setPanel('help');
+  const cats = [...new Set(graph.arch.nodes.map(n => n.category || 'other'))].sort();
+  const guessed = [...new Map(graph.nodes.filter(n => !n.classified && n.role !== 'meta').map(n => [n.type, n])).values()];
+  const arch = level === 'arch';
+  side.innerHTML = `
+    <div class="eyebrow">Terraform project</div>
+    <h2>${esc($('dir').selectedOptions[0]?.textContent || graph.dir)}</h2>
+    <div class="meta">${esc(graph.dir)}</div>
+    <div class="stats">
+      <div><b>${graph.arch.nodes.length}</b><span>components</span></div>
+      <div><b>${graph.arch.edges.length}</b><span>connections</span></div>
+      <div><b>${graph.nodes.filter(n => n.role !== 'meta').length}</b><span>resources</span></div>
+    </div>
+    <p class="hint">${arch
+      ? 'Each box is something that runs code, stores data or takes traffic; IAM, security groups and other wiring are folded into it. Click a box or arrow to see the Terraform behind it. Drag boxes to rearrange them. Zoom out to see one card per provider and how they connect; zoom in to see the resources inside each box.'
+      : 'Every Terraform block, and every reference between them. Labels are the attribute holding the reference. Click a block to see its source.'}</p>
+    ${arch && cats.length ? `<h3>Legend</h3><div class="legend">${cats.map(c => `<span><svg width="14" height="14">${catIcon(c)}</svg>${esc(cap(c))}</span>`).join('')}</div>
+    <div class="legend edges" style="margin-top:10px"><span>${edgeSwatch(false)}uses</span><span>${edgeSwatch(true)}routes to, triggers…</span></div>` : ''}
+    ${guessed.length ? `<details class="section"><summary>Unrecognised resource types (${guessed.length})</summary>
+      <p>desprawl doesn't know these types yet, so it treats them as wiring and they may be missing from the diagram.</p>
+      <ul>${guessed.map(n => `<li data-drill="${esc(n.id)}">${esc(n.type)}</li>`).join('')}</ul></details>` : ''}
+    ${graph.diagnostics ? `<details class="section"><summary>Parse warnings (${graph.diagnostics.length})</summary><div class="diag">${esc(graph.diagnostics.join('\n'))}</div></details>` : ''}`;
+  bindLinks();
+}
+
+$('lvlArch').onclick = () => { level = 'arch'; render(); };
+$('lvlRaw').onclick = () => { level = 'raw'; render(); };
+$('search').oninput = applyFilters;
+$('showMeta').onchange = applyFilters;
+$('showLabels').onchange = applyFilters;
+$('fit').onclick = fit;
+['providers', 'components', 'details'].forEach(l => $('lod' + cap(l)).onclick = () => zoomToLOD(l));
+const zoomBy = f => cy.zoom({ level: cy.zoom() * f, renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 } });
+$('zoomIn').onclick = () => zoomBy(1.25);
+$('zoomOut').onclick = () => zoomBy(0.8);
+const toggleHelp = () => { if (panelView === 'help') setPanel(null); else { cy.elements().removeClass('faded hl'); cy.nodes().unselect(); selected = null; showOverview(); } };
+// ---- An agent's command to this window (screen.go's WindowCmd, from the
+// control_window tool), and the reports of what it shows (WindowState), which
+// is how the agent sees the window. A command waits until the window shows
+// its configuration; the report after it acknowledges it (applied).
+let applied = 0, lastReport = '', commanding = false, cmdError = '';
+async function nextCommand() {
+  if (!PANE || commanding) return;
+  commanding = true;
+  try {
+    const c = await getJSON('/api/window?id=' + encodeURIComponent(PANE));
+    if (c && c.seq > applied && cy && (!c.dir || c.dir === shownDir)) {
+      cmdError = '';
+      try { await runCommand(c); } catch (err) { cmdError = err.message; toast("Couldn't do what your agent asked: " + err.message); }
+      applied = c.seq;
+      report();
+    }
+  } catch {} finally { commanding = false; }
+}
+// Each part is done even if another fails; what failed is reported.
+async function runCommand(c) {
+  const failed = [], step = async f => { try { await f(); } catch (err) { failed.push(err.message); } };
+  const mid = () => ({ x: cy.width() / 2, y: cy.height() / 2 });
+  const eles = ids => cy.nodes().filter(n => ids.includes(n.id()));
+  await step(async () => { if (c.level && c.level !== level) { level = c.level; render(); await laidOut; } });
+  if (c.select != null) await step(async () => {
+    if (c.select === '') return clearSel();
+    if (c.select.includes('->')) {
+      const [a, b] = c.select.split('->').map(x => x.trim());
+      const e = cy.edges().filter(e => e.data('source') === a && e.data('target') === b && !e.hasClass('prov'));
+      if (!e.length) throw new Error('no connection ' + c.select + ' on the map');
+      return level === 'arch' ? showArchEdge(e[0]) : select(a);
+    }
+    if (cy.getElementById(c.select).length) return select(c.select);
+    if (!nodeById(c.select)) throw new Error('nothing called ' + c.select + ' on the map');
+    drill(c.select);
+    await laidOut;
+  });
+  if (c.panel != null) await step(() => {
+    if (c.panel === 'help') { if (panelView !== 'help') toggleHelp(); }
+    else if (c.panel === 'marks') { if (!viewHere()) throw new Error('nothing is marked on this map'); showView(); }
+    else { clearSel(); setPanel(null); }
+  });
+  // The camera, without animation so the report says where it ended up.
+  if (c.lod) await step(() => {
+    if (c.lod === 'providers') {
+      if (!cy.$('.prov').length) throw new Error('this map has no providers view');
+      cy.zoom({ level: overviewZoom * 0.75, renderedPosition: mid() });
+    } else if (c.lod === 'components') fit();
+    else cy.zoom({ level: DETAIL_ZOOM * 1.25, renderedPosition: mid() });
+  });
+  if (c.fit_all) fit();
+  if (c.fit_to?.length) await step(() => {
+    const e = eles(c.fit_to);
+    if (!e.length) throw new Error('none of ' + c.fit_to.join(', ') + ' is on the map');
+    cy.fit(e, 80);
+  });
+  if (c.zoom) cy.zoom({ level: c.zoom, renderedPosition: mid() });
+  if (c.center) cy.pan({ x: cy.width() / 2 - c.center.x * cy.zoom(), y: cy.height() / 2 - c.center.y * cy.zoom() });
+  if (c.center_on) await step(() => {
+    const e = eles([c.center_on]);
+    if (!e.length) throw new Error(c.center_on + ' is not on the map');
+    cy.center(e);
+  });
+  if (c.pan_by) cy.panBy({ x: -c.pan_by.x, y: -c.pan_by.y });
+  syncDots();
+  applyLOD();
+  if (failed.length) throw new Error(failed.join('; '));
+}
+// What this window shows, posted whenever it changes.
+function report() {
+  const st = { applied, dir: $('dir').value, level, selected: selected || '', panel: panelView || '', error: loadError, command_error: cmdError, visible: [] };
+  if (cy) {
+    const z = cy.zoom(), pan = cy.pan(), ext = cy.extent(), r = v => Math.round(v * 100) / 100;
+    Object.assign(st, { zoom: r(z), center: { x: Math.round((cy.width() / 2 - pan.x) / z), y: Math.round((cy.height() / 2 - pan.y) / z) },
+                        lod: lod === 'details' ? 'resources' : lod || '', width: Math.round(cy.width()), height: Math.round(cy.height()) });
+    const seen = cy.nodes().filter(n => !n.hasClass('hidden') && !n.hasClass('lod-off') && !n.hasClass('tag') && !n.data('isModule'))
+      .filter(n => { const b = n.boundingBox(); return b.x2 > ext.x1 && b.x1 < ext.x2 && b.y2 > ext.y1 && b.y1 < ext.y2; }).map(n => n.id());
+    st.visible = seen.slice(0, 100);
+    if (seen.length > 100) st.more_visible = seen.length - 100;
+  }
+  const body = JSON.stringify(st);
+  if (body === lastReport) return;
+  lastReport = body;
+  fetch('/api/window?id=' + encodeURIComponent(PANE), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body }).catch(() => {});
+}
+
+// The page's search and display options (split.html), for every window.
+function setOpts(o) {
+  const changed = $('search').value !== o.search || $('showLabels').checked !== o.labels || $('showMeta').checked !== o.meta;
+  $('search').value = o.search;
+  $('showLabels').checked = o.labels;
+  $('showMeta').checked = o.meta;
+  optsArrived?.();
+  if (changed && cy) applyFilters();
+}
+
+$('help').onclick = toggleHelp;
+$('viewOpen').onclick = () => { if (panelView === 'view') setPanel(null); else { cy.elements().removeClass('hl'); cy.nodes().unselect(); selected = null; showView(); } };
+$('viewClear').onclick = clearView;
+$('close').onclick = () => { clearSel(); setPanel(null); };
+$('menuBtn').onclick = ev => { ev.stopPropagation(); $('menu').classList.toggle('open'); };
+document.addEventListener('click', ev => { if (!$('menu').contains(ev.target)) $('menu').classList.remove('open'); });
+$('autoLayout').onclick = () => {
+  $('menu').classList.remove('open');
+  if (!graph) return;
+  if (graph.seeded) { toast('The layout is already automatic'); return; }
+  if (!confirm('Discard your arrangement and lay the diagram out automatically?')) return;
+  saveGrid({}).then(load);
+};
+document.addEventListener('keydown', ev => {
+  if (ev.metaKey || ev.ctrlKey || ev.altKey) return;
+  if (ev.target === $('search')) {
+    if (ev.key === 'Escape') { $('search').value = ''; applyFilters(); $('search').blur(); }
+    return;
+  }
+  if (/^(INPUT|SELECT|TEXTAREA)$/.test(ev.target.tagName) || !cy) return;
+  if (EMBED && ev.key === '/') { ev.preventDefault(); return toHost({ search: true }); }
+  const keys = { '/': () => $('search').focus(), '?': toggleHelp, Escape: () => { clearSel(); setPanel(null); $('menu').classList.remove('open'); },
+                 f: fit, '+': () => zoomBy(1.25), '=': () => zoomBy(1.25), '-': () => zoomBy(0.8) };
+  if (keys[ev.key]) { ev.preventDefault(); keys[ev.key](); }
+});
+dark.addEventListener('change', () => graph && render());
+cytoscape.use(cytoscapeDagre);
+cytoscape.use(cytoscapeElk);
+(async () => {
+  try { view = await getJSON('/api/view'); } catch {}
+  await optsReady;
+  await load();
+  await laidOut;
+  frameView();
+})();
+if (STATIC) {
+  for (const el of [$('autoLayout'), $('autoLayout').previousElementSibling]) el.style.display = 'none';
+} else {
+  listen();
+  if (PANE) setInterval(report, 500);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "exclude_types": {
+    "azurerm_application_insights_api_key": "Holds an API key credential.",
+    "azurerm_automation_credential": "Holds username and password credentials.",
+    "azurerm_container_registry_token_password": "Holds generated password credentials.",
+    "azurerm_key_vault_secret": "Holds a secret value.",
+    "azurerm_log_analytics_workspace_table_microsoft": "Enumerates large sets of built-in Microsoft tables.",
+    "azurerm_managed_disk_sas_token": "Holds a SAS access token.",
+    "azurerm_mssql_job_credential": "Holds username and password credentials.",
+    "azurerm_mysql_flexible_server_configuration": "Enumerates hundreds of provider-default server parameters.",
+    "azurerm_nginx_api_key": "Holds an API key secret.",
+    "azurerm_oracle_autonomous_database_backup": "Database backups are data.",
+    "azurerm_postgresql_flexible_server_backup": "On-demand backups are data snapshots.",
+    "azurerm_postgresql_flexible_server_configuration": "Enumerates hundreds of provider-default server parameters.",
+    "azurerm_sentinel_threat_intelligence_indicator": "Threat indicators are data records.",
+    "azurerm_sentinel_watchlist_item": "Watchlist items are data rows.",
+    "azurerm_source_control_token": "Holds a source control access token.",
+    "azurerm_storage_blob": "Blobs are objects stored in a container, not infrastructure.",
+    "azurerm_storage_data_lake_gen2_path": "Data lake paths are data inside a filesystem.",
+    "azurerm_storage_share_directory": "Directories in a file share are data layout, not infrastructure.",
+    "azurerm_storage_share_file": "Files in a share are data.",
+    "azurerm_storage_table_entity": "Table entities are data rows.",
+    "azurerm_virtual_desktop_host_pool_registration_info": "Holds a host pool registration token.",
+    "azurerm_virtual_machine_restore_point": "Restore points are point-in-time data."
+  },
+  "params": {
+    "subscription_id": {
+      "ref": "data.azurerm_client_config.current.subscription_id",
+      "data": "data \"azurerm_client_config\" \"current\" {}"
+    }
+  }
+}

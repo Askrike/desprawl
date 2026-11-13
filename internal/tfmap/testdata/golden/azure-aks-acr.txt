@@ -1,0 +1,5 @@
+component AKS cluster azurerm_kubernetes_cluster.example
+component Container registry azurerm_container_registry.example
+component Web app azurerm_linux_web_app.example
+connection azurerm_kubernetes_cluster.example -> azurerm_container_registry.example [access]
+connection azurerm_linux_web_app.example -> azurerm_container_registry.example [access]

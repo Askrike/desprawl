@@ -1,0 +1,94 @@
+{
+  "provider": "mongodbatlas",
+  "resources": {
+    "mongodbatlas_advanced_cluster": {
+      "role": "primary",
+      "category": "database",
+      "label": "Atlas cluster"
+    },
+    "mongodbatlas_cluster": {
+      "role": "primary",
+      "category": "database",
+      "label": "Atlas cluster"
+    },
+    "mongodbatlas_flex_cluster": {
+      "role": "primary",
+      "category": "database",
+      "label": "Atlas Flex cluster"
+    },
+    "mongodbatlas_serverless_instance": {
+      "role": "primary",
+      "category": "database",
+      "label": "Atlas serverless"
+    },
+    "mongodbatlas_federated_database_instance": {
+      "role": "primary",
+      "category": "database",
+      "label": "Atlas Data Federation"
+    },
+    "mongodbatlas_search_index": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "cluster_name"
+    },
+    "mongodbatlas_search_deployment": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "cluster_name"
+    },
+    "mongodbatlas_online_archive": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "cluster_name"
+    },
+    "mongodbatlas_cloud_backup_schedule": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "cluster_name"
+    },
+    "mongodbatlas_stream_workspace": {
+      "role": "primary",
+      "category": "messaging",
+      "label": "Atlas Stream Processing"
+    },
+    "mongodbatlas_stream_instance": {
+      "role": "primary",
+      "category": "messaging",
+      "label": "Atlas Stream Processing"
+    },
+    "mongodbatlas_stream_connection": {
+      "role": "child",
+      "category": "messaging",
+      "parent_attr": "workspace_name"
+    },
+    "mongodbatlas_stream_processor": {
+      "role": "child",
+      "category": "messaging",
+      "parent_attr": "workspace_name"
+    },
+    "mongodbatlas_project": {
+      "role": "helper",
+      "category": "other"
+    },
+    "mongodbatlas_database_user": {
+      "role": "satellite",
+      "category": "identity",
+      "label": "Database user"
+    },
+    "mongodbatlas_project_ip_access_list": {
+      "role": "satellite",
+      "category": "security",
+      "label": "IP access list"
+    },
+    "mongodbatlas_privatelink_endpoint": {
+      "role": "satellite",
+      "category": "network",
+      "label": "Private endpoint"
+    },
+    "mongodbatlas_event_trigger": {
+      "role": "satellite",
+      "category": "integration",
+      "label": "Trigger"
+    }
+  }
+}

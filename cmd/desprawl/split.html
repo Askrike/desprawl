@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>desprawl</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600&family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* The same tokens as index.html. */
+  :root {
+    --canvas: #f8f8f8; --surface: #ffffff; --raised: #f4f4f5; --input: #ffffff; --ink: #090909; --muted: #71717a; --faint: #a1a1aa;
+    --rule: #e4e4e7; --border: #d4d4d8; --node-border-hover: #a1a1aa; --accent: #2563eb; --accent-ink: #ffffff; --frame: #ececee;
+    --warn: #92400e; --danger: #f04238;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.06);
+    --sans: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --canvas: #141414; --surface: #1c1c1c; --raised: #222222; --input: #111110; --ink: #ede7db; --muted: #b5b3ad; --faint: #62605b;
+      --rule: #1e1e1e; --border: #2b2b2b; --node-border-hover: #555555; --accent: #a8c6fe; --accent-ink: #090909; --frame: #0b0b0b;
+      --warn: #efb100; --danger: #f04238;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; }
+  body { font: 13px/1.5 var(--sans); background: var(--frame); color: var(--ink); -webkit-font-smoothing: antialiased; }
+  button, input, select { font: inherit; color: var(--ink); }
+  button { cursor: pointer; }
+
+  /* The page's bar: what is the same for every window. */
+  #top { position: absolute; top: 0; left: 0; right: 0; height: 46px; display: flex; align-items: center; gap: 6px; padding: 0 8px; }
+  .brand { display: inline-flex; align-items: center; gap: 8px; padding: 0 8px 0 4px; }
+  .brand svg { color: var(--accent); }
+  .brand b { font: 600 15px/1 "DM Sans", var(--sans); letter-spacing: -.01em; }
+  .pill { display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 12px; border-radius: 999px; font-size: 12.5px;
+          background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); color: var(--ink); text-decoration: none; }
+  .pill:hover { border-color: var(--node-border-hover); }
+  .pill[hidden] { display: none; }
+  .pill i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); flex: none; }
+  #open { position: relative; }
+  #open select { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  #search { width: 220px; height: 30px; padding: 0 12px 0 30px; border-radius: 999px; outline: none; background: var(--input);
+            border: 1px solid var(--border); box-shadow: var(--shadow);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: 11px center; }
+  #search::placeholder { color: var(--faint); }
+  #search:focus { border-color: var(--accent); }
+  .spacer { flex: 1; }
+  #progPill { display: inline-flex; gap: 4px; min-width: 0; overflow: hidden; }
+  #progPill .pill { max-width: 380px; }
+  #progPill .pill > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #progPill i { background: var(--accent); }
+  #progPill .run i { animation: pulse 1.2s ease-in-out infinite; }
+  #progPill .fail i { background: var(--danger); }
+  #progPill b { flex: none; width: 48px; height: 4px; border-radius: 2px; background: var(--rule); overflow: hidden; }
+  #progPill b u { display: block; height: 100%; background: var(--accent); }
+  /* Overview | Maps: what the page shows. */
+  #tabs { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border);
+          box-shadow: var(--shadow); flex: none; }
+  #tabs button { display: inline-flex; align-items: center; gap: 7px; height: 22px; padding: 0 11px; border: 0; border-radius: 999px;
+                 background: transparent; color: var(--muted); font-size: 12.5px; }
+  #tabs button:hover { color: var(--ink); }
+  #tabs button.on { background: color-mix(in srgb, var(--ink) 12%, transparent); color: var(--ink); }
+  #tabs i { width: 7px; height: 7px; border-radius: 50%; flex: none; display: none; }
+  #tabs .todo i { display: block; background: var(--warn); }
+  #tabs .run i { display: block; background: var(--accent); animation: pulse 1.2s ease-in-out infinite; }
+  body.ov #search, body.ov #opts { display: none; }
+  #offline i { background: var(--danger); }
+  @keyframes pulse { 50% { opacity: .3; } }
+  .icon { width: 30px; height: 30px; padding: 0; display: inline-grid; place-items: center; border-radius: 999px; color: var(--muted);
+          background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); }
+  .icon:hover { color: var(--ink); border-color: var(--node-border-hover); }
+
+  /* menus: the page's options, a window's ⋯ */
+  .menu { position: relative; }
+  .pop { position: absolute; right: 0; top: calc(100% + 6px); min-width: 230px; padding: 6px; display: none; flex-direction: column; gap: 2px; z-index: 10;
+         background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); }
+  .menu.open .pop { display: flex; }
+  .pop label, .pop button { display: flex; align-items: center; gap: 9px; width: 100%; text-align: left; padding: 7px 10px; font-size: 13px;
+         border: 0; border-radius: 8px; background: transparent; color: var(--ink); cursor: pointer; white-space: nowrap; }
+  .pop label:hover, .pop button:hover { background: var(--raised); }
+  .pop small { display: block; color: var(--muted); font-size: 11.5px; }
+  .pop input { appearance: none; margin: 0; width: 14px; height: 14px; flex: none; border-radius: 4px;
+         border: 1px solid var(--node-border-hover); background: transparent; cursor: pointer; display: grid; place-items: center; }
+  .pop input:checked { background: var(--accent); border-color: var(--accent); }
+  .pop input:checked::after { content: ""; width: 7px; height: 4px; border: 2px solid var(--accent-ink); border-top: 0; border-right: 0;
+         transform: translateY(-1px) rotate(-45deg); }
+
+  /* A window: its title bar, and the map (index.html) in an iframe. */
+  #panes { position: absolute; top: 46px; left: 0; right: 0; bottom: 0; }
+  #overview { position: absolute; top: 46px; left: 6px; right: 6px; bottom: 6px; width: calc(100% - 12px); height: calc(100% - 52px);
+              border: 1px solid var(--border); border-radius: 8px; background: var(--canvas); display: none; }
+  body.ov #overview { display: block; }
+  body.ov #panes { visibility: hidden; }
+  .pane { position: absolute; display: flex; flex-direction: column; background: var(--canvas);
+          border: 1px solid var(--border); border-radius: 8px; }
+  .pane.focus { border-color: var(--node-border-hover); }
+  .pane.hidden { visibility: hidden; }
+  .pane.moving { opacity: .5; }
+  .bar { flex: none; display: flex; align-items: center; gap: 4px; height: 34px; padding: 0 4px 0 8px; border-radius: 8px 8px 0 0;
+         background: var(--surface); border-bottom: 1px solid var(--rule); cursor: grab; user-select: none; }
+  .bar .name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font: 12px var(--mono); padding: 0 4px; }
+  .pane.focus .bar .name { color: var(--ink); }
+  .bar .grip { color: var(--faint); display: grid; }
+  .bar .seg { display: inline-flex; gap: 1px; padding: 2px; margin-left: 6px; border-radius: 999px; background: var(--raised); flex: none; }
+  .bar .seg button { border: 0; background: transparent; color: var(--muted); font-size: 11.5px; padding: 1px 9px; border-radius: 999px; }
+  .bar .seg button.on { background: color-mix(in srgb, var(--ink) 14%, transparent); color: var(--ink); }
+  .bar .btn { width: 24px; height: 24px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 6px; flex: none;
+              background: transparent; color: var(--muted); }
+  .bar .btn:hover { background: var(--raised); color: var(--ink); }
+  .bar .pop { min-width: 210px; }
+  body.single .bar .close, body.single .bar .max { display: none; }
+  iframe { flex: 1; width: 100%; border: 0; display: block; background: var(--canvas); border-radius: 0 0 8px 8px; }
+  body.dragging iframe { pointer-events: none; }
+  body.dragging { user-select: none; }
+
+  /* Dividers between columns and between windows in a column: drag to resize. */
+  .divider { position: absolute; z-index: 3; }
+  .divider.col { cursor: col-resize; }
+  .divider.row { cursor: row-resize; }
+  .divider:hover, .divider.active { background: var(--accent); opacity: .5; border-radius: 3px; }
+
+  /* Where a dragged window lands. */
+  .drop { position: absolute; z-index: 4; pointer-events: none; display: none; border: 2px solid var(--accent); border-radius: 8px;
+          background: color-mix(in srgb, var(--accent) 15%, transparent); }
+</style>
+</head>
+<body>
+<div id="top">
+  <span class="brand">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><path d="M10 6.5h4a3 3 0 0 1 3 3V14"/></svg>
+    <b>desprawl</b>
+  </span>
+  <span id="tabs" role="tablist"><button data-page="overview" title="The workspace: the maps it draws, and how far importing its cloud accounts got"><i></i>Overview</button><button data-page="maps" class="on" title="The maps, in windows side by side">Maps</button></span>
+  <span class="pill" id="open" title="Open a configuration's map in a new window"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Open map<select id="openPick" aria-label="Open a map"></select></span>
+  <input id="search" placeholder="Search all maps…  ( / )" aria-label="Search components in every window">
+  <span id="progPill"></span>
+  <span class="spacer"></span>
+  <span class="pill" id="offline" hidden title="The page lost the desprawl server: changes to .tf files, saved layouts and agents' views won't reach it until it's running again"><i></i>Disconnected · restart desprawl</span>
+  <span class="menu" id="opts">
+    <button class="icon" id="optsBtn" title="View options" aria-label="View options"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+    <span class="pop">
+      <label><input type="checkbox" id="showLabels" checked> Connection labels</label>
+      <label><input type="checkbox" id="showMeta"> <span>Variables, locals &amp; outputs<small>In the resources view</small></span></label>
+    </span>
+  </span>
+</div>
+<div id="panes"></div>
+<iframe id="overview" src="/overview?embed" title="Overview"></iframe>
+<div class="drop" id="drop"></div>
+<script>
+// The page: the workspace's overview (overview.html, in an iframe) or the
+// windows open on the screen (screen.go), each one configuration's map
+// (index.html, /map?embed&pane=ID) in an iframe, opened on it for good.
+// Windows sit in columns, a column holding one or more stacked; w and h are
+// weights within the row or column.
+//
+// The bar at the top is the page's: Overview or Maps, opening a map, the
+// search, display options, and the workspace's state (commands running,
+// live updates). Each window's title bar is its own: its view, info, layout
+// reset, maximize, close. Inside, a window keeps only the map, its zoom and
+// what an agent marked.
+//
+// The server holds the screen, so an agent (MCP: arrange_windows,
+// control_window) changes the same windows the person does: every change
+// made here is posted (publish), and a "screen" event brings the agent's.
+// Windows are positioned absolutely and never moved in the DOM, since moving
+// an iframe reloads it. The address is always just /: the server's screen
+// is what a reload, another tab or the agent's browser opens on.
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const GAP = 6, MIN_W = 300, MIN_H = 160;
+let cols = [], dirs = [], rootName = '', focused = null, maximized = null, seq = -1, page = 'maps';
+let opts = { search: '', labels: true, meta: false };
+const panes = new Map(); // window id -> pane
+
+const ICON = {
+  grip: '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>',
+  info: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>',
+  more: '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>',
+  max: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>',
+  restore: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg>',
+  close: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+};
+
+const allPanes = () => cols.flatMap(c => c.panes);
+const colOf = p => cols.find(c => c.panes.includes(p));
+const label = dir => dir === '.' ? rootName : dir;
+const newId = () => Array.from(crypto.getRandomValues(new Uint8Array(4)), b => 'abcdefghijkmnpqrstuvwxyz23456789'[b % 32]).join('');
+const send = (p, msg) => p.frame.contentWindow?.postMessage({ desprawl: true, ...msg }, location.origin);
+const closeMenus = except => document.querySelectorAll('.menu.open').forEach(m => m !== except && m.classList.remove('open'));
+
+function makePane(id, dir, h = 1) {
+  const p = { id, dir, h, level: 'arch' };
+  p.el = document.createElement('div');
+  p.el.className = 'pane';
+  p.el.innerHTML = `<div class="bar" title="Drag to move this map; double-click to maximize">
+      <span class="grip">${ICON.grip}</span><span class="name"></span>
+      <span class="seg"><button data-level="arch" class="on" title="Components and how they connect">Architecture</button><button data-level="raw" title="Every Terraform block and reference">Resources</button></span>
+      <span class="spacer"></span>
+      <button class="btn info" title="This configuration: legend and overview (?)">${ICON.info}</button>
+      <span class="menu"><button class="btn more" title="More">${ICON.more}</button>
+        <span class="pop"><button class="reset"><span>Reset layout<small>Arrange components automatically</small></span></button></span></span>
+      <button class="btn max" title="Maximize">${ICON.max}</button>
+      <button class="btn close" title="Close this map">${ICON.close}</button></div>
+    <iframe src="/map?dir=${encodeURIComponent(dir)}&embed&pane=${encodeURIComponent(id)}"></iframe>`;
+  p.frame = p.el.querySelector('iframe');
+  const q = sel => p.el.querySelector(sel);
+  q('.name').textContent = label(dir);
+  q('.name').title = label(dir);
+  for (const b of p.el.querySelectorAll('.seg button')) b.onclick = () => send(p, { level: b.dataset.level });
+  q('.info').onclick = () => send(p, { help: true });
+  q('.more').onclick = ev => { ev.stopPropagation(); closeMenus(q('.menu')); q('.menu').classList.toggle('open'); };
+  q('.reset').onclick = () => { closeMenus(); send(p, { resetLayout: true }); };
+  q('.max').onclick = () => { toggleMax(p); publish(); };
+  q('.close').onclick = () => closePane(p);
+  q('.bar').ondblclick = ev => { if (!ev.target.closest('button')) { toggleMax(p); publish(); } };
+  q('.bar').onpointerdown = ev => { if (!ev.target.closest('button, .seg') && ev.button === 0) startMove(p, ev); };
+  p.el.addEventListener('pointerdown', () => focus(p));
+  $('panes').appendChild(p.el);
+  panes.set(id, p);
+  return p;
+}
+
+function setLevel(p, level) {
+  p.level = level;
+  for (const b of p.el.querySelectorAll('.seg button')) b.classList.toggle('on', b.dataset.level === level);
+}
+
+// ---- the shared screen
+const toScreen = () => ({
+  page,
+  cols: cols.map(c => ({ w: c.w, panes: c.panes.map(p => ({ id: p.id, dir: p.dir, h: p.h })) })),
+  maximized: maximized?.id || '', focused: focused?.id || '',
+  search: opts.search, hide_labels: !opts.labels, meta: opts.meta,
+});
+
+// apply makes the page show screen s: windows it doesn't have are opened,
+// ones it has but s doesn't are closed, the rest keep their iframe.
+function apply(s) {
+  if (s.seq <= seq) return;
+  seq = s.seq;
+  const keep = new Set();
+  cols = (s.cols || []).map(c => ({ w: c.w, panes: c.panes.map(w => {
+    keep.add(w.id);
+    const p = panes.get(w.id) || makePane(w.id, w.dir, w.h);
+    p.h = w.h;
+    return p;
+  }) }));
+  for (const [id, p] of panes) if (!keep.has(id)) { p.el.remove(); panes.delete(id); }
+  maximized = panes.get(s.maximized) || null;
+  focused = panes.get(s.focused) || allPanes()[0] || null;
+  setPage(s.page === 'overview' ? 'overview' : 'maps');
+  setOpts({ search: s.search || '', labels: !s.hide_labels, meta: !!s.meta });
+  refresh();
+}
+
+// The page's display options: shown in the bar, applied in every window.
+function setOpts(o) {
+  const changed = JSON.stringify(o) !== JSON.stringify(opts);
+  opts = o;
+  if (document.activeElement !== $('search')) $('search').value = o.search;
+  $('showLabels').checked = o.labels;
+  $('showMeta').checked = o.meta;
+  if (changed) allPanes().forEach(p => send(p, { opts }));
+}
+
+// publish posts the screen after a change made here.
+async function publish() {
+  try {
+    const r = await fetch('/api/screen', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(toScreen()) });
+    if (r.ok) seq = Math.max(seq, (await r.json()).seq);
+  } catch {}
+}
+
+// ---- layout: positions every window and draws the dividers.
+function refresh() {
+  const single = allPanes().length === 1;
+  document.body.classList.toggle('single', single);
+  for (const p of allPanes()) {
+    p.el.classList.toggle('focus', p === focused && !single);
+    const b = p.el.querySelector('.max');
+    b.innerHTML = maximized === p ? ICON.restore : ICON.max;
+    b.title = maximized === p ? 'Restore' : 'Maximize';
+  }
+  layout();
+}
+
+function layout() {
+  const box = $('panes').getBoundingClientRect(), W = box.width - 2 * GAP, H = box.height - GAP;
+  document.querySelectorAll('.divider').forEach(d => d.remove());
+  const place = (p, x, y, w, h) => Object.assign(p.el.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' });
+  for (const p of allPanes()) p.el.classList.toggle('hidden', !!maximized && p !== maximized);
+  if (maximized) return place(maximized, GAP, 0, W, H);
+  const sumW = cols.reduce((s, c) => s + c.w, 0), freeW = W - GAP * (cols.length - 1);
+  let x = GAP;
+  cols.forEach((c, ci) => {
+    const cw = freeW * c.w / sumW, sumH = c.panes.reduce((s, p) => s + p.h, 0), freeH = H - GAP * (c.panes.length - 1);
+    let y = 0;
+    c.panes.forEach((p, pi) => {
+      const ph = freeH * p.h / sumH;
+      place(p, x, y, cw, ph);
+      y += ph;
+      if (pi < c.panes.length - 1) divider('row', x, y, cw, GAP, c.panes, pi, freeH / sumH, 'h', MIN_H);
+      y += GAP;
+    });
+    x += cw;
+    if (ci < cols.length - 1) divider('col', x, 0, GAP, H, cols, ci, freeW / sumW, 'w', MIN_W);
+    x += GAP;
+  });
+}
+
+// A divider between items[i] and items[i+1]; dragging it moves weight
+// between them. px is the pixels one unit of weight takes.
+function divider(kind, x, y, w, h, items, i, px, key, min) {
+  const d = document.createElement('div');
+  d.className = 'divider ' + kind;
+  Object.assign(d.style, { left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px' });
+  d.onpointerdown = ev => {
+    ev.preventDefault();
+    const a = items[i], b = items[i + 1], a0 = a[key], b0 = b[key], start = kind === 'col' ? ev.clientX : ev.clientY;
+    const lo = min / px - a0, hi = b0 - min / px;
+    drag(d, ev, e => {
+      const dw = Math.max(Math.min(((kind === 'col' ? e.clientX : e.clientY) - start) / px, hi), Math.min(lo, 0));
+      a[key] = a0 + dw; b[key] = b0 - dw;
+      layout();
+    }, publish);
+  };
+  $('panes').appendChild(d);
+}
+
+// Runs a pointer drag with the iframes ignoring the pointer, so they don't swallow it.
+function drag(el, ev, move, done) {
+  el.setPointerCapture?.(ev.pointerId);
+  el.classList.add('active');
+  document.body.classList.add('dragging');
+  const up = e => {
+    window.removeEventListener('pointermove', move);
+    window.removeEventListener('pointerup', up);
+    el.classList.remove('active');
+    document.body.classList.remove('dragging');
+    done(e);
+  };
+  window.addEventListener('pointermove', move);
+  window.addEventListener('pointerup', up);
+}
+
+// ---- moving a window: drag its title bar onto another window's edge to put
+// it beside (left, right), above or below (top, bottom) that window.
+function startMove(p, ev) {
+  if (maximized) return;
+  const x0 = ev.clientX, y0 = ev.clientY;
+  let target = null, moved = false;
+  drag(ev.currentTarget, ev, e => {
+    if (!moved && Math.hypot(e.clientX - x0, e.clientY - y0) < 5) return;
+    moved = true;
+    p.el.classList.add('moving');
+    target = dropTarget(p, e.clientX, e.clientY);
+    const drop = $('drop');
+    if (!target) { drop.style.display = 'none'; return; }
+    const r = target.pane.el.getBoundingClientRect(), half = { left: [0, 0, .5, 1], right: [.5, 0, .5, 1], top: [0, 0, 1, .5], bottom: [0, .5, 1, .5] }[target.zone];
+    Object.assign(drop.style, { display: 'block', left: r.left + r.width * half[0] + 'px', top: r.top + r.height * half[1] + 'px',
+      width: r.width * half[2] + 'px', height: r.height * half[3] + 'px' });
+  }, () => {
+    p.el.classList.remove('moving');
+    $('drop').style.display = 'none';
+    if (target) { movePane(p, target.pane, target.zone); refresh(); publish(); }
+  });
+}
+
+function dropTarget(p, x, y) {
+  for (const t of allPanes()) {
+    if (t === p) continue;
+    const r = t.el.getBoundingClientRect();
+    if (x < r.left || x > r.right || y < r.top || y > r.bottom) continue;
+    const fx = (x - r.left) / r.width, fy = (y - r.top) / r.height;
+    const zone = Object.entries({ left: fx, right: 1 - fx, top: fy, bottom: 1 - fy }).sort((a, b) => a[1] - b[1])[0][0];
+    return { pane: t, zone };
+  }
+  return null;
+}
+
+function removePane(p) {
+  const c = colOf(p);
+  c.panes.splice(c.panes.indexOf(p), 1);
+  if (!c.panes.length) cols.splice(cols.indexOf(c), 1);
+}
+
+function movePane(p, t, zone) {
+  removePane(p);
+  const tc = colOf(t);
+  if (zone === 'left' || zone === 'right') {
+    tc.w /= 2;
+    p.h = 1;
+    cols.splice(cols.indexOf(tc) + (zone === 'right'), 0, { w: tc.w, panes: [p] });
+  } else {
+    t.h /= 2;
+    p.h = t.h;
+    tc.panes.splice(tc.panes.indexOf(t) + (zone === 'bottom'), 0, p);
+  }
+}
+
+// ---- window actions
+function focus(p) {
+  if (focused === p) return;
+  focused = p;
+  refresh();
+  publish();
+}
+
+function toggleMax(p) {
+  maximized = maximized === p ? null : p;
+  refresh();
+}
+
+// The last window stays: the page always shows a map.
+function closePane(p) {
+  if (allPanes().length === 1) return;
+  if (maximized === p) maximized = null;
+  removePane(p);
+  p.el.remove();
+  panes.delete(p.id);
+  if (focused === p) focused = allPanes()[0];
+  refresh();
+  publish();
+}
+
+// Opens dir in a new window right of the focused one.
+function openMap(dir) {
+  const c = colOf(focused) || cols.at(-1);
+  maximized = null;
+  setPage('maps');
+  const avg = cols.reduce((s, c) => s + c.w, 0) / (cols.length || 1);
+  const n = makePane(newId(), dir);
+  cols.splice(c ? cols.indexOf(c) + 1 : 0, 0, { w: avg, panes: [n] });
+  focused = n;
+  refresh();
+  publish();
+}
+
+// Shows dir: focuses the window that has it, else opens one.
+function showDir(dir) {
+  const p = allPanes().find(p => p.dir === dir);
+  if (!p) return openMap(dir);
+  if (maximized && maximized !== p) toggleMax(maximized);
+  const switched = page !== 'maps';
+  setPage('maps');
+  if (focused !== p) focus(p);
+  else if (switched) publish();
+}
+
+// ---- Overview or Maps
+function setPage(p) {
+  page = p;
+  document.body.classList.toggle('ov', p === 'overview');
+  for (const b of $('tabs').children) b.classList.toggle('on', b.dataset.page === p);
+  if (p === 'maps') layout();
+}
+for (const b of $('tabs').children) b.onclick = () => { if (page !== b.dataset.page) { setPage(b.dataset.page); publish(); } };
+const toOverview = msg => $('overview').contentWindow?.postMessage({ desprawl: true, ...msg }, location.origin);
+
+// ---- the bar
+$('openPick').onchange = () => { const d = $('openPick').value; $('openPick').value = ''; if (d) openMap(d); };
+function fillOpen() {
+  $('openPick').innerHTML = '<option value="">Open map…</option>' + dirs.map(d => `<option value="${esc(d)}">${esc(label(d))}</option>`).join('');
+}
+let searchTimer;
+$('search').oninput = () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => { setOpts({ ...opts, search: $('search').value }); publish(); }, 200);
+};
+$('search').onkeydown = ev => { if (ev.key === 'Escape') { $('search').value = ''; $('search').oninput(); $('search').blur(); } };
+$('showLabels').onchange = () => { setOpts({ ...opts, labels: $('showLabels').checked }); publish(); };
+$('showMeta').onchange = () => { setOpts({ ...opts, meta: $('showMeta').checked }); publish(); };
+$('optsBtn').onclick = ev => { ev.stopPropagation(); closeMenus($('opts')); $('opts').classList.toggle('open'); };
+document.addEventListener('click', ev => { if (!ev.target.closest('.menu')) closeMenus(); });
+document.addEventListener('keydown', ev => {
+  if (ev.key === '/' && page === 'maps' && !/^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement?.tagName)) { ev.preventDefault(); $('search').focus(); }
+});
+
+// Reverse-engineering commands running in the workspace
+// (internal/rea/progress.go): a pill each; clicking one shows the overview,
+// where the stages are.
+async function showProgress() {
+  let cmds = [];
+  try { cmds = await (await fetch('/api/progress')).json() || []; } catch { return; }
+  $('progPill').innerHTML = cmds.map(c => {
+    const cls = c.running ? 'run' : c.failed ? 'fail' : 'done';
+    const bar = c.running && c.percent > 0 ? `<b><u style="width:${c.percent}%"></u></b>` : '';
+    const where = '';
+    const count = c.total ? ` · ${c.done}/${c.total}` : c.done ? ` · ${c.done} read` : '';
+    const text = c.running ? `${c.command} · ${c.step}${count}` : c.text;
+    return `<button class="pill ${cls}" data-dir="${esc(c.dir)}" title="${esc(where + c.text)}"><i></i><span>${esc(where + text)}</span>${bar}</button>`;
+  }).join('');
+  for (const b of $('progPill').querySelectorAll('button')) b.onclick = () => { if (page !== 'overview') { setPage('overview'); publish(); } };
+}
+
+// The Overview tab's dot: a stage is running, or the import has something
+// left to do (internal/rea/status.go).
+async function refreshStatus() {
+  let st;
+  try { st = await (await fetch('/api/status')).json(); } catch { return; }
+  const tab = $('tabs').children[0], running = (st.stages || []).some(s => s.state === 'running');
+  tab.classList.toggle('run', running);
+  tab.classList.toggle('todo', !running && !!st.provider && !st.next.startsWith('nothing left'));
+}
+
+// ---- messages from the windows (index.html's toHost): that one loaded,
+// its name and view level, that it was clicked, or that it wants the search.
+window.addEventListener('message', ev => {
+  if (ev.origin !== location.origin || !ev.data?.desprawl) return;
+  // The overview: open a map.
+  if (ev.source === $('overview').contentWindow) { if (typeof ev.data.open === 'string') showDir(ev.data.open); return; }
+  const p = allPanes().find(p => p.frame.contentWindow === ev.source);
+  if (!p) return;
+  const m = ev.data;
+  if (m.ready) send(p, { opts });
+  if (m.name) p.el.querySelector('.name').textContent = m.name;
+  if (m.level) setLevel(p, m.level);
+  if (m.focus) { focus(p); closeMenus(); }
+  if (m.search) $('search').focus();
+});
+
+// One event stream for every window: browsers allow only a few connections
+// to a host, and each window keeping its own would starve the page's requests.
+// An agent's view goes to the window it names, else the one showing its
+// configuration (the server opens one if none does).
+function listen() {
+  const es = new EventSource('/api/events');
+  const all = msg => allPanes().forEach(p => send(p, msg));
+  // Shown only while the server is gone; EventSource reconnects by itself.
+  es.onopen = () => { $('offline').hidden = true; };
+  es.onerror = () => { $('offline').hidden = false; };
+  // One event at a time, in order: a "view" can follow the "screen" that
+  // opens its window.
+  let chain = Promise.resolve();
+  es.onmessage = ev => { chain = chain.then(() => onEvent(ev)).catch(() => {}); };
+  const onEvent = async ev => {
+    if (ev.data === 'screen') {
+      try { apply(await (await fetch('/api/screen')).json()); } catch {}
+      return;
+    }
+    if (['progress', 'status', 'change'].includes(ev.data)) toOverview({ event: ev.data });
+    if (ev.data === 'progress') { refreshStatus(); showProgress(); return; }
+    if (ev.data === 'status') return refreshStatus();
+    if (ev.data === 'change') loadDirs();
+    if (ev.data !== 'view') return all({ event: ev.data });
+    let view = {};
+    try { view = await (await fetch('/api/view')).json(); } catch {}
+    const target = panes.get(view.pane) || allPanes().find(p => p.dir === view.dir);
+    if (!target) return; // its window is on the way (a "screen" event)
+    if (maximized && maximized !== target) { maximized = null; refresh(); }
+    for (const p of allPanes()) send(p, { event: 'view', follow: p === target });
+    if (target !== focused) { focused = target; refresh(); publish(); }
+  };
+}
+
+async function loadDirs() {
+  let current = '';
+  try { ({ dirs, root: rootName, current } = await (await fetch('/api/dirs')).json()); } catch {}
+  rootName = (rootName || '').split(/[\\/]/).pop();
+  fillOpen();
+  return current;
+}
+
+// The windows to open on: the server's (another tab, the agent, or a
+// reload), else one window on the workspace's first configuration.
+(async () => {
+  const current = await loadDirs();
+  let server = { seq: 0, cols: [] };
+  try { server = await (await fetch('/api/screen')).json(); } catch {}
+  if (location.search) history.replaceState(null, '', '/'); // an old link's ?dir= or ?layout=
+  const fresh = !server.cols?.length;
+  const s = fresh ? { ...server, cols: [{ w: 1, panes: [{ id: newId(), dir: current || dirs[0] || '.', h: 1 }] }] } : server;
+  apply({ ...s, seq: 0 });
+  seq = server.seq;
+  if (fresh) publish();
+  listen();
+  showProgress();
+  refreshStatus();
+  window.addEventListener('resize', layout);
+})();
+</script>
+</body>
+</html>

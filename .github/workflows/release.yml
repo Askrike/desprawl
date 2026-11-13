@@ -1,0 +1,30 @@
+name: release
+
+# Releases each version tag: the binaries are built with goreleaser
+# (.goreleaser.yaml) and the release notes are the body of the commit the tag
+# points at.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+      - run: go test ./...
+      - run: git log -1 --format=%b "$GITHUB_REF_NAME" > "$RUNNER_TEMP/notes.md"
+      - uses: goreleaser/goreleaser-action@v6
+        with:
+          version: "~> v2"
+          args: release --clean --release-notes ${{ runner.temp }}/notes.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

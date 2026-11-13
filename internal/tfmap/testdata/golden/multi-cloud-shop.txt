@@ -1,0 +1,35 @@
+component Auth0 API auth0_resource_server.api
+component Auth0 action auth0_action.add_customer_id
+component Auth0 application auth0_client.storefront
+component Auth0 application auth0_client.worker
+component Auth0 connection auth0_connection.users
+component Auth0 log stream auth0_log_stream.events
+component CloudFront aws_cloudfront_distribution.storefront
+component CronJob kubernetes_cron_job_v1.sales_report
+component Deployment kubernetes_deployment_v1.api
+component Deployment kubernetes_deployment_v1.worker
+component ElastiCache aws_elasticache_replication_group.sessions
+component Ingress kubernetes_ingress_v1.api
+component Lambda function aws_lambda_function.thumbnailer
+component RDS instance aws_db_instance.main
+component S3 bucket aws_s3_bucket.storefront
+component S3 bucket aws_s3_bucket.uploads
+component SQS queue aws_sqs_queue.orders
+connection auth0_client.storefront -> auth0_connection.users [signs in with]
+connection auth0_client.storefront -> aws_cloudfront_distribution.storefront [access]
+connection auth0_client.worker -> auth0_resource_server.api [access]
+connection aws_cloudfront_distribution.storefront -> aws_s3_bucket.storefront [uses]
+connection aws_lambda_function.thumbnailer -> aws_s3_bucket.uploads [access]
+connection aws_s3_bucket.uploads -> aws_lambda_function.thumbnailer [notifies · access]
+connection kubernetes_cron_job_v1.sales_report -> aws_db_instance.main [uses]
+connection kubernetes_cron_job_v1.sales_report -> aws_s3_bucket.uploads [uses]
+connection kubernetes_deployment_v1.api -> auth0_resource_server.api [uses]
+connection kubernetes_deployment_v1.api -> aws_db_instance.main [uses]
+connection kubernetes_deployment_v1.api -> aws_elasticache_replication_group.sessions [uses]
+connection kubernetes_deployment_v1.api -> aws_s3_bucket.uploads [uses]
+connection kubernetes_deployment_v1.api -> aws_sqs_queue.orders [uses]
+connection kubernetes_deployment_v1.worker -> auth0_client.worker [uses]
+connection kubernetes_deployment_v1.worker -> auth0_resource_server.api [uses]
+connection kubernetes_deployment_v1.worker -> aws_db_instance.main [uses]
+connection kubernetes_deployment_v1.worker -> aws_sqs_queue.orders [uses]
+connection kubernetes_ingress_v1.api -> kubernetes_deployment_v1.api [uses]

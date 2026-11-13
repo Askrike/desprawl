@@ -1,0 +1,29 @@
+# Builds the release binaries; .github/workflows/release.yml runs it for each
+# version tag. Try it locally with: goreleaser release --snapshot --clean
+version: 2
+project_name: desprawl
+
+builds:
+  - main: ./cmd/desprawl
+    binary: desprawl
+    env: [CGO_ENABLED=0]
+    goos: [darwin, linux, windows]
+    goarch: [amd64, arm64]
+    ldflags: ["-s -w -X main.version={{.Version}}"]
+
+archives:
+  - name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files: [LICENSE, NOTICE, README.md] # Apache-2.0: copies must carry LICENSE and NOTICE
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  use: github
+
+release:
+  prerelease: auto # v0.1.0-rc.1 and the like are marked as prereleases

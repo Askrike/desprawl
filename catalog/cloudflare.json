@@ -1,0 +1,188 @@
+{
+  "provider": "cloudflare",
+  "resources": {
+    "cloudflare_workers_script": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Worker"
+    },
+    "cloudflare_worker": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Worker"
+    },
+    "cloudflare_worker_version": {
+      "role": "child",
+      "category": "compute",
+      "parent_attr": "worker_id"
+    },
+    "cloudflare_workers_deployment": {
+      "role": "child",
+      "category": "compute",
+      "parent_attr": "script_name"
+    },
+    "cloudflare_workers_cron_trigger": {
+      "role": "child",
+      "category": "compute",
+      "parent_attr": "script_name"
+    },
+    "cloudflare_workers_route": {
+      "role": "connector",
+      "category": "network",
+      "from_attr": "zone_id",
+      "to_attr": "script",
+      "verb": "routes to"
+    },
+    "cloudflare_workers_custom_domain": {
+      "role": "connector",
+      "category": "network",
+      "from_attr": "zone_id",
+      "to_attr": "service",
+      "verb": "routes to"
+    },
+    "cloudflare_workflow": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Cloudflare workflow"
+    },
+    "cloudflare_pages_project": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Pages project"
+    },
+    "cloudflare_pages_domain": {
+      "role": "child",
+      "category": "compute",
+      "parent_attr": "project_name"
+    },
+    "cloudflare_r2_bucket": {
+      "role": "primary",
+      "category": "storage",
+      "label": "R2 bucket"
+    },
+    "cloudflare_r2_custom_domain": {
+      "role": "child",
+      "category": "storage",
+      "parent_attr": "bucket_name"
+    },
+    "cloudflare_r2_bucket_event_notification": {
+      "role": "connector",
+      "category": "messaging",
+      "from_attr": "bucket_name",
+      "to_attr": "queue_id",
+      "verb": "notifies"
+    },
+    "cloudflare_d1_database": {
+      "role": "primary",
+      "category": "database",
+      "label": "D1 database"
+    },
+    "cloudflare_workers_kv_namespace": {
+      "role": "primary",
+      "category": "database",
+      "label": "KV namespace"
+    },
+    "cloudflare_workers_kv": {
+      "role": "child",
+      "category": "database",
+      "parent_attr": "namespace_id"
+    },
+    "cloudflare_hyperdrive_config": {
+      "role": "primary",
+      "category": "database",
+      "label": "Hyperdrive"
+    },
+    "cloudflare_queue": {
+      "role": "primary",
+      "category": "messaging",
+      "label": "Cloudflare queue"
+    },
+    "cloudflare_queue_consumer": {
+      "role": "connector",
+      "category": "messaging",
+      "from_attr": "queue_id",
+      "to_attr": "script_name",
+      "verb": "triggers"
+    },
+    "cloudflare_zone": {
+      "role": "primary",
+      "category": "network",
+      "label": "Cloudflare zone"
+    },
+    "cloudflare_dns_record": {
+      "role": "child",
+      "category": "network",
+      "parent_attr": "zone_id",
+      "verb": "routes to"
+    },
+    "cloudflare_load_balancer": {
+      "role": "primary",
+      "category": "network",
+      "label": "Cloudflare load balancer"
+    },
+    "cloudflare_load_balancer_pool": {
+      "role": "satellite",
+      "category": "network",
+      "label": "Load balancer pool"
+    },
+    "cloudflare_load_balancer_monitor": {
+      "role": "satellite",
+      "category": "network",
+      "label": "Load balancer monitor"
+    },
+    "cloudflare_zero_trust_tunnel_cloudflared": {
+      "role": "primary",
+      "category": "network",
+      "label": "Cloudflare tunnel"
+    },
+    "cloudflare_zero_trust_tunnel_cloudflared_config": {
+      "role": "child",
+      "category": "network",
+      "parent_attr": "tunnel_id"
+    },
+    "cloudflare_ai_gateway": {
+      "role": "primary",
+      "category": "network",
+      "label": "AI Gateway"
+    },
+    "cloudflare_secrets_store": {
+      "role": "satellite",
+      "category": "security",
+      "label": "Secrets store"
+    },
+    "cloudflare_secrets_store_secret": {
+      "role": "primary",
+      "category": "security",
+      "label": "Cloudflare secret"
+    },
+    "cloudflare_ruleset": {
+      "role": "satellite",
+      "category": "security",
+      "label": "Ruleset"
+    },
+    "cloudflare_zero_trust_access_application": {
+      "role": "satellite",
+      "category": "security",
+      "label": "Access application"
+    },
+    "cloudflare_zero_trust_access_policy": {
+      "role": "satellite",
+      "category": "security",
+      "label": "Access policy"
+    },
+    "cloudflare_turnstile_widget": {
+      "role": "satellite",
+      "category": "security",
+      "label": "Turnstile widget"
+    },
+    "cloudflare_logpush_job": {
+      "role": "satellite",
+      "category": "observability",
+      "label": "Logpush job"
+    },
+    "cloudflare_account": {
+      "role": "helper",
+      "category": "other"
+    }
+  }
+}

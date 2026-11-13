@@ -1,0 +1,23 @@
+# build output
+/bin/
+.DS_Store
+
+# terraform init artifacts in the examples
+.terraform/
+.terraform.lock.hcl
+
+# previous layouts kept on every save
+layouts/*.bak
+
+# desprawl-rea workspaces and plan files
+/ws/
+*.tfplan
+
+# goreleaser output
+/dist/
+
+# go build ./cmd/desprawl from the repo root
+/desprawl
+
+# python bytecode
+__pycache__/
