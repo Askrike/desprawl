@@ -99,5 +99,19 @@
       "match": "^Default$",
       "reason": "X-Ray's Default sampling rule is created by AWS and can't be deleted"
     }
-  ]
+  ],
+  "managed_by": {
+    "aws_route_table.route": [
+      "aws_route"
+    ],
+    "aws_network_acl.ingress": [
+      "aws_network_acl_rule"
+    ],
+    "aws_network_acl.egress": [
+      "aws_network_acl_rule"
+    ],
+    "aws_iam_role.inline_policy": [
+      "aws_iam_role_policy"
+    ]
+  }
 }

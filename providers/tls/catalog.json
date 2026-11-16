@@ -1,0 +1,23 @@
+{
+  "provider": "tls",
+  "resources": {
+    "tls_private_key": {
+      "role": "helper",
+      "category": "other"
+    },
+    "tls_self_signed_cert": {
+      "role": "helper",
+      "category": "other"
+    },
+    "tls_cert_request": {
+      "role": "helper",
+      "category": "other"
+    }
+  },
+  "data_sources": {
+    "tls_certificate": {
+      "role": "helper",
+      "category": "other"
+    }
+  }
+}

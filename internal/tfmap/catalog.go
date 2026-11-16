@@ -72,8 +72,8 @@ type Catalog struct {
 	dataSources map[string]Rule
 }
 
-// LoadCatalog reads every *.json catalog in each of dirs in turn: the
-// catalogs built into the binary, then a directory given with -catalog, whose
+// LoadCatalog reads every <provider>/catalog.json in each of dirs in turn:
+// the catalogs built into the binary, then a workspace's packs, whose
 // entries add to or replace the built-in ones type by type.
 func LoadCatalog(dirs ...fs.FS) (*Catalog, error) {
 	c := &Catalog{resources: map[string]Rule{}, dataSources: map[string]Rule{}}
@@ -86,7 +86,7 @@ func LoadCatalog(dirs ...fs.FS) (*Catalog, error) {
 }
 
 func (c *Catalog) read(fsys fs.FS) error {
-	files, err := fs.Glob(fsys, "*.json")
+	files, err := fs.Glob(fsys, "*/catalog.json")
 	if err != nil {
 		return err
 	}

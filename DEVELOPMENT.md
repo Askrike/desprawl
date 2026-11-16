@@ -10,7 +10,7 @@ go build -o bin/desprawl ./cmd/desprawl
 go test ./...                                    # every example against internal/tfmap/testdata/golden
 go test ./internal/tfmap ./internal/link -update # accept an intended golden change (review the diff first)
 scripts/check-ui.sh                              # renders every example in headless Chrome
-go run ./cmd/desprawl -C examples -layouts ../layouts  # serve the examples (their layouts are in layouts/)
+go run ./cmd/desprawl -C examples serve -layouts ../layouts  # serve the examples (their layouts are in layouts/)
 ```
 
 Each `v*` tag is released by GoReleaser (`.goreleaser.yaml`, `.github/workflows/release.yml`),
@@ -43,8 +43,9 @@ attributes).
    is an edge labelled with that attribute. Module inputs and outputs connect references
    across modules; `each.value` reaches what `for_each` iterates over, and `local.m["k"]` only
    the `k` entry of a map literal.
-2. **Classify** (`internal/tfmap/catalog.go` and `abstract.go`, `catalog/*.json`). Each resource type has a role, looked up per
-   provider (see the table in README). Types not in a catalog are treated as wiring. A
+2. **Classify** (`internal/tfmap/catalog.go` and `abstract.go`, `providers/*/catalog.json`). Each resource type has a role, looked up per
+   provider (see the table in `providers/README.md`), from the shipped catalogs and then the
+   workspace's `.desprawl/pack/*/catalog.json`, type by type. Types not in a catalog are treated as wiring. A
    variable or local that is *exactly* a component's name stands for it (so
    `arn:…:table/${var.table}` reaches the table); resource policies (`inverse`) point from the
    caller to the resource, as do attributes in `inverse_attrs` (a security group's `ingress`);
@@ -57,8 +58,8 @@ attributes).
 
 Catalogs: `desprawl unclassified [config]` lists types a config uses that no catalog covers;
 `scripts/provider-types.sh <provider> <initialized dir> [prefix]` lists a provider's types with
-their reference-like attributes, to classify in `catalog/<provider>.json` (the roles are in
-the comment at the top of `internal/tfmap/catalog.go`).
+their reference-like attributes, to classify in `providers/<provider>/catalog.json` (the format is in
+`providers/README.md`, "Catalogs").
 
 ## How reverse-engineering works
 

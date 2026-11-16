@@ -1,0 +1,6 @@
+[
+  {"source": "azurerm_network_security_rule", "path": "source_address_prefix", "target": "azurerm_subnet", "attr": "address_prefixes", "match": "exact", "origin": "manual", "note": "A rule's prefix equal to a subnet's address prefix is that subnet's traffic."},
+  {"source": "azurerm_network_security_rule", "path": "source_address_prefixes", "target": "azurerm_subnet", "attr": "address_prefixes", "match": "exact", "origin": "manual", "note": "A rule's prefix equal to a subnet's address prefix is that subnet's traffic."},
+  {"source": "azurerm_network_security_rule", "path": "destination_address_prefix", "target": "azurerm_subnet", "attr": "address_prefixes", "match": "exact", "origin": "manual", "note": "A rule's prefix equal to a subnet's address prefix is that subnet's traffic."},
+  {"source": "azurerm_network_security_rule", "path": "destination_address_prefixes", "target": "azurerm_subnet", "attr": "address_prefixes", "match": "exact", "origin": "manual", "note": "A rule's prefix equal to a subnet's address prefix is that subnet's traffic."}
+]

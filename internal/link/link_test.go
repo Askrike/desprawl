@@ -227,3 +227,48 @@ func TestBackEdgesCutsWeakest(t *testing.T) {
 		}
 	}
 }
+
+// Some providers keep a parent's numeric id in a child's number attribute:
+// a rule links it, whether the target keeps the id as a string or a number.
+// A number no rule covers stays literal, even when it equals an id.
+func TestNumbersByRule(t *testing.T) {
+	plan, err := tf.ParsePlan([]byte(`{"resource_changes":[
+{"address":"x_instance.main","mode":"managed","type":"x_instance","name":"main","change":{"before":{"id":"245738","vpc_id":91}}},
+{"address":"x_vpc.main","mode":"managed","type":"x_vpc","name":"main","change":{"before":{"id":"vpc-91","vpc_id":91}}},
+{"address":"x_alarm.cpu","mode":"managed","type":"x_alarm","name":"cpu","change":{"before":{"id":"7","instance_id":245738,"threshold":245738}}}
+]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	src := []byte(`
+resource "x_instance" "main" {
+  vpc_id = 91
+}
+resource "x_alarm" "cpu" {
+  instance_id = 245738
+  threshold   = 245738
+}
+`)
+	rs := rules.NewSet([]rules.Rule{
+		{Source: "x_alarm", Path: "instance_id", Target: "x_instance", Attr: "id", Match: rules.MatchExact},
+		{Source: "x_instance", Path: "vpc_id", Target: "x_vpc", Attr: "vpc_id", Match: rules.MatchExact},
+	})
+	ix, err := index.Build(plan, nil, rs)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err := Link(src, ix, Options{Rules: rs})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := strings.Join(strings.Fields(string(r.Config)), " ")
+	for _, want := range []string{
+		`instance_id = x_instance.main.id`,
+		`vpc_id = x_vpc.main.vpc_id`,
+		`threshold = 245738`,
+	} {
+		if !strings.Contains(got, want) {
+			t.Errorf("missing %s in:\n%s", want, r.Config)
+		}
+	}
+}

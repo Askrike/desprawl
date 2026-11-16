@@ -14,8 +14,9 @@ import (
 	"github.com/askrike/desprawl/providers"
 )
 
-// packFixFiles are the pack's files that fixes from accounts go into.
-var packFixFiles = []string{"rules.llm.json", "aliases.json", "list_args.json", "pack.json", "inventory.json"}
+// packFixFiles are the pack's files written from what an account holds:
+// fixes from the stages, and catalogs written for the types it uses.
+var packFixFiles = []string{"rules.llm.json", "aliases.json", "list_args.json", "pack.json", "inventory.json", "catalog.json"}
 
 // guard returns the privacy guard for pack files inferred from this
 // workspace: everything the workspace knows about the account is private,

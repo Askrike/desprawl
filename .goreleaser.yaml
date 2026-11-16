@@ -9,7 +9,7 @@ builds:
     env: [CGO_ENABLED=0]
     goos: [darwin, linux, windows]
     goarch: [amd64, arm64]
-    ldflags: ["-s -w -X main.version={{.Version}}"]
+    ldflags: ["-s -w -X github.com/askrike/desprawl/internal/version.release={{.Version}}"]
 
 archives:
   - name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
@@ -27,3 +27,7 @@ changelog:
 
 release:
   prerelease: auto # v0.1.0-rc.1 and the like are marked as prereleases
+  # Each release carries the install script, so the latest one installs with
+  # curl -fsSL https://install.desprawl.org | sh (a redirect to it)
+  extra_files:
+    - glob: ./install.sh

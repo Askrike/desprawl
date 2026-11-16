@@ -24,6 +24,10 @@ type part struct {
 	ref string // traversal such as aws_iam_role.foo.arn; set means not literal
 }
 
+// numNode is a whole-number literal, which only a rule links: some
+// providers keep a parent's numeric id in a child's number attribute.
+type numNode struct{ src, val string }
+
 type listNode struct{ items []node }
 
 type objNode struct{ items []kv }
@@ -54,6 +58,10 @@ func (s strNode) literal() (string, bool) {
 func toNode(e hclsyntax.Expression, src []byte) node {
 	raw := func() node { return rawNode{string(e.Range().SliceBytes(src))} }
 	switch e := e.(type) {
+	case *hclsyntax.LiteralValueExpr:
+		if e.Val.Type() == cty.Number && !e.Val.IsNull() && e.Val.AsBigFloat().IsInt() {
+			return numNode{src: string(e.Range().SliceBytes(src)), val: e.Val.AsBigFloat().Text('f', -1)}
+		}
 	case *hclsyntax.TemplateExpr:
 		var b strings.Builder
 		for _, p := range e.Parts {
@@ -100,6 +108,8 @@ func toNode(e hclsyntax.Expression, src []byte) node {
 func emit(n node) string {
 	switch n := n.(type) {
 	case rawNode:
+		return n.src
+	case numNode:
 		return n.src
 	case strNode:
 		var parts []part

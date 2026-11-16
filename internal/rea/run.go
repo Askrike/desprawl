@@ -80,7 +80,7 @@ func (w Workspace) Discover(types, exclude []string, opts discover.Options) (err
 		}
 	}
 	targets = discover.Rename(append(targets, added...))
-	w.params = discover.Params(targets)
+	w.params = w.detectParams(targets)
 	if err := w.WriteJSON("targets.json", targets); err != nil {
 		return err
 	}
@@ -125,7 +125,7 @@ func (w Workspace) discoverProvider(ctx context.Context, schemas *tf.Schemas, ty
 	}
 	opts.ProviderAttrs = p.QueryProvider
 	opts.Provider = w.Provider().Ref()
-	d := discover.Discoverer{WS: w.Workspace, TF: w.runner(), Schemas: schemas, Specs: p.ListArgs, Added: added, Opts: opts, Log: Log}
+	d := discover.Discoverer{WS: w.Workspace, TF: w.runner(), Schemas: schemas, Specs: p.ListArgs, Added: added, Params: w.configParams(), Opts: opts, Log: Log}
 	inv := p.Inventory
 	if inv != nil && len(inv.Sources) == 0 {
 		inv = nil
@@ -153,7 +153,7 @@ func (w Workspace) discoverProvider(ctx context.Context, schemas *tf.Schemas, ty
 		errs             map[string]error
 	}
 	readInventory := func(targets []model.Target) invRead {
-		r := invRead{params: discover.Params(targets)}
+		r := invRead{params: w.detectParams(targets)}
 		r.entries, r.found, r.unmapped, r.misfit, r.truncated, r.errs = inv.Discover(ctx, w.Workspace, w.runner(), r.params, targets)
 		return r
 	}
@@ -176,7 +176,7 @@ func (w Workspace) discoverProvider(ctx context.Context, schemas *tf.Schemas, ty
 		if early != nil {
 			r = <-early
 		}
-		if early == nil || !maps.Equal(inv.Uses(r.params), inv.Uses(discover.Params(all))) {
+		if early == nil || !maps.Equal(inv.Uses(r.params), inv.Uses(w.detectParams(all))) {
 			// Listing changed a scope parameter the sources use: read again.
 			r = readInventory(all)
 		}
@@ -367,7 +367,7 @@ func (w Workspace) LinkOptions(sources []string, parametrize bool) (link.Options
 	if err != nil {
 		return link.Options{}, fmt.Errorf("pack aliases.json: %w", err)
 	}
-	opts := link.Options{Rules: rs, Drop: p.ExcludeAttributes}
+	opts := link.Options{Rules: rs, Drop: p.ExcludeAttributes, ManagedBy: p.ManagedBy}
 	if parametrize {
 		var rep discover.Report
 		w.ReadJSON("discovery.json", &rep)

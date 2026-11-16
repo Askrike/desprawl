@@ -1,7 +1,8 @@
 package main
 
 // desprawl update: replace this binary with the latest release, the way
-// deploy/install/install.sh installs it, then run the new binary's setup.
+// install.sh installs it, print what's new, then run the new
+// binary's setup. offerUpdate asks before a command, once per new release.
 
 import (
 	"archive/tar"
@@ -11,6 +12,7 @@ import (
 	"compress/gzip"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -20,13 +22,24 @@ import (
 	"path"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strings"
+	"time"
 
 	"github.com/askrike/desprawl/internal/paths"
+	"github.com/askrike/desprawl/internal/version"
 )
 
-// installURL serves the releases (deploy/install/handler.py).
-const installURL = "https://desprawl.spawned.app"
+// repoURL is where desprawl is released: each release has the archives
+// .goreleaser.yaml names, checksums.txt and install.sh.
+const repoURL = "https://github.com/askrike/desprawl"
+
+// installCommand installs the latest release (install.desprawl.org
+// redirects to its install.sh).
+const installCommand = "curl -fsSL https://install.desprawl.org | sh"
+
+// releasesURL lists the releases with their notes.
+const releasesURL = "https://api.github.com/repos/askrike/desprawl/releases?per_page=100"
 
 func cmdUpdate(args []string) error {
 	fl := newFlagSet("update")
@@ -34,25 +47,49 @@ func cmdUpdate(args []string) error {
 	noSetup := fl.Bool("no-setup", false, "don't run the new binary's setup afterwards")
 	fl.Parse(args)
 
-	exe, err := paths.Exe()
-	if err != nil {
-		return err
-	}
-	if version == "" {
-		return fmt.Errorf("%s isn't a release build (version %s): update it from its checkout, or install a release with\n  curl -fsSL %s | sh", exe, versionString(), installURL)
-	}
-
 	target := *want
 	if target == "" {
-		b, err := get(installURL + "/latest")
-		if err != nil {
+		var err error
+		if target, err = latest(http.DefaultClient); err != nil {
 			return err
 		}
-		target = strings.TrimSpace(string(b))
 	}
-	if strings.TrimPrefix(target, "v") == strings.TrimPrefix(version, "v") {
-		fmt.Printf("desprawl %s is up to date\n", target)
-		return nil
+	_, err := update(target, !*noSetup)
+	return err
+}
+
+// latest is the newest release: where releases/latest redirects (a page,
+// not the API, so it has no rate limit).
+func latest(c *http.Client) (string, error) {
+	nc := *c
+	nc.CheckRedirect = func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }
+	resp, err := nc.Get(repoURL + "/releases/latest")
+	if err != nil {
+		return "", err
+	}
+	resp.Body.Close()
+	_, tag, ok := strings.Cut(resp.Header.Get("Location"), "/releases/tag/")
+	if !ok || tag == "" {
+		return "", fmt.Errorf("no release found at %s/releases (%s)", repoURL, resp.Status)
+	}
+	return tag, nil
+}
+
+// update replaces this binary with release target, prints the release notes
+// of the versions it skips to, and runs the new binary's setup. It returns
+// the binary's path, and "" when there was nothing to do.
+func update(target string, setup bool) (string, error) {
+	exe, err := paths.Exe()
+	if err != nil {
+		return "", err
+	}
+	cur := version.Release()
+	if cur == "" {
+		return "", fmt.Errorf("%s isn't a release build (version %s): update it from its checkout, or install a release with\n  %s", exe, version.String(), installCommand)
+	}
+	if strings.TrimPrefix(target, "v") == strings.TrimPrefix(cur, "v") {
+		fmt.Printf("desprawl %s is up to date\n", cur)
+		return "", nil
 	}
 
 	archive, binary := "desprawl_"+runtime.GOOS+"_"+runtime.GOARCH+".tar.gz", "desprawl"
@@ -60,42 +97,96 @@ func cmdUpdate(args []string) error {
 		archive, binary = "desprawl_windows_"+runtime.GOARCH+".zip", "desprawl.exe"
 	}
 	fmt.Printf("Downloading desprawl %s (%s/%s)\n", target, runtime.GOOS, runtime.GOARCH)
-	data, err := get(installURL + "/download/" + target + "/" + archive)
+	data, err := get(http.DefaultClient, repoURL+"/releases/download/"+target+"/"+archive)
 	if err != nil {
-		return err
+		return "", err
 	}
-	sums, err := get(installURL + "/download/" + target + "/checksums.txt")
+	sums, err := get(http.DefaultClient, repoURL+"/releases/download/"+target+"/checksums.txt")
 	if err != nil {
-		return err
+		return "", err
 	}
 	if err := checkSum(data, sums, archive); err != nil {
-		return err
+		return "", err
 	}
 	bin, err := extract(data, archive, binary)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if err := replaceExe(exe, bin); err != nil {
-		return err
+		return "", err
 	}
-	fmt.Printf("Updated desprawl %s -> %s at %s\n", version, target, exe)
+	fmt.Printf("Updated desprawl %s -> %s at %s\n", cur, target, exe)
+	printNotes(os.Stdout, cur, target)
 
-	if *noSetup {
-		return nil
+	if !setup {
+		return exe, nil
 	}
 	// The new binary's skills and MCP config, not this one's.
 	fmt.Println()
 	cmd := exec.Command(exe, "setup")
 	cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("desprawl setup: %w", err)
+		return "", fmt.Errorf("desprawl setup: %w", err)
 	}
 	fmt.Println("\nRestart your agents to use the new MCP server.")
-	return nil
+	return exe, nil
 }
 
-func get(url string) ([]byte, error) {
-	resp, err := http.Get(url)
+type release struct {
+	Tag   string `json:"tag_name"`
+	Body  string `json:"body"`
+	Draft bool   `json:"draft"`
+}
+
+// printNotes prints the release notes of the published versions after from,
+// up to to, oldest first. Going back prints none.
+func printNotes(w io.Writer, from, to string) {
+	var rs []release
+	b, err := get(&http.Client{Timeout: 10 * time.Second}, releasesURL)
+	if err == nil {
+		err = json.Unmarshal(b, &rs)
+	}
+	if err != nil {
+		fmt.Fprintf(w, "\nWhat's new: https://github.com/askrike/desprawl/releases (couldn't fetch the notes: %v)\n", err)
+		return
+	}
+	rs = notesBetween(rs, from, to)
+	for _, r := range rs {
+		fmt.Fprintf(w, "\n## desprawl %s\n\n%s\n", r.Tag, notesText(r.Body))
+	}
+}
+
+// notesBetween are the releases after from up to to, oldest first.
+func notesBetween(rs []release, from, to string) []release {
+	var out []release
+	for _, r := range rs {
+		if !r.Draft && version.Newer(r.Tag, from) && !version.Newer(r.Tag, to) {
+			out = append(out, r)
+		}
+	}
+	slices.SortFunc(out, func(a, b release) int {
+		if version.Newer(a.Tag, b.Tag) {
+			return 1
+		}
+		return -1
+	})
+	return out
+}
+
+// notesText is a release's notes without the commit's trailers
+// (Co-authored-by: …).
+func notesText(body string) string {
+	var keep []string
+	for _, l := range strings.Split(strings.ReplaceAll(body, "\r\n", "\n"), "\n") {
+		if !strings.HasPrefix(l, "Co-authored-by:") {
+			keep = append(keep, l)
+		}
+	}
+	return strings.TrimSpace(strings.Join(keep, "\n"))
+}
+
+func get(c *http.Client, url string) ([]byte, error) {
+	resp, err := c.Get(url)
 	if err != nil {
 		return nil, err
 	}

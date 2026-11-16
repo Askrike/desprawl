@@ -8,6 +8,7 @@ package rea
 // providers (a DNS record holding a load balancer's hostname) are linked.
 
 import (
+	"encoding/json"
 	"maps"
 	"slices"
 	"strings"
@@ -20,14 +21,57 @@ import (
 )
 
 // scoped is the workspace as one provider block sees it: provider() is that
-// block, pack() its provider's pack, params its targets' scope.
+// block, pack() its provider's pack, params its targets' scope (before
+// the first discovery, the scope its config sets).
 func (w Workspace) scoped(p model.Provider) Workspace {
 	w.current = &p
 	var targets []model.Target
-	if w.ReadJSON("targets.json", &targets) == nil {
-		w.params = discover.Params(ofProvider(targets, w.Config, p.Ref()))
-	}
+	w.ReadJSON("targets.json", &targets)
+	w.params = w.detectParams(ofProvider(targets, w.Config, p.Ref()))
 	return w
+}
+
+// detectParams are the scope parameters of targets (discover.Params), and
+// those the provider block's config sets that no target carries.
+func (w Workspace) detectParams(targets []model.Target) map[string]string {
+	out := discover.Params(targets)
+	for k, v := range w.configParams() {
+		if _, ok := out[k]; !ok {
+			out[k] = v
+		}
+	}
+	return out
+}
+
+// configParams are the scope parameters the provider block's config sets:
+// for each the pack declares, the setting its ref reads
+// (data.google_client_config.current.region: region), so a region set on
+// the provider scopes listing before anything that carries it is listed.
+// Unscoped with several blocks: none.
+func (w Workspace) configParams() map[string]string {
+	if w.current == nil && len(w.Config.Providers) != 1 {
+		return nil
+	}
+	p := w.Provider()
+	settings := p.Settings()
+	if len(settings) == 0 {
+		return nil
+	}
+	b, err := providers.ReadFile(w.Packs(), p.Name, "pack.json")
+	if err != nil {
+		return nil
+	}
+	var c providers.Config
+	if json.Unmarshal(b, &c) != nil {
+		return nil
+	}
+	out := map[string]string{}
+	for name, pp := range c.Params {
+		if v := settings[pp.Ref[strings.LastIndex(pp.Ref, ".")+1:]]; v != "" {
+			out[name] = v
+		}
+	}
+	return out
 }
 
 // ofProvider are the targets imported with the provider block ref; one
@@ -119,6 +163,12 @@ func mergePack(a, b *providers.Pack) {
 		}
 	}
 	a.Skip = append(a.Skip, b.Skip...)
+	if b.ManagedBy != nil {
+		if a.ManagedBy == nil {
+			a.ManagedBy = map[string][]string{}
+		}
+		maps.Copy(a.ManagedBy, b.ManagedBy)
+	}
 }
 
 // mergeReport adds one provider block's discovery to the workspace's.

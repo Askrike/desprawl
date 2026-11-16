@@ -86,6 +86,11 @@ func (g Generator) partialRun(targets []model.Target, overrides map[string]Overr
 	if last.Inputs != inputs {
 		return nil, nil, nil
 	}
+	// The output moved or lost its import blocks: what was kept is
+	// imported nowhere.
+	if _, err := os.Stat(g.WS.Path("imports.tf")); err != nil {
+		return nil, nil, nil //nolint:nilerr // a full run instead
+	}
 	src, err := os.ReadFile(g.WS.StatePath(generatedFile))
 	if err != nil {
 		return nil, nil, nil //nolint:nilerr // no earlier config: nothing to keep

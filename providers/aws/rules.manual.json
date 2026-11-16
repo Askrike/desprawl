@@ -1,0 +1,6 @@
+[
+  {"source": "aws_security_group_rule", "path": "cidr_blocks", "target": "aws_subnet", "attr": "cidr_block", "match": "exact", "origin": "manual", "note": "A rule's range equal to a subnet's range is that subnet's traffic."},
+  {"source": "aws_vpc_security_group_ingress_rule", "path": "cidr_ipv4", "target": "aws_subnet", "attr": "cidr_block", "match": "exact", "origin": "manual", "note": "A rule's range equal to a subnet's range is that subnet's traffic."},
+  {"source": "aws_vpc_security_group_egress_rule", "path": "cidr_ipv4", "target": "aws_subnet", "attr": "cidr_block", "match": "exact", "origin": "manual", "note": "A rule's range equal to a subnet's range is that subnet's traffic."},
+  {"source": "aws_network_acl_rule", "path": "cidr_block", "target": "aws_subnet", "attr": "cidr_block", "match": "exact", "origin": "manual", "note": "A rule's range equal to a subnet's range is that subnet's traffic."}
+]

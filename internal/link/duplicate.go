@@ -2,7 +2,10 @@ package link
 
 import (
 	"encoding/json"
+	"maps"
+	"slices"
 	"sort"
+	"strings"
 
 	"github.com/askrike/desprawl/internal/index"
 	"github.com/askrike/desprawl/internal/tf"
@@ -71,6 +74,55 @@ func Duplicates(plan *tf.PlanJSON, schemas *tf.Schemas, ix *index.Index) ([]Dupl
 		}
 		return out[i].Attr < out[j].Attr
 	})
+	return out, nil
+}
+
+// ManagedDuplicates are the inline attributes the pack says standalone
+// types manage too (managedBy: "type.attr" to those types), on resources
+// that a resource of one of those types attaches to: its import ID
+// extends theirs ("<dataset>/roles/…"), or another of its attributes holds
+// a value theirs owns (a security group's ID).
+func ManagedDuplicates(plan *tf.PlanJSON, ix *index.Index, managedBy map[string][]string) ([]Duplicate, error) {
+	if len(managedBy) == 0 {
+		return nil, nil
+	}
+	type res struct {
+		addr, typ, id string
+		vals          map[string]any
+	}
+	byType := map[string][]res{}
+	for _, rc := range plan.ResourceChanges {
+		if rc.Mode != "managed" {
+			continue
+		}
+		vals, err := rc.Values()
+		if err != nil {
+			return nil, err
+		}
+		id, _ := vals["id"].(string)
+		byType[rc.Type] = append(byType[rc.Type], res{rc.Address, rc.Type, id, vals})
+	}
+	var out []Duplicate
+	for _, key := range slices.Sorted(maps.Keys(managedBy)) {
+		typ, attr, ok := strings.Cut(key, ".")
+		if !ok {
+			continue
+		}
+		for _, r := range byType[typ] {
+			if r.vals[attr] == nil {
+				continue
+			}
+		found:
+			for _, st := range managedBy[key] {
+				for _, s := range byType[st] {
+					if (r.id != "" && strings.HasPrefix(strings.ToLower(s.id), strings.ToLower(r.id)+"/")) || attaches(ix, s.vals, r.addr) {
+						out = append(out, Duplicate{Addr: r.addr, Attr: attr, By: s.addr})
+						break found
+					}
+				}
+			}
+		}
+	}
 	return out, nil
 }
 

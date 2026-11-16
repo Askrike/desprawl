@@ -1,0 +1,21 @@
+{
+  "provider": "time",
+  "resources": {
+    "time_sleep": {
+      "role": "helper",
+      "category": "other"
+    },
+    "time_static": {
+      "role": "helper",
+      "category": "other"
+    },
+    "time_rotating": {
+      "role": "helper",
+      "category": "other"
+    },
+    "time_offset": {
+      "role": "helper",
+      "category": "other"
+    }
+  }
+}

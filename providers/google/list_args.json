@@ -72,14 +72,6 @@
     "note": "Tables belong to a BigQuery dataset, so listing every dataset covers all of them."
   },
   {
-    "type": "google_cloud_run_service",
-    "scope": {
-      "location": "location"
-    },
-    "origin": "llm",
-    "note": "location is the region the listing runs in, so it maps to the location scope."
-  },
-  {
     "type": "google_colab_notebook_execution",
     "scope": {
       "location": "location"

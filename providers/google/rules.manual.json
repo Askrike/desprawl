@@ -1,0 +1,4 @@
+[
+  {"source": "google_compute_firewall", "path": "source_ranges", "target": "google_compute_subnetwork", "attr": "ip_cidr_range", "match": "exact", "origin": "manual", "note": "A firewall range equal to a subnet's primary range is that subnet's traffic."},
+  {"source": "google_compute_firewall", "path": "destination_ranges", "target": "google_compute_subnetwork", "attr": "ip_cidr_range", "match": "exact", "origin": "manual", "note": "A firewall range equal to a subnet's primary range is that subnet's traffic."}
+]

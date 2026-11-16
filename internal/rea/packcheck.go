@@ -27,6 +27,13 @@ func (w Workspace) shippedInventory() *inventory.Inventory {
 	return inv
 }
 
+// isShipped says whether s is one of shipped's sources, whichever
+// provider block it is read with.
+func isShipped(shipped *inventory.Inventory, s inventory.Source) bool {
+	s.Provider = ""
+	return slices.ContainsFunc(shipped.Sources, func(o inventory.Source) bool { return reflect.DeepEqual(o, s) })
+}
+
 // checkPartitions reads each source whose partition isn't the shipped one
 // without it, and checks the partition against what it reported. A
 // partition that fails is taken off its source (which is still read, cut
@@ -35,7 +42,7 @@ func (w Workspace) checkPartitions(ctx context.Context, inv *inventory.Inventory
 	shipped := w.shippedInventory()
 	bad := map[string]string{}
 	for i, s := range inv.Sources {
-		if s.Partition == nil || slices.ContainsFunc(shipped.Sources, func(o inventory.Source) bool { return reflect.DeepEqual(o, s) }) {
+		if s.Partition == nil || isShipped(shipped, s) {
 			continue
 		}
 		plain := s
@@ -113,7 +120,7 @@ func (w Workspace) checkPerParent(ctx context.Context, inv *inventory.Inventory,
 	shipped := w.shippedInventory()
 	bad := map[string]string{}
 	for i, s := range inv.Sources {
-		if s.Parent == "" || slices.ContainsFunc(shipped.Sources, func(o inventory.Source) bool { return reflect.DeepEqual(o, s) }) {
+		if s.Parent == "" || isShipped(shipped, s) {
 			continue
 		}
 		single := s

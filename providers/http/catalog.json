@@ -1,0 +1,9 @@
+{
+  "provider": "http",
+  "data_sources": {
+    "http": {
+      "role": "helper",
+      "category": "other"
+    }
+  }
+}

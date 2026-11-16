@@ -30,7 +30,7 @@ go test ./...
 
 ## Where changes go
 
-- **A resource type is drawn wrong or "not in catalog"**: fix it in `catalog/<provider>.json`.
+- **A resource type is drawn wrong or "not in catalog"**: fix it in `providers/<provider>/catalog.json`.
 - **Reverse-engineering misses or mislinks something**: fix it in the provider pack,
   `providers/<provider>/`. Code in `internal/` must stay provider-agnostic: no provider,
   resource type or cloud API names outside tests.

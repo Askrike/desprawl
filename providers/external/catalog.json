@@ -1,0 +1,9 @@
+{
+  "provider": "external",
+  "data_sources": {
+    "external": {
+      "role": "helper",
+      "category": "other"
+    }
+  }
+}

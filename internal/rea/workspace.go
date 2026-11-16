@@ -17,7 +17,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/askrike/desprawl/internal/discover"
 	"github.com/askrike/desprawl/internal/logs"
 	"github.com/askrike/desprawl/internal/model"
 	"github.com/askrike/desprawl/internal/paths"
@@ -66,10 +65,11 @@ func Open(dir string) (Workspace, error) {
 		return Workspace{}, err
 	}
 	w := Workspace{Workspace: model.Workspace{Dir: dir, Out: cfg.OutputDir(dir)}, Config: cfg}
+	// Before the first discovery there are no targets: the scope is what
+	// the provider block's config sets.
 	var targets []model.Target
-	if w.ReadJSON("targets.json", &targets) == nil {
-		w.params = discover.Params(targets)
-	}
+	w.ReadJSON("targets.json", &targets)
+	w.params = w.detectParams(targets)
 	return w, nil
 }
 

@@ -34,8 +34,8 @@ git; nothing searches upward. The map commands take a configuration path in the 
   `map_infrastructure` prompt.
 - Releases: `.goreleaser.yaml`, run by `.github/workflows/release.yml` for each `v*` tag.
 - `internal/`: the reverse-engineering pipeline (discover, generate, link, verify, suggest…).
-- `providers/`: provider packs for the reverse-engineering commands (not the same as `catalog/`).
-- `catalog/`: provider catalogs, embedded by the tiny `catalog` package.
+- `providers/`: provider packs, everything provider-specific as data: how the map draws a
+  provider's types (`catalog.json`) and how the reverse-engineering commands handle them.
 - `examples/`, `layouts/`: Terraform examples and their saved layouts. `examples/desprawl.hcl`
   (`draw = ["."]`) makes `examples/` a workspace that draws every example.
 - `scripts/`: helper scripts; run them from anywhere.
@@ -65,7 +65,7 @@ git; nothing searches upward. The map commands take a configuration path in the 
 - Headless Chrome: use a fresh `--user-data-dir` per run, or it serves a cached page.
 - This repo's layouts live in `layouts/`, not `examples/.desprawl/layouts/`: always pass
   `-layouts ../layouts` from the examples workspace
-  (`go run ./cmd/desprawl -C examples -layouts ../layouts` to serve,
+  (`go run ./cmd/desprawl -C examples serve -layouts ../layouts` to serve,
   `go run ./cmd/desprawl -C examples map -layouts ../layouts X`, likewise `layout seed|tidy`).
 - The headless check uses `--virtual-time-budget`; the page's live-update stream
   (`/api/events`) keeps a request open, so for screenshots of the real server use `--timeout`.

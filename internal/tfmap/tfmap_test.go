@@ -12,18 +12,18 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"github.com/askrike/desprawl/catalog"
+	"github.com/askrike/desprawl/providers"
 )
 
 var update = flag.Bool("update", false, "rewrite testdata/golden from the current output")
 
-// TestCatalogOverlay: a -catalog directory adds to and replaces built-in
-// entries type by type, keeping the rest.
+// TestCatalogOverlay: a workspace pack's catalog adds to and replaces
+// built-in entries type by type, keeping the rest.
 func TestCatalogOverlay(t *testing.T) {
-	extra := fstest.MapFS{"mine.json": {Data: []byte(`{"provider": "aws", "resources": {
+	extra := fstest.MapFS{"aws/catalog.json": {Data: []byte(`{"provider": "aws", "resources": {
 		"aws_s3_bucket": {"role": "satellite"},
 		"aws_made_up_thing": {"role": "primary", "label": "Thing"}}}`)}}
-	c, err := LoadCatalog(catalog.FS, extra)
+	c, err := LoadCatalog(providers.Catalogs, extra)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,7 +39,7 @@ func TestCatalogOverlay(t *testing.T) {
 // example shows up as a diff here; when the change is intended, review the
 // diff and run `go test -update`.
 func TestExamples(t *testing.T) {
-	cat, err := LoadCatalog(catalog.FS)
+	cat, err := LoadCatalog(providers.Catalogs)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -98,7 +98,7 @@ func goldenText(a Arch) string {
 // TestSeedLayouts checks that every example's seed layout places each
 // component in its own cell and keeps modules out of each other's boxes.
 func TestSeedLayouts(t *testing.T) {
-	cat, err := LoadCatalog(catalog.FS)
+	cat, err := LoadCatalog(providers.Catalogs)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -181,7 +181,7 @@ resource "aws_lambda_event_source_mapping" "m" {
 	if err := os.WriteFile(filepath.Join(dir, "main.tf"), []byte(src), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	cat, err := LoadCatalog(catalog.FS)
+	cat, err := LoadCatalog(providers.Catalogs)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -232,7 +232,7 @@ output "arn" { value = aws_dynamodb_table.this.arn }`,
 			t.Fatal(err)
 		}
 	}
-	cat, err := LoadCatalog(catalog.FS)
+	cat, err := LoadCatalog(providers.Catalogs)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -260,7 +260,7 @@ func archOf(t *testing.T, files map[string]string) string {
 			t.Fatal(err)
 		}
 	}
-	cat, err := LoadCatalog(catalog.FS)
+	cat, err := LoadCatalog(providers.Catalogs)
 	if err != nil {
 		t.Fatal(err)
 	}

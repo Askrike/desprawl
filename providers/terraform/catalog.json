@@ -1,0 +1,9 @@
+{
+  "provider": "terraform",
+  "resources": {
+    "terraform_data": {
+      "role": "helper",
+      "category": "other"
+    }
+  }
+}

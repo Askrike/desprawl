@@ -1,0 +1,9 @@
+{
+  "provider": "template",
+  "data_sources": {
+    "template_file": {
+      "role": "helper",
+      "category": "other"
+    }
+  }
+}

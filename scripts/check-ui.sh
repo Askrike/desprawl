@@ -14,7 +14,7 @@ trap 'kill $server $web 2>/dev/null; wait $server $web 2>/dev/null || true; rm -
 
 cd "$root"
 go build -o "$work/desprawl" ./cmd/desprawl
-"$work/desprawl" -C examples -addr "localhost:$port" -open=false -layouts ../layouts >/dev/null 2>&1 &
+"$work/desprawl" -C examples serve -addr "localhost:$port" -open=false -layouts ../layouts >/dev/null 2>&1 &
 server=$!
 mkdir -p "$work/site/api"
 python3 -I -m http.server "$static" -d "$work/site" >/dev/null 2>&1 &

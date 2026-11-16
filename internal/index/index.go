@@ -3,6 +3,7 @@ package index
 
 import (
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -142,7 +143,13 @@ func Build(plan *tf.PlanJSON, schemas *tf.Schemas, rs *rules.Set) (*Index, error
 				}
 				continue
 			}
-			s, ok := Value(vals, attr).(string)
+			v := Value(vals, attr)
+			// A number is indexed only where a rule targets it: alone, a
+			// number is too ambiguous (a port, a count) to link.
+			if n, ok := v.(float64); ok && slices.Contains(rs.TargetAttrs(rc.Type), attr) {
+				v = strconv.FormatFloat(n, 'f', -1, 64)
+			}
+			s, ok := v.(string)
 			if !ok || s == "" {
 				continue
 			}

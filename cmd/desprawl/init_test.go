@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"io"
 	"os"
 	"strings"
@@ -9,6 +10,19 @@ import (
 	"github.com/askrike/desprawl/internal/model"
 	"github.com/askrike/desprawl/internal/rea"
 )
+
+// -config may be repeated, one setting each, joined as lines.
+func TestConfigLines(t *testing.T) {
+	var l lines
+	fs := flag.NewFlagSet("init", flag.ContinueOnError)
+	fs.Var(&l, "config", "")
+	if err := fs.Parse([]string{"-config", `project = "p"`, "-config", `region = "r"`}); err != nil {
+		t.Fatal(err)
+	}
+	if got := l.String(); got != "project = \"p\"\nregion = \"r\"" {
+		t.Errorf("config = %q", got)
+	}
+}
 
 // The answers to init's questions make a desprawl.hcl that reads back the
 // same: two providers (one aliased), settings, environment, what to draw.

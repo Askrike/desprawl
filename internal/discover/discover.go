@@ -102,8 +102,11 @@ type Discoverer struct {
 	// Added are targets added by hand. They supply parent instances for
 	// types the provider can't list (a DNS zone whose records can be).
 	Added []model.Target
-	Opts  Options
-	Log   logs.Logger
+	// Params are scope parameters known before listing (set in the
+	// provider's config); one that listing detects takes its place.
+	Params map[string]string
+	Opts   Options
+	Log    logs.Logger
 }
 
 func (d Discoverer) Run(ctx context.Context) ([]model.Target, *Report, error) {
@@ -149,6 +152,11 @@ func (d Discoverer) Run(ctx context.Context) ([]model.Target, *Report, error) {
 	for round := 0; ; {
 		mu.Lock()
 		params := scopeParams(results)
+		for k, v := range d.Params {
+			if params[k] == "" {
+				params[k] = v
+			}
+		}
 		var ready []string
 		for typ := range pending {
 			if d.ready(typ, specs, results, pending, params) {
@@ -419,6 +427,27 @@ func scopeParams(results map[string][]tf.ListResult) map[string]string {
 // listBlock is one list block: its config arguments, if any.
 type listBlock map[string]string
 
+// scopeOf says whether parent instance p is itself a scope: its identity is
+// one attribute, filling a list argument named after a scope parameter the
+// provider block's config sets (Params), like a project. It returns the
+// parameter and p's value, or "" for any other parent.
+func (d Discoverer) scopeOf(s ListArg, p tf.ListResult) (string, string) {
+	if len(p.Identity) != 1 {
+		return "", ""
+	}
+	for _, arg := range slices.Sorted(maps.Keys(s.Args)) {
+		if d.Params[arg] == "" {
+			continue
+		}
+		if v, ok := p.Identity[s.Args[arg]].(string); ok && v != "" {
+			return arg, v
+		}
+	}
+	return "", ""
+}
+
+// blocks are the list blocks of type typ. Parents outside the provider
+// block's scope (see scopeOf) are left out.
 func (d Discoverer) blocks(typ string, s ListArg, results map[string][]tf.ListResult, params map[string]string) ([]listBlock, error) {
 	if len(d.Schemas.RequiredListArgs(typ)) == 0 && s.Type == "" {
 		return []listBlock{{}}, nil
@@ -434,6 +463,25 @@ func (d Discoverer) blocks(typ string, s ListArg, results map[string][]tf.ListRe
 		parents := slices.Concat(results[s.Parent], d.added(s.Parent))
 		if len(parents) == 0 && (d.Schemas.Lists[s.Parent] == nil || !d.wants(s.Parent)) {
 			return nil, fmt.Errorf("parent type %s can't be listed; add its instances with add-target", s.Parent)
+		}
+		// Parents that are other scopes than the provider block's (another
+		// project the credentials can also see) are left out: listed per
+		// them, a type brings in a scope the workspace doesn't manage, and
+		// every plan reads it. Only when the block's own scope is among
+		// them: a config value spelled otherwise (a number for a name)
+		// matches none, and then every parent is listed.
+		var inside []tf.ListResult
+		own := false
+		for _, p := range parents {
+			param, v := d.scopeOf(s, p)
+			if v == "" || strings.EqualFold(v, d.Params[param]) {
+				own = own || v != ""
+				inside = append(inside, p)
+			}
+		}
+		if own && len(inside) < len(parents) {
+			d.Log.Verbose("%s: not listing for %d parents outside the provider block's scope", typ, len(parents)-len(inside))
+			parents = inside
 		}
 		// A parent without an argument's attribute is left out (one found
 		// by inventory may know only its import ID); the type fails only

@@ -64,6 +64,23 @@ func (p Provider) Ref() string {
 	return p.Name
 }
 
+// Settings are the config block's attributes set to a literal string
+// (region = "eu-west-1"), by name.
+func (p Provider) Settings() map[string]string {
+	f, d := hclsyntax.ParseConfig([]byte(p.Body), "config", hcl.InitialPos)
+	if d.HasErrors() {
+		return nil
+	}
+	out := map[string]string{}
+	for name, a := range f.Body.(*hclsyntax.Body).Attributes {
+		v, d := a.Expr.Value(nil)
+		if !d.HasErrors() && v.Type() == cty.String && v.IsKnown() && !v.IsNull() && v.AsString() != "" {
+			out[name] = v.AsString()
+		}
+	}
+	return out
+}
+
 // IsWorkspace reports whether dir is a workspace: it holds a desprawl.hcl.
 func IsWorkspace(dir string) bool {
 	_, err := os.Stat(paths.ConfigFile(dir))

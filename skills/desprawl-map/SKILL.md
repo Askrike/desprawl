@@ -14,7 +14,7 @@ Use desprawl's MCP tools (`use_workspace`, `list_configs`, `get_map`,
 `open_map`, `show_map`, `show_changes`, `seed_layout`, `save_layout`,
 `tidy_layout`, and for the page's windows `get_windows`, `arrange_windows`,
 `control_window`). Without the tools, the same works from the shell, run in the
-workspace: `desprawl` serves the map, `desprawl ls` lists the
+workspace: `desprawl serve` serves the map until stopped, `desprawl ls` lists the
 configurations, `desprawl map <config>` prints one as text and
 `desprawl diff <config>` lists what changed since HEAD.
 
@@ -57,7 +57,13 @@ handles it, what that touches. Look for:
   asked.
 - **Types not in desprawl's catalog** (listed at the end). Unknown types are
   treated as wiring, so a real component of that type is missing from the
-  map. Name them to the user.
+  map. Name them to the user. If they want them drawn, a catalog in the
+  workspace's `.desprawl/pack/<provider>/catalog.json` does it for every map
+  at once, e.g. `{"provider": "x", "resources": {"x_instance": {"role":
+  "primary", "category": "messaging", "label": "Instance"}, "x_alarm":
+  {"role": "child", "parent_attr": "instance_id"}}}`. Give a box (`primary`)
+  only to what runs code, stores data or takes traffic; the full format is
+  in desprawl's `providers/README.md`, "Catalogs".
 - **Parse errors** (listed at the end): the rest of that file may be missing
   from the map. Tell the user which file.
 - **Services the code uses that the Terraform doesn't create** (a SaaS API

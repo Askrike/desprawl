@@ -1,0 +1,174 @@
+{
+  "sources": [
+    {
+      "data_source": "google_cloud_asset_search_all_resources",
+      "config": {
+        "scope": "\"projects/{project}\""
+      },
+      "list": "results",
+      "id": "name",
+      "kind": "asset_type",
+      "name": "display_name",
+      "partition": {
+        "arg": "asset_types",
+        "only": "[\"{kind}\"]",
+        "note": "asset_types reads only the kinds it names."
+      },
+      "note": "Cloud Asset search reports every resource in the project, including types the provider can't list. It needs the Cloud Asset API and cloudasset.assets.searchAllResources (roles/cloudasset.viewer)."
+    }
+  ],
+  "kinds": {
+    "artifactregistry.googleapis.com/Repository": {
+      "type": "google_artifact_registry_repository",
+      "match": "^//artifactregistry\\.googleapis\\.com/projects/(?P<project>[^/]+)/locations/(?P<location>[^/]+)/repositories/(?P<repository_id>[^/]+)$",
+      "id": "projects/{project}/locations/{location}/repositories/{repository_id}",
+      "origin": "llm"
+    },
+    "bigquery.googleapis.com/Dataset": {
+      "type": "google_bigquery_dataset",
+      "match": "^//bigquery\\.googleapis\\.com/projects/(?P<project>[^/]+)/datasets/(?P<dataset_id>[^/]+)$",
+      "id": "projects/{project}/datasets/{dataset_id}",
+      "origin": "llm"
+    },
+    "bigquery.googleapis.com/Table": {
+      "type": "google_bigquery_table",
+      "match": "^//bigquery\\.googleapis\\.com/projects/(?P<project>[^/]+)/datasets/(?P<dataset_id>[^/]+)/tables/(?P<table_id>[^/]+)$",
+      "id": "projects/{project}/datasets/{dataset_id}/tables/{table_id}",
+      "origin": "llm"
+    },
+    "cloudbilling.googleapis.com/ProjectBillingInfo": {
+      "note": "google_billing_project_info (import ID projects/{project}) needs the Cloud Billing API and billing permissions; unchecked, so not mapped."
+    },
+    "cloudresourcemanager.googleapis.com/Project": {
+      "type": "google_project",
+      "match": "^//cloudresourcemanager\\.googleapis\\.com/projects/(?P<project>[^/]+)$",
+      "id": "{project}",
+      "origin": "llm"
+    },
+    "cloudscheduler.googleapis.com/Job": {
+      "type": "google_cloud_scheduler_job",
+      "match": "^//cloudscheduler\\.googleapis\\.com/projects/(?P<project>[^/]+)/locations/(?P<location>[^/]+)/jobs/(?P<name>[^/]+)$",
+      "id": "projects/{project}/locations/{location}/jobs/{name}",
+      "origin": "llm"
+    },
+    "compute.googleapis.com/Firewall": {
+      "type": "google_compute_firewall",
+      "match": "^//compute\\.googleapis\\.com/projects/(?P<project>[^/]+)/global/firewalls/(?P<name>[^/]+)$",
+      "id": "projects/{project}/global/firewalls/{name}",
+      "origin": "llm"
+    },
+    "compute.googleapis.com/Network": {
+      "type": "google_compute_network",
+      "match": "^//compute\\.googleapis\\.com/projects/(?P<project>[^/]+)/global/networks/(?P<name>[^/]+)$",
+      "id": "projects/{project}/global/networks/{name}",
+      "origin": "llm"
+    },
+    "compute.googleapis.com/Project": {
+      "note": "The project's Compute Engine settings, not a resource of its own (google_compute_project_metadata manages only its metadata)."
+    },
+    "compute.googleapis.com/Route": {
+      "type": "google_compute_route",
+      "match": "^//compute\\.googleapis\\.com/projects/(?P<project>[^/]+)/global/routes/(?P<name>[^/]+)$",
+      "id": "projects/{project}/global/routes/{name}",
+      "origin": "llm"
+    },
+    "compute.googleapis.com/Subnetwork": {
+      "type": "google_compute_subnetwork",
+      "match": "^//compute\\.googleapis\\.com/projects/(?P<project>[^/]+)/regions/(?P<region>[^/]+)/subnetworks/(?P<name>[^/]+)$",
+      "id": "projects/{project}/regions/{region}/subnetworks/{name}",
+      "origin": "llm"
+    },
+    "dataplex.googleapis.com/EntryGroup": {
+      "note": "Mostly system entry groups (@bigquery, @dataproc\u2026) that Dataplex creates and manages itself."
+    },
+    "dns.googleapis.com/ManagedZone": {
+      "type": "google_dns_managed_zone",
+      "match": "^//dns\\.googleapis\\.com/projects/(?P<project>[^/]+)/managedZones/(?P<zone>[^/]+)$",
+      "id": "projects/{project}/managedZones/{zone}",
+      "origin": "llm",
+      "note": "Cloud Asset reports the zone's numeric ID, which imports as well as its name."
+    },
+    "dns.googleapis.com/ResourceRecordSet": {
+      "type": "google_dns_record_set",
+      "match": "^//dns\\.googleapis\\.com/projects/(?P<project>[^/]+)/locations/(?P<location>[^/]+)/managedZones/(?P<zone>[^/]+)/rrsets/(?P<name>[^/]+)/(?P<type>[^/]+)$",
+      "id": "projects/{project}/managedZones/{zone}/rrsets/{name}/{type}",
+      "origin": "llm"
+    },
+    "iam.googleapis.com/ServiceAccount": {
+      "type": "google_service_account",
+      "match": "^//iam\\.googleapis\\.com/projects/(?P<project>[^/]+)/serviceAccounts/(?P<email>[^/]+)$",
+      "id": "projects/{project}/serviceAccounts/{email}",
+      "origin": "llm"
+    },
+    "logging.googleapis.com/LogBucket": {
+      "type": "google_logging_project_bucket_config",
+      "match": "^//logging\\.googleapis\\.com/projects/(?P<parent>[^/]+)/locations/(?P<location>[^/]+)/buckets/(?P<bucket_id>[^/]+)$",
+      "id": "projects/{parent}/locations/{location}/buckets/{bucket_id}",
+      "origin": "llm"
+    },
+    "logging.googleapis.com/LogSink": {
+      "type": "google_logging_project_sink",
+      "match": "^//logging\\.googleapis\\.com/projects/(?P<project>[^/]+)/sinks/(?P<name>[^/]+)$",
+      "id": "projects/{project}/sinks/{name}",
+      "origin": "llm"
+    },
+    "monitoring.googleapis.com/AlertPolicy": {
+      "type": "google_monitoring_alert_policy",
+      "match": "^//monitoring\\.googleapis\\.com/projects/(?P<project>[^/]+)/alertPolicies/(?P<id>[^/]+)$",
+      "id": "projects/{project}/alertPolicies/{id}",
+      "origin": "llm"
+    },
+    "monitoring.googleapis.com/NotificationChannel": {
+      "type": "google_monitoring_notification_channel",
+      "match": "^//monitoring\\.googleapis\\.com/projects/(?P<project>[^/]+)/notificationChannels/(?P<id>[^/]+)$",
+      "id": "projects/{project}/notificationChannels/{id}",
+      "origin": "llm"
+    },
+    "pubsub.googleapis.com/Subscription": {
+      "type": "google_pubsub_subscription",
+      "match": "^//pubsub\\.googleapis\\.com/projects/(?P<project>[^/]+)/subscriptions/(?P<name>[^/]+)$",
+      "id": "projects/{project}/subscriptions/{name}",
+      "origin": "llm"
+    },
+    "pubsub.googleapis.com/Topic": {
+      "type": "google_pubsub_topic",
+      "match": "^//pubsub\\.googleapis\\.com/projects/(?P<project>[^/]+)/topics/(?P<name>[^/]+)$",
+      "id": "projects/{project}/topics/{name}",
+      "origin": "llm"
+    },
+    "run.googleapis.com/Revision": {
+      "note": "A revision belongs to its Cloud Run service, which creates it on each deploy."
+    },
+    "run.googleapis.com/Service": {
+      "type": "google_cloud_run_v2_service",
+      "match": "^//run\\.googleapis\\.com/projects/(?P<project>[^/]+)/locations/(?P<location>[^/]+)/services/(?P<name>[^/]+)$",
+      "id": "projects/{project}/locations/{location}/services/{name}",
+      "origin": "llm",
+      "note": "Cloud Run services, as the v2 resource (the v1 google_cloud_run_service manages the same object)."
+    },
+    "secretmanager.googleapis.com/Secret": {
+      "type": "google_secret_manager_secret",
+      "match": "^//secretmanager\\.googleapis\\.com/projects/(?P<project>[^/]+)/secrets/(?P<secret_id>[^/]+)$",
+      "id": "projects/{project}/secrets/{secret_id}",
+      "origin": "llm"
+    },
+    "secretmanager.googleapis.com/SecretVersion": {
+      "type": "google_secret_manager_secret_version",
+      "match": "^//secretmanager\\.googleapis\\.com/projects/(?P<project>[^/]+)/secrets/(?P<secret_name>[^/]+)/versions/(?P<version>[^/]+)$",
+      "id": "projects/{project}/secrets/{secret_name}/versions/{version}",
+      "origin": "llm"
+    },
+    "serviceusage.googleapis.com/Service": {
+      "type": "google_project_service",
+      "match": "^//serviceusage\\.googleapis\\.com/projects/(?P<project>[^/]+)/services/(?P<service>[^/]+)$",
+      "id": "{project}/{service}",
+      "origin": "llm"
+    },
+    "storage.googleapis.com/Bucket": {
+      "type": "google_storage_bucket",
+      "match": "^//storage\\.googleapis\\.com/(?P<name>[^/]+)$",
+      "id": "{name}",
+      "origin": "llm"
+    }
+  }
+}

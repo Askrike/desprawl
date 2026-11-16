@@ -7,36 +7,33 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 
-	"github.com/askrike/desprawl/catalog"
 	"github.com/askrike/desprawl/internal/model"
+	"github.com/askrike/desprawl/internal/paths"
 	"github.com/askrike/desprawl/internal/tfmap"
+	"github.com/askrike/desprawl/providers"
 )
 
 // mapFlags are the flags every map command takes.
-type mapFlags struct{ catalog, layouts string }
+type mapFlags struct{ layouts string }
 
 func (o *mapFlags) register(fs *flag.FlagSet) {
-	fs.StringVar(&o.catalog, "catalog", "", "directory of provider catalogs whose entries add to or replace the built-in ones")
 	fs.StringVar(&o.layouts, "layouts", "", "directory of saved layouts (default: the workspace's .desprawl/layouts)")
 }
 
-func (o mapFlags) loader() tfmap.Loader {
-	cs := []fs.FS{catalog.FS}
-	if o.catalog != "" {
-		cs = append(cs, os.DirFS(o.catalog))
-	}
-	return tfmap.NewLoader(cs...)
+// mapLoader loads the configurations of the workspace ws with the catalogs
+// desprawl ships, which those in its packs add to or replace type by type.
+func mapLoader(ws string) tfmap.Loader {
+	return tfmap.NewLoader(providers.Catalogs, os.DirFS(paths.Pack(ws)))
 }
 
 // site is the current workspace's map, as serve and html show it.
 func (o mapFlags) site() site {
-	return newSite(".", o.loader(), tfmap.WorkspaceLayouts(".", o.layouts))
+	return newSite(".", mapLoader("."), tfmap.WorkspaceLayouts(".", o.layouts))
 }
 
 // config loads the one configuration in dir and says where its layout is.
@@ -47,7 +44,7 @@ func (o mapFlags) config(dir string) (*tfmap.Graph, string, error) {
 		return nil, "", fmt.Errorf("%s is not a directory", dir)
 	}
 	path := tfmap.WorkspaceLayouts(".", o.layouts).Path(dir)
-	g, err := o.loader()(dir, path)
+	g, err := mapLoader(".")(dir, path)
 	if err != nil {
 		return nil, "", err
 	}
@@ -67,6 +64,9 @@ const nothingToDraw = "the workspace has nothing to draw yet: add a directory of
 func workspaceConfig(name, arg string) (string, error) {
 	if !model.IsWorkspace(".") {
 		return "", fmt.Errorf("desprawl %s works on the workspace in the current directory (-C DIR for another): %w", name, model.NotWorkspace("."))
+	}
+	if _, err := model.LoadConfig("."); err != nil {
+		return "", err
 	}
 	warnDraw()
 	configs := tfmap.Configs(".")
@@ -91,8 +91,8 @@ func workspaceRoot(name, dir string) error {
 	if dir != "." {
 		return fmt.Errorf("desprawl %s works on the workspace in the current directory; for another, desprawl -C %s %s", name, dir, name)
 	}
-	if !model.IsWorkspace(".") {
-		return model.NotWorkspace(".")
+	if _, err := model.LoadConfig("."); err != nil {
+		return err // not a workspace, or desprawl.hcl can't be used
 	}
 	warnDraw()
 	return nil
@@ -239,7 +239,7 @@ func cmdDiff(args []string) error {
 	if err != nil {
 		return err
 	}
-	ch, err := tfmap.Since(dir, g, base, o.loader())
+	ch, err := tfmap.Since(dir, g, base, mapLoader("."))
 	if err != nil {
 		return err
 	}

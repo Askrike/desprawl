@@ -16,11 +16,11 @@ import (
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
-	"github.com/askrike/desprawl/catalog"
 	"github.com/askrike/desprawl/internal/model"
 	"github.com/askrike/desprawl/internal/paths"
 	"github.com/askrike/desprawl/internal/rea"
 	"github.com/askrike/desprawl/internal/tfmap"
+	"github.com/askrike/desprawl/internal/version"
 	"github.com/askrike/desprawl/skills"
 )
 
@@ -63,8 +63,6 @@ to go through what an import left to fix.`
 
 // mapServer is one agent session: its workspace and the viewer serving it.
 type mapServer struct {
-	load tfmap.Loader
-
 	mu      sync.Mutex
 	viewers map[string]*viewerRef // workspace -> viewer
 	ws      string                // the session's workspace
@@ -83,8 +81,8 @@ func cmdMCP(args []string) error {
 }
 
 func newMCPServer() *mcp.Server {
-	m := &mapServer{load: tfmap.NewLoader(catalog.FS), viewers: map[string]*viewerRef{}}
-	s := mcp.NewServer(&mcp.Implementation{Name: "desprawl", Title: "desprawl", Version: versionString()},
+	m := &mapServer{viewers: map[string]*viewerRef{}}
+	s := mcp.NewServer(&mcp.Implementation{Name: "desprawl", Title: "desprawl", Version: version.String()},
 		&mcp.ServerOptions{Instructions: mcpInstructions})
 
 	mcp.AddTool(s, &mcp.Tool{Name: "use_workspace", Description: "Set this session's workspace: the directory holding desprawl.hcl (absolute path). Every other tool works on it alone. Without it the session uses your project directory if it holds a desprawl.hcl."}, m.useWorkspace)
@@ -184,6 +182,11 @@ func (m *mapServer) workspace() (string, error) {
 	ws := m.ws
 	m.mu.Unlock()
 	if ws != "" {
+		// desprawl.hcl as it is now: a broken one would otherwise read as
+		// having nothing to draw.
+		if _, err := model.LoadConfig(ws); err != nil {
+			return "", err
+		}
 		return ws, nil
 	}
 	return "", errors.New("no workspace for this session: call use_workspace with the directory holding desprawl.hcl (`desprawl init` makes one)")
@@ -248,8 +251,8 @@ func (m *mapServer) useWorkspace(_ context.Context, _ *mcp.CallToolRequest, in d
 	if err != nil {
 		return nil, nil, err
 	}
-	if !model.IsWorkspace(dir) {
-		return nil, nil, model.NotWorkspace(dir)
+	if _, err := model.LoadConfig(dir); err != nil {
+		return nil, nil, err
 	}
 	m.mu.Lock()
 	m.ws, m.chosen = dir, true
@@ -328,7 +331,7 @@ func (m *mapServer) loadConfig(config string) (dir string, g *tfmap.Graph, layou
 		return "", nil, "", err
 	}
 	layout = tfmap.WorkspaceLayouts(ws, "").Path(abs)
-	if g, err = m.load(abs, layout); err != nil {
+	if g, err = mapLoader(ws)(abs, layout); err != nil {
 		return "", nil, "", err
 	}
 	if len(g.Nodes) == 0 {
@@ -380,7 +383,7 @@ func (m *mapServer) viewer(ws string) (*viewerRef, error) {
 	}
 	v := &viewerRef{url: url, board: newBoard(ws)}
 	m.viewers[ws] = v
-	go http.Serve(ln, newSite(ws, m.load, tfmap.WorkspaceLayouts(ws, "")).handler(v.board))
+	go http.Serve(ln, newSite(ws, mapLoader(ws), tfmap.WorkspaceLayouts(ws, "")).handler(v.board))
 	return v, nil
 }
 
@@ -425,7 +428,11 @@ func (m *mapServer) showChanges(ctx context.Context, req *mcp.CallToolRequest, i
 	if base == "" {
 		base = "HEAD"
 	}
-	ch, err := tfmap.Since(dir, g, base, m.load)
+	ws, err := m.workspace()
+	if err != nil {
+		return nil, nil, err
+	}
+	ch, err := tfmap.Since(dir, g, base, mapLoader(ws))
 	if err != nil {
 		return nil, nil, err
 	}

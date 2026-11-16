@@ -34,6 +34,9 @@ type Options struct {
 	// standalone resource manages too (see Duplicates); they are removed
 	// before linking.
 	Duplicates []Duplicate
+	// ManagedBy maps "type.attr" to standalone types managing the same
+	// things (see ManagedDuplicates).
+	ManagedBy map[string][]string
 	// Schemas, when set, tell which values are entries of a free-form map
 	// (an environment's variables), where a resource's plain name links
 	// (see named).
@@ -41,6 +44,10 @@ type Options struct {
 	// unresolved, when set, receives every whole-string literal that no
 	// rule or unique value resolved.
 	unresolved func(Literal)
+	// changed and imported hold, per address, the top-level attributes
+	// the import plan would change and those it imported a value for
+	// (see importPlan).
+	changed, imported map[string]map[string]bool
 }
 
 type Param struct {
@@ -83,6 +90,9 @@ type Result struct {
 	Data        []byte // data source blocks, empty if none are used
 	Edges       []Edge
 	CycleBreaks [][2]string // from -> to pairs left as literals to avoid cycles
+	// Ignored are "address.attr" pairs config leaves out that a plan
+	// would change, now in the resource's ignore_changes.
+	Ignored []string
 }
 
 // Link rewrites src (terraform-generated config) using the index.
@@ -148,14 +158,33 @@ func run(src []byte, ix *index.Index, opts Options, blocked map[[2]string]bool, 
 			continue
 		}
 		w.addr, w.typ = addr, b.Labels()[0]
+		var removed []string
 		for _, d := range opts.Drop {
-			if typ, name, ok := strings.Cut(d, "."); ok && typ == w.typ {
+			if typ, name, ok := strings.Cut(d, "."); !ok {
+				removed = append(removed, d) // dropped everywhere, by tidy
+			} else if typ == w.typ {
 				b.Body().RemoveAttribute(name)
+				removed = append(removed, name)
 			}
 		}
 		for _, d := range opts.Duplicates {
-			if d.Addr == addr {
-				b.Body().RemoveAttribute(d.Attr)
+			if d.Addr != addr {
+				continue
+			}
+			b.Body().RemoveAttribute(d.Attr)
+			for _, nb := range b.Body().Blocks() {
+				if nb.Type() == d.Attr {
+					b.Body().RemoveBlock(nb)
+				}
+			}
+			removed = append(removed, d.Attr)
+		}
+		// What config leaves out, the plan must not change: someone else
+		// manages it (the provider, a standalone resource).
+		for _, name := range removed {
+			if opts.wouldChange(addr, w.typ, name) && !slices.Contains(w.ignored, addr+"."+name) {
+				hclx.IgnoreChanges(b.Body(), name)
+				w.ignored = append(w.ignored, addr+"."+name)
 			}
 		}
 		if err := w.body(b.Body(), nil); err != nil {
@@ -180,6 +209,7 @@ type walker struct {
 	entries    map[string]string // literal entries of the object being walked
 	freeMaps   map[string]bool   // map paths by whether few types have them
 	linked     []string          // values linked inside the literal being resolved
+	ignored    []string          // see Result.Ignored
 }
 
 func (w *walker) body(b *hclwrite.Body, path []string) error {
@@ -215,6 +245,25 @@ func (w *walker) body(b *hclwrite.Body, path []string) error {
 		}
 	}
 	return nil
+}
+
+// wouldChange says whether a plan would change attribute or block name of
+// the resource at addr once config leaves it out: the import plan already
+// changes it, or it was imported with a value that config alone sets (a
+// computed attribute keeps its value; whether a nested block's entries are
+// computed, the schema doesn't say).
+func (o Options) wouldChange(addr, typ, name string) bool {
+	if o.changed[addr][name] {
+		return true
+	}
+	if !o.imported[addr][name] {
+		return false
+	}
+	if o.Schemas == nil || o.Schemas.Resources[typ] == nil {
+		return false
+	}
+	a := o.Schemas.Resources[typ].Attributes[name]
+	return a == nil || !a.Computed
 }
 
 // reference records a reference generate already wrote: a sensitive
@@ -255,6 +304,8 @@ func (w *walker) node(n node, path []string) (node, bool) {
 			return n, false
 		}
 		return w.str(s, path)
+	case numNode:
+		return w.num(n, path)
 	case listNode:
 		changed := false
 		for i, it := range n.items {
@@ -448,13 +499,28 @@ func (w *walker) link(r index.Ref, path []string, kind Kind, value string, ev ev
 	return parts, true
 }
 
-// str resolves one string literal.
-func (w *walker) str(s string, path []string) (node, bool) {
+// num resolves one number literal, by rule only: a number on its own (a
+// port, a count) is too ambiguous to link by value. The reference is a
+// string where the target keeps one, which Terraform converts back.
+func (w *walker) num(n numNode, path []string) (node, bool) {
+	pooled, ruleOf := w.ruleMatches(n.val, path)
+	if len(pooled) == 0 {
+		return n, false
+	}
+	parts, ok := w.ruleRef(ruleOf, pooled, path, n.val, KindRule)
+	if !ok {
+		return n, false
+	}
+	return strNode{parts: parts}, true
+}
+
+// ruleMatches returns the resources the exact rules for path find with
+// value v, and the rule that found each (by address). Matches of every
+// applicable rule are chosen among together: a selector's rules for two
+// workload types must not each settle for a workload of another namespace.
+func (w *walker) ruleMatches(v string, path []string) ([]index.Ref, map[string]rules.Rule) {
 	p := strings.Join(path, ".")
-	cands := w.ix.Lookup(s)
-	// Matches of every applicable rule are chosen among together: a
-	// selector's rules for two workload types must not each settle for a
-	// workload of another namespace.
+	cands := w.ix.Lookup(v)
 	var pooled []index.Ref
 	ruleOf := map[string]rules.Rule{}
 	for _, rule := range w.opts.Rules.For(w.typ, p, rules.MatchExact) {
@@ -470,7 +536,13 @@ func (w *walker) str(s string, path []string) (node, bool) {
 			}
 		}
 	}
-	if len(pooled) > 0 {
+	return pooled, ruleOf
+}
+
+// str resolves one string literal.
+func (w *walker) str(s string, path []string) (node, bool) {
+	p := strings.Join(path, ".")
+	if pooled, ruleOf := w.ruleMatches(s, path); len(pooled) > 0 {
 		if parts, ok := w.ruleRef(ruleOf, pooled, path, s, KindRule); ok {
 			return strNode{parts: parts}, true
 		}
@@ -805,7 +877,7 @@ func (w *walker) result(breaks [][2]string) (*Result, error) {
 			data.WriteString(d + "\n")
 		}
 	}
-	return &Result{Config: out, Data: data.Bytes(), Edges: w.edges, CycleBreaks: breaks}, nil
+	return &Result{Config: out, Data: data.Bytes(), Edges: w.edges, CycleBreaks: breaks, Ignored: w.ignored}, nil
 }
 
 // tidy drops attributes that carry no information: explicit nulls (the same

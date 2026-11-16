@@ -2,10 +2,16 @@ name: release
 
 # Releases each version tag: the binaries are built with goreleaser
 # (.goreleaser.yaml) and the release notes are the body of the commit the tag
-# points at.
+# points at. A tag whose push started no run is released by hand:
+#   gh workflow run release.yml -R askrike/desprawl -f tag=v0.1.7
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: The version tag to release, e.g. v0.1.7
+        required: true
 
 permissions:
   contents: write
@@ -16,15 +22,19 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
+          ref: refs/tags/${{ inputs.tag || github.ref_name }}
           fetch-depth: 0
       - uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
       - run: go test ./...
-      - run: git log -1 --format=%b "$GITHUB_REF_NAME" > "$RUNNER_TEMP/notes.md"
+      - run: git log -1 --format=%b "$TAG" > "$RUNNER_TEMP/notes.md"
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
       - uses: goreleaser/goreleaser-action@v6
         with:
           version: "~> v2"
           args: release --clean --release-notes ${{ runner.temp }}/notes.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_CURRENT_TAG: ${{ inputs.tag || github.ref_name }}

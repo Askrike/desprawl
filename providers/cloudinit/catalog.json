@@ -1,0 +1,9 @@
+{
+  "provider": "cloudinit",
+  "data_sources": {
+    "cloudinit_config": {
+      "role": "helper",
+      "category": "other"
+    }
+  }
+}

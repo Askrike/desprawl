@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Lists a provider's resource and data source types that are not yet in
-# catalog/<provider>.json, one per line: kind<TAB>type<TAB>required attrs<TAB>reference-like attrs.
+# providers/<provider>/catalog.json, one per line: kind<TAB>type<TAB>required attrs<TAB>reference-like attrs.
 #
 # usage: scripts/provider-types.sh <provider> <initialized terraform dir> [type-prefix]
 # e.g.   scripts/provider-types.sh aws examples/lambda-api-gateway aws_sqs_
@@ -8,7 +8,7 @@ set -euo pipefail
 
 provider=$1 dir=$2 prefix=${3:-}
 root=$(cd "$(dirname "$0")/.." && pwd)
-catalog="$root/catalog/$provider.json"
+catalog="$root/providers/$provider/catalog.json"
 [ -f "$catalog" ] || catalog=/dev/null
 
 terraform -chdir="$dir" providers schema -json | jq -r \

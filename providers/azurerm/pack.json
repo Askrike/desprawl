@@ -28,5 +28,16 @@
       "ref": "data.azurerm_client_config.current.subscription_id",
       "data": "data \"azurerm_client_config\" \"current\" {}"
     }
+  },
+  "managed_by": {
+    "azurerm_network_security_group.security_rule": [
+      "azurerm_network_security_rule"
+    ],
+    "azurerm_virtual_network.subnet": [
+      "azurerm_subnet"
+    ],
+    "azurerm_route_table.route": [
+      "azurerm_route"
+    ]
   }
 }

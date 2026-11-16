@@ -1,0 +1,33 @@
+{
+  "provider": "random",
+  "resources": {
+    "random_string": {
+      "role": "helper",
+      "category": "other"
+    },
+    "random_pet": {
+      "role": "helper",
+      "category": "other"
+    },
+    "random_id": {
+      "role": "helper",
+      "category": "other"
+    },
+    "random_password": {
+      "role": "helper",
+      "category": "other"
+    },
+    "random_integer": {
+      "role": "helper",
+      "category": "other"
+    },
+    "random_uuid": {
+      "role": "helper",
+      "category": "other"
+    },
+    "random_shuffle": {
+      "role": "helper",
+      "category": "other"
+    }
+  }
+}

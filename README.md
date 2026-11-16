@@ -10,9 +10,12 @@ desprawl comes as a CLI, an MCP server and skills for your agent, and a web UI w
 ## Install
 
 ```sh
-curl -fsSL https://desprawl.spawned.app | sh    # into ~/.local/bin (INSTALL_DIR, DESPRAWL_VERSION to change)
-desprawl setup                                 # add desprawl to your agents, then restart them
+curl -fsSL https://install.desprawl.org | sh
+desprawl setup    # add desprawl to your agents, then restart them
 ```
+
+The script installs into `~/.local/bin` (`INSTALL_DIR` to change) the latest release
+(`DESPRAWL_VERSION=v0.1.7` for another).
 
 Or download an archive for your OS from [Releases](https://github.com/askrike/desprawl/releases)
 and put `desprawl` on your PATH, or install with Go 1.27.4 or later:
@@ -21,8 +24,12 @@ and put `desprawl` on your PATH, or install with Go 1.27.4 or later:
 go install github.com/askrike/desprawl/cmd/desprawl@latest
 ```
 
-`desprawl update` replaces the binary with the latest release (`-version V` for another) and
-reruns `desprawl setup`; restart your agents afterwards to use the new MCP server.
+`desprawl update` replaces the binary with the latest release (`-version V` for another),
+prints the release notes of the versions since yours and reruns `desprawl setup`; restart
+your agents afterwards to use the new MCP server. Once a day, before a command run in a
+terminal, desprawl checks for a new release and asks once whether to update to it (Enter
+updates and runs your command again with the new version; `DESPRAWL_NO_UPDATE_CHECK=1`
+turns the check off). It never asks in `desprawl mcp` or when stdin isn't a terminal.
 
 ### Build from source
 
@@ -165,7 +172,9 @@ be committed with your Terraform. Deleting a layout file restores the automatic 
 ### Help
 
 `desprawl help` lists every command, and `desprawl help <command>` its flags. Resource types
-desprawl doesn't know are drawn as wiring; `desprawl unclassified` lists them.
+desprawl doesn't know are drawn as wiring; `desprawl unclassified` lists them, and a catalog
+in `.desprawl/pack/<provider>/catalog.json` draws them
+([format](providers/README.md#catalogs)).
 
 `desprawl setup` finds Claude Code, Cursor, Codex and Gemini CLI. For any other agent that
 supports MCP, `desprawl setup -print` shows the config to add.
@@ -178,7 +187,7 @@ supports MCP, `desprawl setup -print` shows the config to add.
 |---|---|---|
 | a workspace's settings | `desprawl.hcl` (written by `init`) | edit it |
 | layouts | `.desprawl/layouts/` in the workspace | `-layouts DIR` |
-| fixes for generated config, and to provider packs | `.desprawl/overrides.json`, `.desprawl/pack/<provider>/` | |
+| fixes for generated config, and to provider packs (including catalogs, how the map draws a provider) | `.desprawl/overrides.json`, `.desprawl/pack/<provider>/` | |
 | the imported Terraform | `.desprawl/imported/` | `output` in `desprawl.hcl` |
 | a workspace's state and account data (git-ignored by `.desprawl/.gitignore`) | `.desprawl/state/` | |
 | a running command's progress (`desprawl status`, the map page) | `.desprawl/state/progress.json` | |
@@ -187,6 +196,7 @@ supports MCP, `desprawl setup -print` shows the config to add.
 | `desprawl diff`: a git revision's `.tf` files, removed afterwards | system temp directory | `TMPDIR` |
 | `desprawl html -o FILE` | the file you name (without `-o`, standard output) | `-o` |
 | `desprawl update` | the desprawl binary itself (replaced by a rename in its directory) | |
+| when desprawl last checked for a new release, and which it last offered | `<user cache dir>/desprawl/update-check.json` | `DESPRAWL_CACHE` |
 | `desprawl setup` | each agent harness's MCP config (the old one kept as `.bak`) and skills directory | |
 
 Working on desprawl itself? See [DEVELOPMENT.md](DEVELOPMENT.md).

@@ -1,0 +1,9 @@
+{
+  "provider": "archive",
+  "data_sources": {
+    "archive_file": {
+      "role": "helper",
+      "category": "other"
+    }
+  }
+}

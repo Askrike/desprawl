@@ -140,6 +140,30 @@ func marshal(v any) (string, error) {
 	return strings.TrimSpace(b.String()), nil
 }
 
+// namesArgument says whether a list error is about an argument: it says
+// "argument", or quotes one of the type's list arguments.
+func namesArgument(e string, args []string) bool {
+	if strings.Contains(strings.ToLower(e), "argument") {
+		return true
+	}
+	for _, a := range args {
+		for _, q := range []string{`"`, `'`, "`"} {
+			if strings.Contains(e, q+a+q) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// briefList is items joined, the first n of them and how many more.
+func briefList(items []string, n int) string {
+	if len(items) <= n {
+		return strings.Join(items, ", ")
+	}
+	return strings.Join(items[:n], ", ") + fmt.Sprintf(" and %d more", len(items)-n)
+}
+
 func plural(n int, one, many string) string {
 	if n == 1 {
 		return "1 " + one
@@ -200,12 +224,24 @@ func shippedOrEmpty(provider, name string) ([]byte, error) {
 // by hand or by an agent), and a problem for each.
 func (w Workspace) checkPack(schemas *tf.Schemas, p *providers.Pack) (*providers.Pack, []ProblemGroup) {
 	out := *p
-	scopes := slices.Sorted(maps.Keys(w.params))
-	if len(scopes) == 0 {
-		scopes = suggest.ScopeCandidates(schemas)
-	}
+	// Everything a listing can be scoped by, not only the parameters known
+	// so far: a spec whose parameter nothing supplies yet fails in discover
+	// ("scope parameters … not found"), not here as invalid.
+	scopes := slices.Concat(slices.Collect(maps.Keys(w.params)), slices.Collect(maps.Keys(p.Params)), suggest.ScopeCandidates(schemas))
+	slices.Sort(scopes)
+	scopes = slices.Compact(scopes)
 	var bad []Problem
-	where := func(name string) string { return filepath.Join(w.Packs(), w.Provider().Name, name) }
+	// Entries the workspace didn't change come with desprawl: say so, or
+	// they read as the workspace's own edits to fix.
+	shipped := false
+	where := func(name string) string {
+		path := filepath.Join(w.Packs(), w.Provider().Name, name)
+		if w.unchangedPackFile(name) {
+			shipped = true
+			return "shipped pack " + w.Provider().Name + "/" + name
+		}
+		return path
+	}
 	out.ListArgs = nil
 	for _, la := range p.ListArgs {
 		if schemas.Lists[la.Type] == nil {
@@ -242,15 +278,30 @@ func (w Workspace) checkPack(schemas *tf.Schemas, p *providers.Pack) (*providers
 	slices.SortFunc(bad, func(a, b Problem) int { return strings.Compare(a.Subject, b.Subject) })
 	var groups []ProblemGroup
 	if len(bad) > 0 {
+		howto := fmt.Sprintf("Fix or remove each in the file it names, then run `%s` again.", w.cmd("discover"))
+		if shipped {
+			howto += fmt.Sprintf(" Entries of the shipped pack come with desprawl: to fix one, put the file in %s, which replaces the shipped one, and report it.", filepath.Join(w.Packs(), w.Provider().Name))
+		}
 		groups = append(groups, ProblemGroup{
 			Kind:     "pack-invalid",
 			Summary:  plural(len(bad), "entry in the provider's pack doesn't fit its schema, so desprawl leaves it out.", "entries in the provider's pack don't fit its schema, so desprawl leaves them out."),
-			Howto:    fmt.Sprintf("Fix or remove each in the file it names, then run `%s` again.", w.cmd("discover")),
+			Howto:    howto,
 			Rerun:    w.cmd("discover"),
 			Problems: bad,
 		})
 	}
 	return &out, groups
+}
+
+// unchangedPackFile says whether the workspace's pack has no file name of
+// its own, or one identical to the shipped one.
+func (w Workspace) unchangedPackFile(name string) bool {
+	b, err := os.ReadFile(filepath.Join(w.Packs(), w.Provider().Name, name))
+	if errors.Is(err, fs.ErrNotExist) {
+		return true
+	}
+	s, serr := providers.ReadFile("", w.Provider().Name, name)
+	return err == nil && serr == nil && bytes.Equal(b, s)
 }
 
 // DiscoverProblems: types discovery couldn't list, and kinds the
@@ -365,9 +416,19 @@ func (w Workspace) discoverProblemsOf(schemas *tf.Schemas) ([]ProblemGroup, erro
 			Howto:   fmt.Sprintf("If an error says an argument is needed, add an entry for the type to the list in %s, then run `%s` again.", file, rerun),
 			File:    file, Rerun: rerun,
 		}
+		// Only an error that names an argument ("argument", or one of the
+		// type's list arguments quoted) has a fix: those are printed per
+		// type. The rest (a service that isn't enabled fails every type
+		// it serves) are counted, their errors in discovery.json.
+		var other []string
 		for _, typ := range slices.Sorted(maps.Keys(rep.Failed)) {
+			args := suggest.OptionalListArgs(schemas, typ)
+			if !namesArgument(rep.Failed[typ], args) {
+				other = append(other, typ)
+				continue
+			}
 			p := Problem{Subject: typ, Detail: []string{"error: " + oneLine(rep.Failed[typ])}}
-			if args := suggest.OptionalListArgs(schemas, typ); len(args) > 0 {
+			if len(args) > 0 {
 				p.Detail = append(p.Detail, "optional arguments: "+strings.Join(args, ", "))
 				if spec, _, ok := suggest.ListArg(schemas, typ, scopes); ok {
 					p.Detail = append(p.Detail, "if the error says one is needed:")
@@ -375,6 +436,12 @@ func (w Workspace) discoverProblemsOf(schemas *tf.Schemas) ([]ProblemGroup, erro
 				}
 			}
 			g.Problems = append(g.Problems, p)
+		}
+		if len(other) > 0 {
+			g.Problems = append(g.Problems, Problem{
+				Subject: plural(len(other), "type", "types") + " with errors that name no argument: " + briefList(other, 5),
+				Detail:  []string{`errors: "failed" in ` + w.StatePath("discovery.json")},
+			})
 		}
 		out = append(out, g)
 	}
@@ -385,7 +452,7 @@ func (w Workspace) discoverProblemsOf(schemas *tf.Schemas) ([]ProblemGroup, erro
 			Summary: plural(len(rep.Truncated), "resource type", "resource types") + " hit the result limit, so some of their resources are missing.",
 			Howto:   fmt.Sprintf("To list them all, run `%s -limit 10000 -types %s`.", rerun, strings.Join(rep.Truncated, ",")),
 			Rerun:   rerun, Brief: true,
-			Listed: `"truncated" in ` + w.rel(".desprawl", "discovery.json"),
+			Listed: `"truncated" in ` + w.StatePath("discovery.json"),
 		}
 		for _, typ := range rep.Truncated {
 			g.Problems = append(g.Problems, Problem{Subject: typ})
@@ -405,8 +472,8 @@ func (w Workspace) discoverProblemsOf(schemas *tf.Schemas) ([]ProblemGroup, erro
 			Summary: plural(len(rep.Unlistable), "resource type", "resource types") + " can't be listed by the provider, so desprawl only has those the inventory found.",
 			Howto: fmt.Sprintf("If you need one that's missing, look up its import ID with `%s -type TYPE`\n"+
 				"and add it with `%s -type TYPE -id ID`; then run `%s` again.", w.cmd("import-format"), w.cmd("add-target"), rerun),
-			File: w.rel(".desprawl", "targets.json"), Rerun: rerun, Brief: true,
-			Listed: `"unlistable" in ` + w.rel(".desprawl", "discovery.json"),
+			File: w.StatePath("targets.json"), Rerun: rerun, Brief: true,
+			Listed: `"unlistable" in ` + w.StatePath("discovery.json"),
 		}
 		if !hasInventory {
 			file, err := w.packFile("inventory.json")

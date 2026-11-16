@@ -1,0 +1,19 @@
+{
+  "provider": "local",
+  "resources": {
+    "local_file": {
+      "role": "helper",
+      "category": "other"
+    },
+    "local_sensitive_file": {
+      "role": "helper",
+      "category": "other"
+    }
+  },
+  "data_sources": {
+    "local_file": {
+      "role": "helper",
+      "category": "other"
+    }
+  }
+}

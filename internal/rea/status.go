@@ -19,7 +19,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/askrike/desprawl/internal/discover"
 	"github.com/askrike/desprawl/internal/generate"
 	"github.com/askrike/desprawl/internal/link"
 	"github.com/askrike/desprawl/internal/model"
@@ -283,7 +282,7 @@ func (w Workspace) stageResult(stage string) string {
 			types[t.Type] = true
 		}
 		res := fmt.Sprintf("%s of %s to import", plural(len(targets), "resource", "resources"), plural(len(types), "type", "types"))
-		if p := discover.Params(targets); len(p) > 0 {
+		if p := w.detectParams(targets); len(p) > 0 {
 			var kv []string
 			for _, k := range slices.Sorted(maps.Keys(p)) {
 				kv = append(kv, k+" "+p[k])
@@ -331,7 +330,7 @@ func (w Workspace) stageResult(stage string) string {
 			}
 		}
 		if real == 0 {
-			return fmt.Sprintf("config matches the cloud; %d differ only in config", only)
+			return fmt.Sprintf("verified: terraform plan imports everything and changes nothing (%d differ only in config, which the plan ignores)", only)
 		}
 		return fmt.Sprintf("config for %s doesn't match the cloud yet; %d differ only in config", plural(real, "resource", "resources"), only)
 	}

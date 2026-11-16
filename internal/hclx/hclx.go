@@ -158,7 +158,9 @@ func IgnoreChanges(body *hclwrite.Body, attr string) {
 	if a := lc.GetAttribute("ignore_changes"); a != nil {
 		inner := strings.Trim(strings.TrimSpace(string(a.Expr().BuildTokens(nil).Bytes())), "[]")
 		for _, x := range strings.Split(inner, ",") {
-			if x = strings.TrimSpace(x); x != "" {
+			if x = strings.TrimSpace(x); x == attr {
+				return
+			} else if x != "" {
 				elems = append(elems, hclwrite.TokensForTraversal(hcl.Traversal{hcl.TraverseRoot{Name: x}}))
 			}
 		}

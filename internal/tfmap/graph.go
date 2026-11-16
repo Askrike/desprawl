@@ -412,7 +412,7 @@ func resolve(t hcl.Traversal) (string, string, string) {
 type Loader func(dir, layout string) (*Graph, error)
 
 // NewLoader loads with the catalogs, read on every load so edits to a
-// -catalog directory show up.
+// workspace's catalogs show up.
 func NewLoader(catalogs ...fs.FS) Loader {
 	return func(dir, layout string) (*Graph, error) {
 		g, err := Parse(dir)

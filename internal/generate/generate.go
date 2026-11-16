@@ -238,6 +238,9 @@ func (g Generator) Run(ctx context.Context) error {
 			return err
 		}
 		dropped = append(dropped, more...)
+		if len(targets) == 0 { // a partial run whose every target was left out
+			break
+		}
 		if len(repaired) > 0 {
 			var args []string
 			for _, a := range repaired {
@@ -255,36 +258,13 @@ func (g Generator) Run(ctx context.Context) error {
 		}
 	}
 
-	g.TF.Progress.Step("reading imported values", 0)
-	plan, err := g.TF.ShowJSON(ctx, g.planFile())
-	if err != nil {
-		return err
-	}
-	if targets, skippedTargets, plan, err = g.skip(targets, plan); err != nil {
-		return err
-	}
-	dropped = append(dropped, skippedTargets...)
-	if plan, err = g.restoreIdentifiers(ctx, targets, plan); err != nil {
-		return err
-	}
-	// No plan after this: the pipeline reads only imported values from the
-	// plan, which config doesn't change. ignore_changes trips no validator;
-	// a reconciled value can, and verify backs those out (Unreconcile).
-	defaulted, err := defaultedPaths(plan)
-	if err != nil {
-		return err
-	}
-	g.dropSetIndexes(defaulted)
-	if err := g.reconcile(plan, defaulted); err != nil {
-		return err
-	}
-	if err := g.ignoreDefaulted(defaulted); err != nil {
-		return err
-	}
-
-	scrubbed, err := Scrub(plan)
-	if err != nil {
-		return err
+	// A partial run that left out everything it regenerated keeps what the
+	// last run imported: nothing new to read.
+	scrubbed := []byte("{}")
+	if len(targets) > 0 {
+		if scrubbed, targets, dropped, err = g.readImported(ctx, targets, dropped); err != nil {
+			return err
+		}
 	}
 	if g.partial != nil {
 		if targets, scrubbed, dropped, err = g.finishPartial(targets, scrubbed, dropped); err != nil {
@@ -307,6 +287,44 @@ func (g Generator) Run(ctx context.Context) error {
 	}
 	g.Log.Info("wrote config for %d resources, left out %d", len(targets), len(dropped))
 	return nil
+}
+
+// readImported reads the imported values from the saved plan, settles the
+// config against them and returns them scrubbed.
+func (g Generator) readImported(ctx context.Context, targets []model.Target, dropped []Dropped) ([]byte, []model.Target, []Dropped, error) {
+	g.TF.Progress.Step("reading imported values", 0)
+	plan, err := g.TF.ShowJSON(ctx, g.planFile())
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	var skippedTargets []Dropped
+	if targets, skippedTargets, plan, err = g.skip(targets, plan); err != nil {
+		return nil, nil, nil, err
+	}
+	dropped = append(dropped, skippedTargets...)
+	if plan, err = g.restoreIdentifiers(ctx, targets, plan); err != nil {
+		return nil, nil, nil, err
+	}
+	// No plan after this: the pipeline reads only imported values from the
+	// plan, which config doesn't change. ignore_changes trips no validator;
+	// a reconciled value can, and verify backs those out (Unreconcile).
+	defaulted, err := defaultedPaths(plan)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	g.dropSetIndexes(defaulted)
+	if err := g.reconcile(plan, defaulted); err != nil {
+		return nil, nil, nil, err
+	}
+	if err := g.ignoreDefaulted(defaulted); err != nil {
+		return nil, nil, nil, err
+	}
+
+	scrubbed, err := Scrub(plan)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	return scrubbed, targets, dropped, nil
 }
 
 // addNamed adds the older versions to targets, named apart from them and,
@@ -676,7 +694,8 @@ func (g Generator) fix(ctx context.Context, targets []model.Target, diags []tf.D
 			repairedAddrs = append(repairedAddrs, t.Address())
 		}
 	}
-	if len(kept) == 0 {
+	// In a partial run that is a result: the kept resources stand.
+	if len(kept) == 0 && g.partial == nil {
 		return nil, nil, nil, fmt.Errorf("every target failed to import:\n%s", joinDiags(diags))
 	}
 	if err := os.WriteFile(g.WS.Path(generatedFile), f.Bytes(), 0o644); err != nil {

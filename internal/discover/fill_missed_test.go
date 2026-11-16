@@ -77,3 +77,37 @@ func TestBlocksLeaveOutParentsWithoutArgs(t *testing.T) {
 		t.Error("no parent has the attributes: want an error")
 	}
 }
+
+// A parent that is another scope than the provider block's config sets
+// (another project) isn't listed per; one whose identity holds more than
+// the scope (an engine in another location) is.
+func TestBlocksLeaveOutOtherScopes(t *testing.T) {
+	d := Discoverer{Schemas: &tf.Schemas{}, Params: map[string]string{"project": "mine", "location": "eu"}}
+	spec := ListArg{Type: "x_member", Parent: "x_project", Args: map[string]string{"project": "project_id"}}
+	listed := map[string][]tf.ListResult{"x_project": {
+		{Type: "x_project", Identity: map[string]any{"project_id": "Mine"}},
+		{Type: "x_project", Identity: map[string]any{"project_id": "other"}},
+	}}
+	got, err := d.blocks("x_member", spec, listed, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 1 || got[0]["project"] != "Mine" {
+		t.Errorf("blocks = %v", got)
+	}
+
+	// The config's scope spelled otherwise matches no parent: list them all.
+	d.Params["project"] = "12345"
+	if got, _ := d.blocks("x_member", spec, listed, nil); len(got) != 2 {
+		t.Errorf("no parent is the block's scope: blocks = %v", got)
+	}
+
+	spec = ListArg{Type: "x_control", Parent: "x_engine", Args: map[string]string{"engine": "id", "location": "location"}}
+	listed = map[string][]tf.ListResult{"x_engine": {
+		{Type: "x_engine", Identity: map[string]any{"id": "e1", "location": "eu"}},
+		{Type: "x_engine", Identity: map[string]any{"id": "e2", "location": "us"}},
+	}}
+	if got, _ := d.blocks("x_control", spec, listed, nil); len(got) != 2 {
+		t.Errorf("parents in another location: blocks = %v", got)
+	}
+}

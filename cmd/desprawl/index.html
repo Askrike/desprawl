@@ -1051,6 +1051,11 @@ function render() {
       { selector: '.hidden', style: { display: 'none' } },
     ],
   });
+  // Cytoscape draws elements from bitmaps cached at power-of-two scales and shows a
+  // lower-resolution one until it redraws, which leaves text blurry after zooming.
+  // Its cache has no option to turn it off: a cache that returns nothing draws directly.
+  { const d = cy.renderer().data; d.lyrTxrCache.getLayers = () => null;
+    [d.eleTxrCache, d.lblTxrCache, d.slbTxrCache, d.tlbTxrCache].forEach(c => { c.getElement = () => null; }); }
   cy.on('tap', 'node', e => {
     if (e.target.hasClass('prov')) zoomToLOD('components', cy.nodes().filter(n => providerOf(n.id()) === e.target.data('provider') && archById(n.id())));
     else if (!e.target.data('isModule')) select(e.target.id());

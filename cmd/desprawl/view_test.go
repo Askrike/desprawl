@@ -12,7 +12,6 @@ import (
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
-	"github.com/askrike/desprawl/catalog"
 	"github.com/askrike/desprawl/internal/tfmap"
 )
 
@@ -46,7 +45,7 @@ func TestShowChanges(t *testing.T) {
 	os.WriteFile(main, []byte(changed), 0o644)
 
 	os.WriteFile(filepath.Join(root, "desprawl.hcl"), []byte(`draw = ["infra"]`), 0o644)
-	m := &mapServer{load: tfmap.NewLoader(catalog.FS), viewers: map[string]*viewerRef{}, ws: root}
+	m := &mapServer{viewers: map[string]*viewerRef{}, ws: root}
 	res, _, err := m.showChanges(context.Background(), nil, changesArg{Config: "infra"})
 	if err != nil {
 		t.Fatal(err)

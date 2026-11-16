@@ -34,15 +34,17 @@ import (
 )
 
 func cmdInit(args []string) error {
-	var source, version, config, env, output, draw string
+	var source, version, env, output, draw string
+	var configs lines
 	dir := flags("init", args, func(fs *flag.FlagSet) {
 		fs.StringVar(&source, "provider", "", "provider source to reverse-engineer with, e.g. hashicorp/aws (leave out to only draw)")
 		fs.StringVar(&version, "version", "", "provider version constraint (default: latest)")
-		fs.StringVar(&config, "config", "", "the provider's settings, as HCL, e.g. 'region = \"eu-central-1\"' (one per line)")
+		fs.Var(&configs, "config", "one of the provider's settings, as HCL, e.g. 'region = \"eu-central-1\"' (repeat for each)")
 		fs.StringVar(&env, "env", "", "environment for terraform, e.g. AWS_PROFILE=dev,GOOGLE_PROJECT=x (no secrets: desprawl.hcl is committed)")
 		fs.StringVar(&output, "output", "", "where the imported Terraform goes (default "+paths.DefaultOutput+")")
 		fs.StringVar(&draw, "draw", "", "Terraform directories to draw, comma-separated (with -provider, the imported Terraform is added)")
 	})
+	config := strings.Join(configs, "\n")
 	given := source+version+config+env+output+draw != ""
 	// In a workspace, init rewrites desprawl.hcl: from the flags, or from
 	// the answers, which start from what the file says now. Without either
@@ -113,6 +115,12 @@ func cmdInit(args []string) error {
 	}
 	return nil
 }
+
+// lines is a flag that may be given more than once, each value a line.
+type lines []string
+
+func (l *lines) String() string     { return strings.Join(*l, "\n") }
+func (l *lines) Set(s string) error { *l = append(*l, s); return nil }
 
 // withDir is draw with dir first, unless it's already in it.
 func withDir(draw []string, dir string) []string {
@@ -454,7 +462,35 @@ func cmdRun(args []string) error {
 		return err
 	}
 	rea.PrintProblems(os.Stdout, groups, asJSON)
+	if !asJSON {
+		// What each stage did, at the end where the output's last lines
+		// are read, so the counts to report need no status call.
+		printStages(w)
+	}
 	return rea.DriftError(groups)
+}
+
+// printStages prints a line per stage as the map page's overview shows
+// it, and the next step.
+func printStages(w rea.Workspace) {
+	v, err := rea.ViewWorkspace(w.Dir, time.Now())
+	if err != nil {
+		return
+	}
+	for _, st := range v.Stages {
+		line := fmt.Sprintf("%-9s %s", st.Name, st.State)
+		if len(st.Changed) > 0 {
+			line += ", out of date: " + strings.Join(st.Changed, ", ") + " changed since it ran"
+		}
+		if st.Finished != nil {
+			line += ", " + st.Finished.Local().Format("2006-01-02 15:04")
+		}
+		if st.Result != "" {
+			line += " (" + st.Result + ")"
+		}
+		fmt.Println(line)
+	}
+	fmt.Println("next:", v.Next)
 }
 
 func cmdStatus(args []string) error {
@@ -483,24 +519,8 @@ func cmdStatus(args []string) error {
 	for _, l := range w.Locations() {
 		fmt.Println(l)
 	}
-	// Each stage as the map page's overview shows it.
-	if v, err := rea.ViewWorkspace(w.Dir, time.Now()); err == nil {
-		fmt.Println()
-		for _, st := range v.Stages {
-			line := fmt.Sprintf("%-9s %s", st.Name, st.State)
-			if len(st.Changed) > 0 {
-				line += ", out of date: " + strings.Join(st.Changed, ", ") + " changed since it ran"
-			}
-			if st.Finished != nil {
-				line += ", " + st.Finished.Local().Format("2006-01-02 15:04")
-			}
-			if st.Result != "" {
-				line += " (" + st.Result + ")"
-			}
-			fmt.Println(line)
-		}
-		fmt.Println("next:", v.Next)
-	}
+	fmt.Println()
+	printStages(w)
 	// Problems need the providers' schema, which init saves; status only
 	// reads, so without one there are none to show yet.
 	schemas, err := tf.LoadSchemas(w.StatePath("schema.json"))

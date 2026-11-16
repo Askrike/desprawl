@@ -5,14 +5,13 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/askrike/desprawl/catalog"
 	"github.com/askrike/desprawl/internal/tfmap"
 )
 
 // TestStaticPage checks `desprawl html` builds every example and its saved
 // layout into the page.
 func TestStaticPage(t *testing.T) {
-	s := site{root: "../../examples", current: "aws-s3-sqs-lambda", load: tfmap.NewLoader(catalog.FS), layouts: tfmap.WorkspaceLayouts("../../examples", "../../layouts")}
+	s := site{root: "../../examples", current: "aws-s3-sqs-lambda", load: mapLoader("../../examples"), layouts: tfmap.WorkspaceLayouts("../../examples", "../../layouts")}
 	page, err := s.static()
 	if err != nil {
 		t.Fatal(err)

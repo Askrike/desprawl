@@ -38,12 +38,21 @@ committed. Without a terminal, `init` takes flags:
 
 ```sh
 mkdir -p <ws> && cd <ws>
-desprawl init -provider hashicorp/aws \
-  -config 'region = "eu-central-1"' -env AWS_PROFILE=<profile>
-# google:  -provider hashicorp/google  -config $'project = "p"\nregion = "europe-west1"' -env GOOGLE_PROJECT=p
-# azurerm: -provider hashicorp/azurerm -config $'features {}\nsubscription_id = "…"'
-# (one attribute per line: HCL rejects two on one line)
+desprawl init -no-progress -provider hashicorp/aws \
+  -config 'region = "eu-central-1"' -env AWS_PROFILE=<profile> -output <dir> \
+  && desprawl run -no-progress
+# google:  -provider hashicorp/google  -config 'project = "p"' -config 'region = "europe-west1"' -env GOOGLE_PROJECT=p
+# azurerm: -provider hashicorp/azurerm -config 'features {}' -config 'subscription_id = "…"'
+# (one -config per attribute)
 ```
+
+Chain the loop's first `run` (step 2) onto `init` like this: it runs only
+if `init` succeeds, and saves a round trip.
+
+`-output <dir>` sets where the imported Terraform goes (`-output .` puts it
+in the workspace itself), and `init` adds it to `draw`. To change
+`desprawl.hcl` or `.desprawl/overrides.json` later, edit them with your
+file tools, not `sed` or heredocs.
 
 Leave `-version` out, even when the user's existing code pins an older
 major version: the generated config imports and plans fine with the newer
@@ -98,6 +107,9 @@ rest. Fixes to a pack go into the workspace, in `.desprawl/pack/<name>/`.
 desprawl run -no-progress   # discover, generate, link, verify
 ```
 
+`desprawl help` lists the commands and `desprawl help <command>` a
+command's flags.
+
 Pass `-no-progress` to every command: its progress line redraws itself,
 which makes a mess of captured output if your shell looks like a terminal.
 The problems go to stdout and a few lines on what the command did go to
@@ -110,9 +122,13 @@ which file the fixes go into and which command to run after; every problem
 comes with the fix desprawl suggests where it has one. Read it, decide,
 edit the file, run the command it names (which reruns from that stage),
 and repeat until nothing is printed, or only what you've decided to
-accept. `desprawl status` prints the same again; `-json` gives one
-object per problem. `status` starts with a line per stage (ran, failed, out of date
-because an input changed) and the next step; the `workspace_status` MCP
+accept. `run` ends with a line per stage saying what it produced (the
+counts to report) and the next step. Verify runs `terraform plan` on the
+output directory: when its line says "verified", that plan imports
+everything and changes nothing, so don't run `terraform plan` again
+yourself. `desprawl status` prints the same; `-json` gives one object per
+problem. Each stage line says whether it ran, failed or is out of date
+because an input changed; the `workspace_status` MCP
 tool returns the same as data, and the map page's Overview shows it to the
 user live (`arrange_windows` with `page: "overview"` takes them there).
 
@@ -166,7 +182,7 @@ these connected?" and to review `inferred` edges before trusting the map.
 The imported `main.tf` is ordinary Terraform: map it with the
 `desprawl-map` skill (`use_workspace` with the workspace's absolute path,
 `list_configs`, then `get_map` and `open_map` on `.desprawl/imported`), or
-run `desprawl` in the workspace. Its layouts are saved in the workspace's
+run `desprawl serve` in the workspace. Its layouts are saved in the workspace's
 `.desprawl/layouts/`, since they name real resources. Components without any connection usually mean a
 missing target or a value left as text.
 

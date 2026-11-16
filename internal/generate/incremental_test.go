@@ -39,7 +39,10 @@ resource "x_e" "e" {
 }
 `
 	os.WriteFile(ws.StatePath(generatedFile), []byte(config), 0o644)
-	os.WriteFile(ws.StatePath("plan.json"), []byte(`{"resource_changes":[]}`), 0o644)
+	os.WriteFile(ws.Path("imports.tf"), nil, 0o644)
+	os.WriteFile(ws.StatePath("plan.json"), []byte(`{"resource_changes":[
+  {"address":"x_a.a","change":{"before":null,"after":{"id":"p/a"}}},
+  {"address":"x_b.b","change":{"before":null,"after":{"id":"p/b"}}}]}`), 0o644)
 	g := Generator{WS: ws}
 	inputs := hash([]any{targets, g.Skip})
 	old := map[string]Override{"x_b.b": {Remove: []string{"tags"}}, "x_e.e": {Remove: []string{"tags"}}}
@@ -65,6 +68,13 @@ resource "x_e" "e" {
 
 	if p, _, _ := g.partialRun(targets, now, "other"); p != nil {
 		t.Error("changed targets: partial run")
+	}
+	// An output directory without the last run's import blocks (it was
+	// moved) imports nothing that was kept: everything is regenerated.
+	moved := g
+	moved.WS.Out = t.TempDir()
+	if p, _, _ := moved.partialRun(targets, now, inputs); p != nil {
+		t.Error("output without imports.tf: partial run")
 	}
 	g.All = true
 	if p, _, _ := g.partialRun(targets, now, inputs); p != nil {

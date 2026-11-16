@@ -14,6 +14,8 @@
 //	pack.json            excluded types, scope parameters, dropped attributes,
 //	                     and skip filters for resources managed elsewhere
 //	                     (hand-reviewed, like aliases)
+//	catalog.json         what each type is on the map (package tfmap); a
+//	                     workspace's adds to the shipped one type by type
 //
 // Packs are optional. Without one, discovery lists only types that need no
 // arguments and linking relies on unique values alone. `mine-docs` builds
@@ -43,6 +45,9 @@ import (
 //go:embed */*.json */*.txt
 var embedded embed.FS
 
+// Catalogs holds the shipped catalogs, as <provider>/catalog.json.
+var Catalogs fs.FS = embedded
+
 type Pack struct {
 	Rules     []rules.Rule
 	Aliases   []rules.Alias
@@ -69,6 +74,13 @@ type Config struct {
 	// (automated backups, provider-owned keys). Written by hand and
 	// reviewed, like aliases: terraform can't check who manages a resource.
 	Skip []generate.Skip `json:"skip,omitempty"`
+	// ManagedBy maps "type.attr", an inline attribute or block, to the
+	// standalone types that manage the same things one by one (a dataset's
+	// access entries and its IAM members, a security group's inline rules
+	// and rule resources). When one of those attached to a resource is
+	// imported, link leaves the inline one out of that resource and
+	// ignores changes to it, so both don't manage the same grant.
+	ManagedBy map[string][]string `json:"managed_by,omitempty"`
 	// QueryProvider holds provider block attributes for discover's terraform
 	// queries, where providers.tf doesn't set them: e.g. fewer provider
 	// retries, so a list API that keeps failing is reported in seconds

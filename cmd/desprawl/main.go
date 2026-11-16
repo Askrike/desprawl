@@ -12,12 +12,13 @@ import (
 	"io"
 	"log"
 	"os"
-	"runtime/debug"
 	"strings"
 
 	"github.com/askrike/desprawl/internal/logs"
 	"github.com/askrike/desprawl/internal/prof"
+	"github.com/askrike/desprawl/internal/progress"
 	"github.com/askrike/desprawl/internal/rea"
+	"github.com/askrike/desprawl/internal/version"
 )
 
 type command struct {
@@ -46,7 +47,7 @@ func init() {
 			{"unclassified", "[config]", "list resource types no catalog covers, with the role desprawl guessed", cmdUnclassified},
 		}},
 		{"Reverse-engineer live infrastructure into linked Terraform (needs terraform >= 1.14 and cloud credentials; read-only)", []command{
-			{"init", "[-provider NS/NAME] [-version V] [-config HCL] [-env K=V,...] [-draw DIR,...] [-output DIR]", "make the current directory a workspace: write desprawl.hcl (asks when run in a terminal)", cmdInit},
+			{"init", "[-provider NS/NAME] [-version V] [-config HCL]... [-env K=V,...] [-draw DIR,...] [-output DIR]", "make the current directory a workspace: write desprawl.hcl (asks when run in a terminal)", cmdInit},
 			{"discover", "[-types T,...] [-exclude-types T,...] [-json]", "list live resources with terraform query; prints what it couldn't list, with fixes", cmdDiscover},
 			{"add-target", "-type T (-id ID | -identity JSON) [-name N]", "add a resource discovery couldn't list", cmdAddTarget},
 			{"import-format", "-type T", "show the import IDs/identities a type takes, for add-target", cmdImportFormat},
@@ -82,7 +83,8 @@ Everything works on the workspace in the current directory: one with a
 desprawl.hcl (desprawl init makes it), which says what to draw and which
 cloud accounts to reverse-engineer.
 
-usage: desprawl                      serve the workspace's map
+usage: desprawl                      serve the workspace's map (in a terminal)
+       desprawl serve                serve it anywhere, until stopped
        desprawl <command> [args]     flags may come before or after the argument
        desprawl -C DIR <command>     run as if from DIR
        desprawl help <command>       a command's flags
@@ -93,6 +95,9 @@ what each stage is doing, -debug every resource's details).
 `
 
 var commandsByName = map[string]command{}
+
+// startDir is where desprawl was started, before -C.
+var startDir string
 
 func usage(w io.Writer) {
 	fmt.Fprint(w, intro)
@@ -110,6 +115,7 @@ func main() {
 	log.SetFlags(0)
 	log.SetPrefix("desprawl: ")
 	args := os.Args[1:]
+	startDir, _ = os.Getwd()
 	// -C DIR before the command, as with git: run as if from DIR.
 	if len(args) >= 2 && args[0] == "-C" {
 		if err := os.Chdir(args[1]); err != nil {
@@ -117,7 +123,7 @@ func main() {
 		}
 		args = args[2:]
 	}
-	name := "serve"
+	name, bare := "serve", len(args) == 0
 	if len(args) > 0 {
 		switch a := args[0]; {
 		case a == "help" || a == "-h" || a == "-help" || a == "--help":
@@ -139,6 +145,15 @@ func main() {
 			log.Fatalf("%q is neither a command nor a directory; desprawl help lists the commands", a)
 		}
 	}
+	// An agent or script that runs bare desprawl for the command list would
+	// wait on the server forever: without a terminal, serving takes the
+	// command by name, or serve's flags or directory.
+	if bare && !progress.IsTerminal(os.Stdout) {
+		usage(os.Stderr)
+		fmt.Fprintln(os.Stderr, "\nno command: `desprawl serve` serves the map until stopped")
+		os.Exit(2)
+	}
+	offerUpdate(name)
 	end := prof.Span("command", "name", name)
 	err := commandsByName[name].run(args)
 	end(prof.Err(err)...)
@@ -231,22 +246,8 @@ func flags(name string, args []string, reg func(*flag.FlagSet)) *string {
 	return dir
 }
 
-// version is set at release time (-ldflags "-X main.version=…"); go install
-// builds report their module version instead.
-var version = ""
-
-func versionString() string {
-	if version != "" {
-		return version
-	}
-	if bi, ok := debug.ReadBuildInfo(); ok && bi.Main.Version != "" {
-		return bi.Main.Version
-	}
-	return "dev"
-}
-
 func cmdVersion([]string) error {
-	fmt.Println(versionString())
+	fmt.Println(version.String())
 	return nil
 }
 

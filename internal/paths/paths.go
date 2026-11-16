@@ -71,6 +71,10 @@ func Cache(name string) (string, error) {
 	return filepath.Join(d, "desprawl", name), nil
 }
 
+// UpdateCheck records when desprawl last asked which version is the latest,
+// and which new version it last offered to update to.
+func UpdateCheck() (string, error) { return Cache("update-check.json") }
+
 // Exe is the running desprawl binary, which `desprawl update` replaces.
 func Exe() (string, error) {
 	exe, err := os.Executable()
