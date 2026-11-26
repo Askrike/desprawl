@@ -31,7 +31,7 @@ jobs:
       - run: git log -1 --format=%b "$TAG" > "$RUNNER_TEMP/notes.md"
         env:
           TAG: ${{ inputs.tag || github.ref_name }}
-      - uses: goreleaser/goreleaser-action@v6
+      - uses: goreleaser/goreleaser-action@v7
         with:
           version: "~> v2"
           args: release --clean --release-notes ${{ runner.temp }}/notes.md

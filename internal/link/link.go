@@ -134,9 +134,9 @@ type Literal struct {
 	Linked []string
 }
 
-// Unresolved returns the whole-string literals that the rules and unique
-// values in opts don't resolve as a whole; these are candidates for new
-// rules.
+// Unresolved returns the whole-string and number literals that the rules
+// and unique values in opts don't resolve as a whole; these are candidates
+// for new rules.
 func Unresolved(src []byte, ix *index.Index, opts Options) ([]Literal, error) {
 	var out []Literal
 	opts.unresolved = func(l Literal) { out = append(out, l) }
@@ -501,10 +501,15 @@ func (w *walker) link(r index.Ref, path []string, kind Kind, value string, ev ev
 
 // num resolves one number literal, by rule only: a number on its own (a
 // port, a count) is too ambiguous to link by value. The reference is a
-// string where the target keeps one, which Terraform converts back.
+// string where the target keeps one, which Terraform converts back. One no
+// rule links is reported like a string, so a numeric ID can still be
+// suggested as a rule.
 func (w *walker) num(n numNode, path []string) (node, bool) {
 	pooled, ruleOf := w.ruleMatches(n.val, path)
 	if len(pooled) == 0 {
+		if w.opts.unresolved != nil {
+			w.opts.unresolved(Literal{Addr: w.addr, Type: w.typ, Path: strings.Join(path, "."), Value: n.val})
+		}
 		return n, false
 	}
 	parts, ok := w.ruleRef(ruleOf, pooled, path, n.val, KindRule)
@@ -689,7 +694,8 @@ func (w *walker) ruleRef(ruleOf map[string]rules.Rule, matches []index.Ref, path
 
 // embeddedRules replaces the names that embedded rules find inside s
 // ("redis" in "redis.ns.svc.cluster.local"), leftmost and longest first.
-// A name is bounded by characters names don't contain.
+// A name ends where the word does, and starts a word or a tail of one
+// after "-" or "_".
 func (w *walker) embeddedRules(s string, path []string) ([]part, bool) {
 	rs := w.opts.Rules.For(w.typ, strings.Join(path, "."), rules.MatchEmbedded)
 	if len(rs) == 0 {
@@ -698,7 +704,10 @@ func (w *walker) embeddedRules(s string, path []string) ([]part, bool) {
 	var parts []part
 	pos, changed := 0, false
 	for i := 0; i < len(s); i++ {
-		if i > 0 && isNameByte(s[i-1]) {
+		// A name starts a word or follows a "-" or "_" that ends a prefix
+		// marking its kind ("pager" in "@webhook-pager"); the rule says
+		// names go here, and leftmost-longest prefers the whole word.
+		if i > 0 && isNameByte(s[i-1]) && s[i-1] != '-' && s[i-1] != '_' {
 			continue
 		}
 		var best string

@@ -1,6 +1,7 @@
 package inventory
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -300,7 +301,11 @@ func (rd *reader) plan(blocks []block) ([]blockResult, error) {
 	for i := range blocks {
 		name := fmt.Sprintf("inventory%d", i)
 		if raw := outs[name]; raw != nil {
-			if err := json.Unmarshal(raw, &brs[i].objs); err != nil {
+			// Numbers stay as written: a large numeric ID would be
+			// rounded as a float64.
+			dec := json.NewDecoder(bytes.NewReader(raw))
+			dec.UseNumber()
+			if err := dec.Decode(&brs[i].objs); err != nil {
 				return nil, fmt.Errorf("%s.%s is not a list of objects: %w", s.DataSource, s.List, err)
 			}
 		}

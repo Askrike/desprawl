@@ -254,8 +254,7 @@ func (w Workspace) checkPack(schemas *tf.Schemas, p *providers.Pack) (*providers
 		out.ListArgs = append(out.ListArgs, la)
 	}
 	if p.Inventory != nil {
-		var seen inventoryReport
-		w.ReadJSON("inventory.json", &seen)
+		seen, _ := w.inventory()
 		inv := *p.Inventory
 		inv.Sources = nil
 		for _, src := range p.Inventory.Sources {
@@ -351,6 +350,15 @@ func (w Workspace) firstOf(name string) string {
 	return ""
 }
 
+// minedDocs says whether a pack has anything mine-docs writes: import
+// examples or rules from the docs.
+func minedDocs(pk *providers.Pack) bool {
+	if len(pk.Imports) > 0 {
+		return true
+	}
+	return slices.ContainsFunc(pk.Rules, func(r rules.Rule) bool { return r.Origin == rules.OriginDocs })
+}
+
 func (w Workspace) discoverProblemsOf(schemas *tf.Schemas) ([]ProblemGroup, error) {
 	if w.current != nil && w.firstOf(w.current.Name) != w.current.Ref() {
 		return nil, nil // the provider's first block reports its types and pack
@@ -375,6 +383,18 @@ func (w Workspace) discoverProblemsOf(schemas *tf.Schemas) ([]ProblemGroup, erro
 		return nil, err
 	}
 	_, out := w.checkPack(schemas, pk)
+
+	if !minedDocs(pk) {
+		mine := w.cmd("mine-docs -provider " + w.Provider().Source)
+		out = append(out, ProblemGroup{
+			Kind: "no-docs",
+			Summary: "The pack has nothing from the provider's docs: no rules, so link finds few references,\n" +
+				"and no import IDs, so import-format and generate's probes have nothing to go on.",
+			Howto: fmt.Sprintf("Run `%s` (it writes the workspace's pack), then run `%s` again.", mine, w.cmd("run")),
+			File:  filepath.Join(w.Packs(), w.Provider().Name), Rerun: w.cmd("run"),
+			Problems: []Problem{{Subject: w.Provider().Source}},
+		})
+	}
 
 	if len(rep.NeedsArgs) > 0 {
 		file, err := w.packFile("list_args.json")
@@ -460,8 +480,8 @@ func (w Workspace) discoverProblemsOf(schemas *tf.Schemas) ([]ProblemGroup, erro
 		out = append(out, g)
 	}
 
-	var inv inventoryReport
-	if err := w.ReadJSON("inventory.json", &inv); err != nil && !os.IsNotExist(err) {
+	inv, err := w.inventory()
+	if err != nil {
 		return nil, err
 	}
 	hasInventory := pk.Inventory != nil && len(pk.Inventory.Sources) > 0
@@ -480,14 +500,54 @@ func (w Workspace) discoverProblemsOf(schemas *tf.Schemas) ([]ProblemGroup, erro
 			if err != nil {
 				return nil, err
 			}
-			srcs := suggest.InventorySources(schemas)
-			g.Howto += fmt.Sprintf("\nThe pack has no inventory, which finds many of them at once: add a data source that reports\n"+
-				"resources to \"sources\" in %s. Data sources that may: %s.", file, strings.Join(srcs[:min(len(srcs), 10)], ", "))
+			// Sources named after an unlistable type come first, all of
+			// them; the rest only as a sample. Named ones whose schema
+			// says how to read them get a complete entry of their own.
+			srcs := suggest.InventorySources(schemas, rep.Unlistable)
+			named := 0
+			ready := ProblemGroup{
+				Kind: "inventory-sources",
+				Summary: "The pack has no inventory, so discover can't find resources of the types listed below that can't be listed.\n" +
+					"These data sources are named after such types and can list them.",
+				Howto: fmt.Sprintf("Add each source to \"sources\" in %s and its line under \"kinds\" (the type it lists),\n"+
+					"then run `%s` again. Discover checks each with a sample import. Do this before adding targets one by one.", file, rerun),
+				File: file, Rerun: rerun,
+			}
+			var rest []string
+			for _, ds := range srcs {
+				one := suggest.Singular(ds)
+				if one == ds || !slices.Contains(rep.Unlistable, one) {
+					break
+				}
+				named++
+				s, ok := suggest.InventorySource(schemas, ds)
+				if !ok {
+					rest = append(rest, ds)
+					continue
+				}
+				kind, _ := marshal(map[string]any{ds: inventory.Mapping{Type: one}})
+				ready.Problems = append(ready.Problems, Problem{
+					Subject: ds + " lists " + one,
+					Detail:  []string{`under "kinds": ` + strings.TrimSuffix(strings.TrimPrefix(kind, "{"), "}")},
+					Fix:     s,
+				})
+			}
+			if len(ready.Problems) > 0 {
+				out = append(out, ready)
+			}
+			rest = append(rest, srcs[named:min(len(srcs), named+10)]...)
+			if len(rest) > 0 {
+				g.Howto += fmt.Sprintf("\nThe pack has no inventory, which finds many of them at once: add a data source that reports\n"+
+					"resources to \"sources\" in %s. Other data sources that may: %s.", file, strings.Join(rest, ", "))
+			}
 		}
 		for _, typ := range rep.Unlistable {
 			g.Problems = append(g.Problems, Problem{Subject: typ})
 		}
 		out = append(out, g)
+		if rel := w.relatedUnlistable(schemas, pk, rep.Unlistable); len(rel.Problems) > 0 {
+			out = append(out, rel)
+		}
 	}
 
 	if len(inv.Unmapped) > 0 {
@@ -508,7 +568,11 @@ func (w Workspace) discoverProblemsOf(schemas *tf.Schemas) ([]ProblemGroup, erro
 			if ks, ok := inv.Kinds[k]; ok && ks.Sample != "" {
 				p.Detail[0] += fmt.Sprintf(", e.g. ID %q", ks.Sample)
 			}
-			p.Key, p.Fix = k, map[string]string{"type": "TYPE", "id": "{id}"}
+			typ := "TYPE"
+			if one := suggest.Singular(k); one != k && schemas.Resources[one] != nil {
+				typ = one // a kind named after the type it lists
+			}
+			p.Key, p.Fix = k, map[string]string{"type": typ, "id": "{id}"}
 			g.Problems = append(g.Problems, p)
 		}
 		out = append(out, g)
@@ -856,6 +920,9 @@ func (w Workspace) linkProblemsOf(schemas *tf.Schemas, opts link.Options, parame
 		// of other attributes; those in this config are worth a look.
 		present := map[string]bool{}
 		for _, rc := range plan.ResourceChanges {
+			if !w.mine(rc.Type) {
+				continue // another provider's pack judges its attributes
+			}
 			if vals, err := rc.Values(); err == nil {
 				for k, v := range vals {
 					if v != nil {

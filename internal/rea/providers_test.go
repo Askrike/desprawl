@@ -12,6 +12,7 @@ import (
 	"github.com/askrike/desprawl/internal/model"
 	"github.com/askrike/desprawl/internal/paths"
 	"github.com/askrike/desprawl/internal/tf"
+	"github.com/askrike/desprawl/providers"
 )
 
 // A scope parameter the provider block's config sets (the setting its ref
@@ -110,4 +111,131 @@ func TestListFailedCollapsed(t *testing.T) {
 		t.Errorf("an error that names no argument is printed:\n%s", got)
 	}
 
+}
+
+// A provider's version constraint is the one desprawl.hcl sets on any of
+// its blocks, else its shipped pack's, else none: a pack never overrides a
+// pin, and a workspace's copy of pack.json doesn't hide the shipped version.
+func TestVersioned(t *testing.T) {
+	shipped, err := providers.Load("", "aws")
+	if err != nil || shipped.Version == "" {
+		t.Skip("the aws pack names no version")
+	}
+	dir := t.TempDir()
+	os.WriteFile(paths.ConfigFile(dir), []byte(`provider "aws" {
+  source = "hashicorp/aws"
+  config {}
+}
+provider "aws" {
+  source = "hashicorp/aws"
+  alias  = "two"
+  config {}
+}
+provider "google" {
+  source = "hashicorp/google"
+  alias  = "one"
+  config {}
+}
+provider "google" {
+  source  = "hashicorp/google"
+  version = "~> 7.0"
+  config {}
+}
+provider "z" {
+  source = "ns/z"
+  config {}
+}
+`), 0o644)
+	d := filepath.Join(paths.Pack(dir), "aws")
+	os.MkdirAll(d, 0o755)
+	os.WriteFile(filepath.Join(d, "pack.json"), []byte(`{"exclude_types": {}}`), 0o644)
+	w, err := Open(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var got []string
+	for _, p := range w.versioned() {
+		got = append(got, p.Ref()+"="+p.Version)
+	}
+	v := shipped.Version
+	want := []string{"aws=" + v, "aws.two=" + v, "google.one=~> 7.0", "google=~> 7.0", "z="}
+	if strings.Join(got, " ") != strings.Join(want, " ") {
+		t.Errorf("versioned = %v, want %v", got, want)
+	}
+	if def := w.packDefaults(); len(def) != 1 || def["aws"] != v {
+		t.Errorf("packDefaults = %v, want only aws=%s", def, v)
+	}
+	if strings.Contains(string(w.Config.ProvidersTF()), v) {
+		t.Error("versioned changed the workspace's own config")
+	}
+	if _, err := w.prepare(); err != nil {
+		t.Fatal(err)
+	}
+	tfb, _ := os.ReadFile(w.Path("providers.tf"))
+	for _, s := range []string{`version = "` + v + `"`, `version = "~> 7.0"`} {
+		if !strings.Contains(string(tfb), s) {
+			t.Errorf("providers.tf lacks %s:\n%s", s, tfb)
+		}
+	}
+}
+
+// Without a pack, discover's problems say to run mine-docs, give a complete
+// inventory source (and its kinds line) for each data source named after
+// a type that can't be listed, and suggest that type for its unmapped kind.
+func TestUnlistableSuggestsSources(t *testing.T) {
+	dir := t.TempDir()
+	os.WriteFile(paths.ConfigFile(dir), []byte("provider \"x\" {\n  source = \"ns/x\"\n}\n"), 0o644)
+	w, err := Open(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	w.WriteJSON("targets.json", []model.Target{})
+	w = w.scoped(w.Config.Providers[0])
+	w.WriteJSON("discovery.json", map[string]any{"unlistable": []string{"x_alert", "x_board"}})
+	w.WriteJSON("inventory.json", map[string]any{"unmapped": map[string]int{"x_alerts": 2}})
+	computed := func(typ string) *tf.SchemaAttr { return &tf.SchemaAttr{Type: json.RawMessage(typ), Computed: true} }
+	groups, err := w.discoverProblemsOf(&tf.Schemas{
+		Resources: map[string]*tf.SchemaBlock{"x_alert": {}, "x_board": {}},
+		DataSources: map[string]*tf.SchemaBlock{"x_alerts": {Attributes: map[string]*tf.SchemaAttr{
+			"alerts": computed(`["list",["object",{"id":"number","name":"string"}]]`),
+		}}},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var text bytes.Buffer
+	PrintProblems(&text, groups, false)
+	got := text.String()
+	for _, want := range []string{
+		"desprawl -C " + dir + " mine-docs -provider ns/x",
+		"  x_alerts lists x_alert\n",
+		`    under "kinds": "x_alerts":{"type":"x_alert"}` + "\n",
+		`    {"data_source":"x_alerts","list":"alerts","id":"id","name":"name"}` + "\n",
+		`    "x_alerts": {"id":"{id}","type":"x_alert"}` + "\n",
+	} {
+		if !strings.Contains(got, want) {
+			t.Errorf("missing %q in:\n%s", want, got)
+		}
+	}
+}
+
+// Each provider sees only its own inventory report: another provider's
+// unmapped kinds aren't its problems. A flat file from before is everyone's.
+func TestInventoryByProvider(t *testing.T) {
+	dir := t.TempDir()
+	os.WriteFile(paths.ConfigFile(dir), []byte("provider \"x\" {\n  source = \"ns/x\"\n}\nprovider \"y\" {\n  source = \"ns/y\"\n}\n"), 0o644)
+	w, err := Open(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	w.WriteJSON("inventory.json", map[string]any{"x": map[string]any{"unmapped": map[string]int{"x:thing": 2}}})
+	gotX, _ := w.scoped(w.Config.Providers[0]).inventory()
+	gotY, _ := w.scoped(w.Config.Providers[1]).inventory()
+	if gotX.Unmapped["x:thing"] != 2 || len(gotY.Unmapped) != 0 {
+		t.Errorf("x = %v, y = %v", gotX.Unmapped, gotY.Unmapped)
+	}
+	w.WriteJSON("inventory.json", map[string]any{"unmapped": map[string]int{"old": 1}})
+	if old, _ := w.scoped(w.Config.Providers[1]).inventory(); old.Unmapped["old"] != 1 {
+		t.Errorf("flat file: %v", old.Unmapped)
+	}
 }

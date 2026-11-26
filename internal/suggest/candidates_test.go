@@ -1,6 +1,7 @@
 package suggest
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/askrike/desprawl/internal/link"
@@ -109,6 +110,36 @@ resource "x_route" "r" {
 	}
 }
 
+// A name after a prefix in one word ("@hook-my-pager") and a name-like
+// attribute that isn't the generated ID ("team:my-team") are suggested.
+func TestCandidatesNameTailsAndHandles(t *testing.T) {
+	plan := `{"resource_changes": [
+	 {"address": "x_hook.h", "mode": "managed", "type": "x_hook", "change": {"before": {"id": "my-pager", "name": "my-pager"}}},
+	 {"address": "x_team.t", "mode": "managed", "type": "x_team", "change": {"before": {"id": "0f8fad5b-d9cb-469f-a165-70867728950e", "handle": "my-team"}}},
+	 {"address": "x_alert.a", "mode": "managed", "type": "x_alert", "change": {"before": {"id": "1", "message": "Down. @hook-my-pager", "tags": ["team:my-team"]}}}
+	]}`
+	src := `resource "x_hook" "h" {
+  name = "my-pager"
+}
+resource "x_team" "t" {
+  handle = "my-team"
+}
+resource "x_alert" "a" {
+  message = "Down. @hook-my-pager"
+  tags    = ["team:my-team"]
+}
+`
+	got := map[string]bool{}
+	for _, c := range candidates(t, plan, src, link.Options{}) {
+		got[c.Path+" "+c.Target+"."+c.Attr+" "+string(c.Match)] = true
+	}
+	for _, want := range []string{"message x_hook.name embedded", "tags x_team.handle embedded"} {
+		if !got[want] {
+			t.Errorf("missing %s in %v", want, got)
+		}
+	}
+}
+
 // Of the resources a value names, those that refer to another of them
 // (a bucket's ACL) carry its name: only the one they refer to is suggested.
 func TestCandidatesPreferParent(t *testing.T) {
@@ -164,5 +195,42 @@ resource "x_group" "g" {
 	}
 	if (Candidate{Values: 1, Examples: []string{"orders-queue"}}).Weak() {
 		t.Error("a name with a separator is not weak")
+	}
+}
+
+// A resource's all-digit ID is suggested as the target of a number, or a
+// digit string, that no rule links; a short number (a port) isn't.
+func TestCandidatesNumericIDs(t *testing.T) {
+	plan := `{"resource_changes": [
+	 {"address": "x_alarm.a", "mode": "managed", "type": "x_alarm", "change": {"before": {"id": "130749612", "port": "8080"}}},
+	 {"address": "x_slo.s", "mode": "managed", "type": "x_slo", "change": {"before": {"id": "s1", "alarm_ids": [130749612], "port": 8080}}},
+	 {"address": "x_board.b", "mode": "managed", "type": "x_board", "change": {"before": {"id": "b1", "widget": [{"alarm": "130749612"}]}}}
+	]}`
+	src := `resource "x_alarm" "a" {
+  port = "8080"
+}
+resource "x_slo" "s" {
+  alarm_ids = [130749612]
+  port      = 8080
+}
+resource "x_board" "b" {
+  widget {
+    alarm = "130749612"
+  }
+}
+`
+	got := map[string]bool{}
+	for _, c := range candidates(t, plan, src, link.Options{}) {
+		got[c.Source+" "+c.Path+" "+c.Target+" "+c.Attr] = true
+	}
+	for _, want := range []string{"x_slo alarm_ids x_alarm id", "x_board widget.alarm x_alarm id"} {
+		if !got[want] {
+			t.Errorf("missing candidate %q in %v", want, got)
+		}
+	}
+	for k := range got {
+		if strings.Contains(k, "port") {
+			t.Errorf("a short number was suggested: %q", k)
+		}
 	}
 }

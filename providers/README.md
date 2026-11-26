@@ -19,7 +19,7 @@ whoever runs them (you) decides; running the stage again checks it.
 | `vocabulary.docs.txt` | `mine-docs` | every word in the provider docs: what counts as public | (mined) |
 | `imports.docs.json` | `mine-docs` | documented import IDs/identities per type | (mined) |
 | `list_args.json` | `discover`'s suggestions | how to list types that need arguments | the schema, then the next discover lists them or prints the failure |
-| `pack.json` | `discover`'s and `link`'s suggestions (params, excluded types and attributes); by hand (skips, `query_provider`) | scope parameter data sources and the rest | discover reads each param's data source and compares it with the discovered value |
+| `pack.json` | `discover`'s and `link`'s suggestions (params, excluded types and attributes); by hand (skips, `query_provider`, `version`: the provider release used when `desprawl.hcl` sets none, raised once a newer one is checked) | scope parameter data sources and the rest | discover reads each param's data source and compares it with the discovered value |
 | `inventory.json` | `discover`'s suggestions | data sources that enumerate resources; kind -> type and import ID | the schema; discover imports a sample of each new mapping, reads with each new partition, and compares each new per-parent source with a single read |
 | `rules.llm.json` | `link`'s suggestions | rules judged from real infrastructure, and rejected ones | your judgment: a wrong rule still plans |
 | `catalog.json` | by hand | what each resource type is on the map (see [Catalogs](#catalogs)) | the map: `desprawl unclassified` lists the types it doesn't cover |

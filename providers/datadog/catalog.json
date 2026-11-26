@@ -1,0 +1,253 @@
+{
+  "provider": "datadog",
+  "resources": {
+    "datadog_monitor": {
+      "role": "primary",
+      "category": "observability",
+      "label": "Monitor"
+    },
+    "datadog_monitor_json": {
+      "role": "primary",
+      "category": "observability",
+      "label": "Monitor"
+    },
+    "datadog_service_level_objective": {
+      "role": "primary",
+      "category": "observability",
+      "label": "SLO"
+    },
+    "datadog_dashboard": {
+      "role": "primary",
+      "category": "observability",
+      "label": "Dashboard"
+    },
+    "datadog_dashboard_json": {
+      "role": "primary",
+      "category": "observability",
+      "label": "Dashboard"
+    },
+    "datadog_dashboard_v2": {
+      "role": "primary",
+      "category": "observability",
+      "label": "Dashboard"
+    },
+    "datadog_dashboard_list": {
+      "role": "primary",
+      "category": "observability",
+      "label": "Dashboard list"
+    },
+    "datadog_powerpack": {
+      "role": "primary",
+      "category": "observability",
+      "label": "Powerpack"
+    },
+    "datadog_synthetics_test": {
+      "role": "primary",
+      "category": "observability",
+      "label": "Synthetics test"
+    },
+    "datadog_synthetics_suite": {
+      "role": "primary",
+      "category": "observability",
+      "label": "Synthetics suite"
+    },
+    "datadog_synthetics_private_location": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Synthetics private location"
+    },
+    "datadog_downtime_schedule": {
+      "role": "primary",
+      "category": "observability",
+      "label": "Downtime"
+    },
+    "datadog_webhook": {
+      "role": "primary",
+      "category": "integration",
+      "label": "Webhook"
+    },
+    "datadog_logs_custom_pipeline": {
+      "role": "primary",
+      "category": "observability",
+      "label": "Log pipeline"
+    },
+    "datadog_logs_index": {
+      "role": "primary",
+      "category": "storage",
+      "label": "Log index"
+    },
+    "datadog_logs_archive": {
+      "role": "primary",
+      "category": "storage",
+      "label": "Log archive"
+    },
+    "datadog_logs_custom_destination": {
+      "role": "primary",
+      "category": "integration",
+      "label": "Log destination"
+    },
+    "datadog_logs_metric": {
+      "role": "primary",
+      "category": "observability",
+      "label": "Log metric"
+    },
+    "datadog_spans_metric": {
+      "role": "primary",
+      "category": "observability",
+      "label": "Span metric"
+    },
+    "datadog_rum_application": {
+      "role": "primary",
+      "category": "observability",
+      "label": "RUM application"
+    },
+    "datadog_observability_pipeline": {
+      "role": "primary",
+      "category": "messaging",
+      "label": "Observability pipeline"
+    },
+    "datadog_security_monitoring_rule": {
+      "role": "primary",
+      "category": "security",
+      "label": "Detection rule"
+    },
+    "datadog_team": {
+      "role": "primary",
+      "category": "identity",
+      "label": "Team"
+    },
+    "datadog_role": {
+      "role": "primary",
+      "category": "identity",
+      "label": "Role"
+    },
+    "datadog_user": {
+      "role": "primary",
+      "category": "identity",
+      "label": "User"
+    },
+    "datadog_service_account": {
+      "role": "primary",
+      "category": "identity",
+      "label": "Service account"
+    },
+    "datadog_service_definition_yaml": {
+      "role": "primary",
+      "category": "other",
+      "label": "Service"
+    },
+    "datadog_software_catalog": {
+      "role": "primary",
+      "category": "other",
+      "label": "Catalog entity"
+    },
+    "datadog_on_call_schedule": {
+      "role": "primary",
+      "category": "observability",
+      "label": "On-call schedule"
+    },
+    "datadog_on_call_escalation_policy": {
+      "role": "primary",
+      "category": "observability",
+      "label": "Escalation policy"
+    },
+    "datadog_status_page": {
+      "role": "primary",
+      "category": "observability",
+      "label": "Status page"
+    },
+    "datadog_workflow_automation": {
+      "role": "primary",
+      "category": "compute",
+      "label": "Workflow"
+    },
+    "datadog_app_builder_app": {
+      "role": "primary",
+      "category": "compute",
+      "label": "App"
+    },
+    "datadog_integration_aws_account": {
+      "role": "primary",
+      "category": "integration",
+      "label": "AWS integration"
+    },
+    "datadog_integration_gcp_sts": {
+      "role": "primary",
+      "category": "integration",
+      "label": "GCP integration"
+    },
+    "datadog_integration_azure": {
+      "role": "primary",
+      "category": "integration",
+      "label": "Azure integration"
+    },
+    "datadog_integration_slack_channel": {
+      "role": "primary",
+      "category": "integration",
+      "label": "Slack channel"
+    },
+    "datadog_integration_pagerduty_service_object": {
+      "role": "primary",
+      "category": "integration",
+      "label": "PagerDuty service"
+    },
+    "datadog_integration_opsgenie_service_object": {
+      "role": "primary",
+      "category": "integration",
+      "label": "Opsgenie service"
+    },
+    "datadog_slo_correction": {
+      "role": "child",
+      "category": "observability",
+      "parent_attr": "slo_id"
+    },
+    "datadog_team_link": {
+      "role": "child",
+      "category": "observability",
+      "parent_attr": "team_id"
+    },
+    "datadog_team_permission_setting": {
+      "role": "child",
+      "category": "observability",
+      "parent_attr": "team_id"
+    },
+    "datadog_status_page_component": {
+      "role": "child",
+      "category": "observability",
+      "parent_attr": "page_id"
+    },
+    "datadog_rum_retention_filter": {
+      "role": "child",
+      "category": "observability",
+      "parent_attr": "application_id"
+    },
+    "datadog_rum_exclusion_filter": {
+      "role": "child",
+      "category": "observability",
+      "parent_attr": "application_id"
+    },
+    "datadog_service_account_application_key": {
+      "role": "child",
+      "category": "identity",
+      "parent_attr": "service_account_id"
+    },
+    "datadog_team_membership": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "user_id",
+      "to_attr": "team_id",
+      "verb": "member of"
+    },
+    "datadog_user_role": {
+      "role": "connector",
+      "category": "identity",
+      "from_attr": "user_id",
+      "to_attr": "role_id",
+      "verb": "has role"
+    },
+    "datadog_organization_settings": {
+      "role": "helper",
+      "category": "other"
+    }
+  }
+}

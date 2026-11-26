@@ -57,8 +57,14 @@ func (r Runner) cmd(ctx context.Context, args ...string) *exec.Cmd {
 	return c
 }
 
-func (r Runner) Init(ctx context.Context) error {
-	c := r.cmd(ctx, "init", "-no-color", "-input=false")
+// Init runs terraform init. upgrade lets it pick provider versions other
+// than the lock file's, which a changed version constraint needs.
+func (r Runner) Init(ctx context.Context, upgrade bool) error {
+	args := []string{"init", "-no-color", "-input=false"}
+	if upgrade {
+		args = append(args, "-upgrade")
+	}
+	c := r.cmd(ctx, args...)
 	if r.ProviderCache != "" {
 		c.Env = append(c.Env, r.pluginCacheEnv()...)
 	}

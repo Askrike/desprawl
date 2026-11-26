@@ -3,6 +3,7 @@ package generate
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"os"
 	"slices"
 	"strings"
@@ -459,6 +460,90 @@ func TestOverrideRemovesNested(t *testing.T) {
 	}
 	if err := g.applyOverrides(map[string]Override{"x_group.g": {Remove: []string{"rule.5"}}}); err == nil {
 		t.Error("removing a block that isn't there: no error")
+	}
+}
+
+// An override sets a nested attribute by its path.
+func TestOverrideSetsNested(t *testing.T) {
+	ws := model.Workspace{Dir: t.TempDir()}
+	const src = `resource "x_board" "b" {
+  widget {
+    chart {
+      request {
+        style = "bars"
+      }
+    }
+  }
+}
+`
+	if err := os.WriteFile(ws.Path(generatedFile), []byte(src), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	g := Generator{WS: ws}
+	if err := g.applyOverrides(map[string]Override{"x_board.b": {Set: map[string]string{"widget.0.chart.0.request.0.query": `"sum:x"`}}}); err != nil {
+		t.Fatal(err)
+	}
+	out, _ := os.ReadFile(ws.Path(generatedFile))
+	f, diags := hclwrite.ParseConfig(out, "x.tf", hcl.InitialPos)
+	if diags.HasErrors() {
+		t.Fatalf("%s\n%s", diags, out)
+	}
+	n, ok := resolve(f.Body().Blocks()[0].Body(), "widget.0.chart.0.request.0.query")
+	if !ok || n.block != nil {
+		t.Fatalf("query not set in the request block:\n%s", out)
+	}
+	if err := g.applyOverrides(map[string]Override{"x_board.b": {Set: map[string]string{"widget.3.query": `"x"`}}}); err == nil {
+		t.Error("setting in a block that isn't there: no error")
+	}
+}
+
+// When the error names a nested block missing a settable attribute (one
+// Terraform left out of generated config, as it does deprecated ones),
+// the hint suggests setting it rather than removing the whole block.
+func TestHintLeftOutNested(t *testing.T) {
+	const src = `resource "x_board" "b" {
+  title = "t"
+  widget {
+    chart {
+      request {
+        style = "bars"
+        axis  = null
+      }
+    }
+  }
+}
+`
+	f, _ := hclwrite.ParseConfig([]byte(src), "x.tf", hcl.InitialPos)
+	str := json.RawMessage(`"string"`)
+	request := &tf.SchemaBlock{Attributes: map[string]*tf.SchemaAttr{
+		"style": {Type: str, Optional: true},
+		"axis":  {Type: str, Optional: true},
+		"query": {Type: str, Optional: true},
+		"key":   {Type: str, Optional: true, Sensitive: true},
+		"total": {Type: str, Computed: true},
+	}}
+	schema := &tf.SchemaBlock{
+		Attributes: map[string]*tf.SchemaAttr{"title": {Type: str, Required: true}},
+		BlockTypes: map[string]*tf.BlockType{"widget": {NestingMode: "list", Block: &tf.SchemaBlock{
+			BlockTypes: map[string]*tf.BlockType{"chart": {NestingMode: "list", Block: &tf.SchemaBlock{
+				BlockTypes: map[string]*tf.BlockType{"request": {NestingMode: "list", Block: request}},
+			}}},
+		}}},
+	}
+	d := tf.Diagnostic{Address: "x_board.b", Summary: "validation failed", Detail: "widget.0.chart.0.request.0: {'style': 'bars'} is not valid"}
+	h := hint(f.Body().Blocks()[0].Body(), schema, nil, d)
+	if h.Override == nil || len(h.Override.Remove) > 0 || !maps.Equal(h.Override.Set, map[string]string{"widget.0.chart.0.request.query": `"placeholder"`}) {
+		t.Fatalf("override = %+v, want set of request.query", h.Override)
+	}
+	if !strings.Contains(h.Why, "remove widget.0.chart.0.request") {
+		t.Errorf("why = %q, want the removal as fallback", h.Why)
+	}
+
+	// Nothing left out: removal, as before.
+	request.Attributes = map[string]*tf.SchemaAttr{"style": {Type: str, Optional: true}}
+	h = hint(f.Body().Blocks()[0].Body(), schema, nil, d)
+	if h.Override == nil || len(h.Override.Set) > 0 || len(h.Override.Remove) != 1 {
+		t.Errorf("override = %+v, want a removal", h.Override)
 	}
 }
 

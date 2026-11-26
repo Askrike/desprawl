@@ -1,0 +1,252 @@
+[
+  {
+    "source": "datadog_monitor",
+    "path": "name",
+    "target": "aws_ecr_repository",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "same name by chance: another resource shares the watched resource's name",
+    "rejected": true
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "name",
+    "target": "aws_ecs_task_definition",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "same name by chance: another resource shares the watched resource's name",
+    "rejected": true
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "message",
+    "target": "aws_ecr_repository",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "same name by chance: another resource shares the watched resource's name",
+    "rejected": true
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "message",
+    "target": "aws_ecs_task_definition",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "same name by chance: another resource shares the watched resource's name",
+    "rejected": true
+  },
+  {
+    "source": "datadog_dashboard_json",
+    "path": "dashboard.widgets.definition.requests.q",
+    "target": "aws_iam_role",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "same name by chance: another resource shares the watched resource's name",
+    "rejected": true
+  },
+  {
+    "source": "datadog_dashboard_json",
+    "path": "dashboard.widgets.definition.requests.q",
+    "target": "aws_lambda_function",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "a widget's metric query scopes to a Lambda function by its name (a tag on the metric)"
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "query",
+    "target": "aws_ecr_repository",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "same name by chance: another resource shares the watched resource's name",
+    "rejected": true
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "query",
+    "target": "aws_ecs_task_definition",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "same name by chance: another resource shares the watched resource's name",
+    "rejected": true
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "query",
+    "target": "aws_iam_role",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "same name by chance: another resource shares the watched resource's name",
+    "rejected": true
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "query",
+    "target": "aws_lambda_function",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "a metric query scopes to a Lambda function by its name (a tag on the metric)"
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "message",
+    "target": "aws_iam_role_policy",
+    "attr": "name",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "same name by chance: another resource shares the watched resource's name",
+    "rejected": true
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "tags",
+    "target": "aws_ecr_repository",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "same name by chance: another resource shares the watched resource's name",
+    "rejected": true
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "tags",
+    "target": "aws_ecs_task_definition",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "same name by chance: another resource shares the watched resource's name",
+    "rejected": true
+  },
+  {
+    "source": "datadog_dashboard_json",
+    "path": "dashboard.widgets.definition.requests.q",
+    "target": "aws_cloudfront_distribution",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "a widget's metric query scopes to a CloudFront distribution by its ID (a tag on the metric)"
+  },
+  {
+    "source": "datadog_dashboard_json",
+    "path": "dashboard.widgets.definition.requests.q",
+    "target": "aws_sqs_queue",
+    "attr": "name",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "a widget's metric query scopes to an SQS queue by its name (a tag on the metric)"
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "message",
+    "target": "aws_iam_role",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "same name by chance: another resource shares the watched resource's name",
+    "rejected": true
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "message",
+    "target": "aws_lambda_function",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "same name by chance: another resource shares the watched resource's name",
+    "rejected": true
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "message",
+    "target": "aws_sqs_queue",
+    "attr": "name",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "same name by chance: another resource shares the watched resource's name",
+    "rejected": true
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "query",
+    "target": "aws_cloudfront_distribution",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "a metric query scopes to a CloudFront distribution by its ID (a tag on the metric)"
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "query",
+    "target": "aws_sqs_queue",
+    "attr": "name",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "a metric query scopes to an SQS queue by its name (a tag on the metric)"
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "tags",
+    "target": "datadog_team",
+    "attr": "name",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "a display name, not the handle tags use",
+    "rejected": true
+  },
+  {
+    "source": "datadog_service_level_objective",
+    "path": "tags",
+    "target": "datadog_team",
+    "attr": "name",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "a display name, not the handle tags use",
+    "rejected": true
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "query",
+    "target": "datadog_service_level_objective",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "an SLO burn-rate alert's query names the SLO by its ID"
+  },
+  {
+    "source": "datadog_service_level_objective",
+    "path": "monitor_ids",
+    "target": "datadog_monitor",
+    "attr": "id",
+    "match": "exact",
+    "origin": "llm",
+    "note": "a monitor-based SLO lists the monitors it is computed from"
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "tags",
+    "target": "datadog_team",
+    "attr": "handle",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "a team:<handle> tag assigns the monitor to that team"
+  },
+  {
+    "source": "datadog_service_level_objective",
+    "path": "tags",
+    "target": "datadog_team",
+    "attr": "handle",
+    "match": "embedded",
+    "origin": "llm",
+    "note": "a team:<handle> tag assigns the SLO to that team"
+  }
+]

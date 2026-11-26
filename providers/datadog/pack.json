@@ -1,0 +1,12 @@
+{
+  "exclude_types": {},
+  "exclude_attributes": [],
+  "skip": [
+    {
+      "type": "datadog_role",
+      "attr": "name",
+      "match": "^Datadog (Admin|Standard|Read Only) Role$",
+      "reason": "Datadog's managed roles are created by Datadog and can't be changed or deleted"
+    }
+  ]
+}

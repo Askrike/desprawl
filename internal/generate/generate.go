@@ -38,8 +38,9 @@ const (
 // config, for problems no generic repair can solve (e.g. a function's code
 // source, which the cloud API doesn't return).
 type Override struct {
-	// Set maps top-level attributes to HCL expressions, e.g.
-	// {"filename": "\"placeholder.zip\""}.
+	// Set maps attributes to HCL expressions, e.g.
+	// {"filename": "\"placeholder.zip\""}; a dotted path
+	// ("rule.0.filter") sets one inside a nested block.
 	Set map[string]string `json:"set,omitempty"`
 	// Remove lists attributes or blocks to delete: a top-level name
 	// removes the attribute or every block of that type; a dotted path
@@ -526,7 +527,16 @@ func (g Generator) applyOverrides(overrides map[string]Override) error {
 			if err != nil {
 				return fmt.Errorf("override %s.%s: %w", hclx.Address(b), name, err)
 			}
-			b.Body().SetAttributeRaw(name, toks)
+			body, attr := b.Body(), name
+			if i := strings.LastIndex(name, "."); i >= 0 {
+				// A nested attribute: set it in the block its path names.
+				n, ok := resolve(b.Body(), name[:i])
+				if !ok || n.block == nil {
+					return fmt.Errorf("override %s: set %s: no such block", hclx.Address(b), name)
+				}
+				body, attr = n.block.Body(), name[i+1:]
+			}
+			body.SetAttributeRaw(attr, toks)
 		}
 		for _, name := range o.IgnoreChanges {
 			hclx.IgnoreChanges(b.Body(), name)

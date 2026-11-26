@@ -7,6 +7,7 @@
 package rea
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
@@ -21,6 +22,7 @@ import (
 	"github.com/askrike/desprawl/internal/model"
 	"github.com/askrike/desprawl/internal/paths"
 	"github.com/askrike/desprawl/internal/tf"
+	"github.com/askrike/desprawl/providers"
 )
 
 // Output says what commands print to stderr besides their results
@@ -144,7 +146,12 @@ func (w Workspace) ready(ctx context.Context) error {
 		}
 	}
 	Log.Info("terraform init")
-	if err := w.runner().Init(ctx); err != nil {
+	// A changed providers.tf may change a version constraint, which the
+	// lock file's versions no longer meet without -upgrade.
+	if err := w.runner().Init(ctx, changed); err != nil {
+		// Next time providers.tf must count as changed again, or init
+		// would be skipped and the old lock file kept.
+		os.Remove(w.Path("providers.tf"))
 		return err
 	}
 	s, err := w.runner().CachedProvidersSchema(ctx)
@@ -170,7 +177,56 @@ func (w Workspace) prepare() (changed bool, err error) {
 	if err := os.MkdirAll(w.Path(""), 0o755); err != nil {
 		return false, err
 	}
-	return writeIfChanged(w.Path("providers.tf"), w.Config.ProvidersTF())
+	c := w.Config
+	c.Providers = w.versioned()
+	return writeIfChanged(w.Path("providers.tf"), c.ProvidersTF())
+}
+
+// versioned are desprawl.hcl's provider blocks with each provider's version
+// constraint: the one desprawl.hcl sets on any of its blocks, else its pack's
+// (packDefaults), else none (the latest).
+func (w Workspace) versioned() []model.Provider {
+	set := map[string]string{}
+	for _, p := range w.Config.Providers {
+		if p.Version != "" && set[p.Name] == "" {
+			set[p.Name] = p.Version
+		}
+	}
+	def := w.packDefaults()
+	out := slices.Clone(w.Config.Providers)
+	for i, p := range out {
+		if p.Version == "" {
+			out[i].Version = cmp.Or(set[p.Name], def[p.Name])
+		}
+	}
+	return out
+}
+
+// packDefaults are the versions shipped packs name (a release known to work)
+// for the providers no block of desprawl.hcl sets a version on. Only the
+// shipped pack counts: a workspace's pack.json is a copy of the shipped one
+// from when its first fix was made, and would keep an old version, or none.
+func (w Workspace) packDefaults() map[string]string {
+	out := map[string]string{}
+	for _, p := range w.Config.Providers {
+		if p.Version != "" {
+			out[p.Name] = ""
+			continue
+		}
+		if _, ok := out[p.Name]; ok {
+			continue
+		}
+		out[p.Name] = ""
+		if pk, err := providers.Load("", p.Name); err == nil {
+			out[p.Name] = pk.Version
+		}
+	}
+	for name, v := range out {
+		if v == "" {
+			delete(out, name)
+		}
+	}
+	return out
 }
 
 func writeIfChanged(path string, b []byte) (bool, error) {
@@ -222,16 +278,39 @@ func Init(dir string) error {
 	if err := w.ready(context.Background()); err != nil {
 		return err
 	}
+	def := w.packDefaults()
+	for _, name := range slices.Sorted(maps.Keys(def)) {
+		Log.Info("%s %s: the version desprawl knows works (set version in desprawl.hcl to choose another)", name, def[name])
+	}
 	s, err := tf.LoadSchemas(w.StatePath("schema.json"))
 	if err != nil {
 		return err
 	}
-	pk, err := w.Pack()
-	if err != nil {
-		return err
+	// One line per provider (its first block), counting its own types: the
+	// schema holds every provider's.
+	for _, p := range w.Config.Providers {
+		if w.firstOf(p.Name) != p.Ref() {
+			continue
+		}
+		pw := w.scoped(p)
+		pk, err := pw.Pack()
+		if err != nil {
+			return err
+		}
+		types, lists := 0, 0
+		for t := range s.Resources {
+			if pw.mine(t) {
+				types++
+			}
+		}
+		for t := range s.Lists {
+			if pw.mine(t) {
+				lists++
+			}
+		}
+		Log.Info("%s: %d resource types, %d listable; pack: %d rules, %d list-arg specs",
+			p.Source, types, lists, len(pk.Rules), len(pk.ListArgs))
 	}
-	Log.Info("%s: %d resource types, %d listable; pack: %d rules, %d list-arg specs",
-		w.Provider().Source, len(s.Resources), len(s.Lists), len(pk.Rules), len(pk.ListArgs))
 	w.recordStage("init", started, nil)
 	return nil
 }

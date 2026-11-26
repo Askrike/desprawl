@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/askrike/desprawl/internal/discover"
+	"github.com/askrike/desprawl/internal/inventory"
 	"github.com/askrike/desprawl/internal/tf"
 )
 
@@ -141,7 +142,13 @@ func ParamSources(schemas *tf.Schemas, param string) []string {
 
 // InventorySources are data sources that report many resources at once
 // (a computed list of objects), which the pack's inventory can read.
-func InventorySources(schemas *tf.Schemas) []string { return sourceCandidates(schemas) }
+func InventorySources(schemas *tf.Schemas, types []string) []string {
+	return sourceCandidates(schemas, types)
+}
+
+// Singular is the resource type a listing data source is named after
+// (its name's singular form).
+func Singular(name string) string { return singular(name) }
 
 // OptionalListArgs are a list type's optional arguments, which a failed
 // listing may need anyway.
@@ -190,4 +197,55 @@ func PerParent(schemas *tf.Schemas, ds string, discovered map[string]bool) (arg,
 		}
 	}
 	return "", "", "", false
+}
+
+// InventorySource suggests a complete inventory source for a listing data
+// source: its one list of entries, their "id" field as the ID, and a name
+// field where there is one ("name", else one ending in "name", else
+// "title" or "handle"). Its entries are all of one kind, the data source's
+// name, which Singular maps to the type it's named after. ok is false when
+// the data source needs arguments, has no or several entry lists, or its
+// entries have no "id" field: those want a person to write the source.
+func InventorySource(schemas *tf.Schemas, ds string) (s inventory.Source, ok bool) {
+	blk := schemas.DataSources[ds]
+	if blk == nil {
+		return s, false
+	}
+	var lists, fields []string
+	for name, a := range blk.Attributes {
+		if a.Required {
+			return s, false
+		}
+		if f := objectListFields(a); a.Computed && !a.Optional && f != nil {
+			lists, fields = append(lists, name), f
+		}
+	}
+	for name := range blk.BlockTypes {
+		if f, _ := entryFields(blk, name); f != nil {
+			lists, fields = append(lists, name), f
+		}
+	}
+	if len(lists) != 1 || !slices.Contains(fields, "id") {
+		return s, false
+	}
+	s = inventory.Source{DataSource: ds, List: lists[0], ID: "id", Name: nameField(fields)}
+	return s, CheckSource(schemas, s) == nil
+}
+
+// nameField is the entry field most likely holding a display name.
+func nameField(fields []string) string {
+	if slices.Contains(fields, "name") {
+		return "name"
+	}
+	for _, f := range slices.Sorted(slices.Values(fields)) {
+		if strings.HasSuffix(f, "name") {
+			return f
+		}
+	}
+	for _, f := range []string{"title", "handle"} {
+		if slices.Contains(fields, f) {
+			return f
+		}
+	}
+	return ""
 }

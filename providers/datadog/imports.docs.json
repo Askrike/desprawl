@@ -1,0 +1,805 @@
+{
+  "datadog_action_connection": {
+    "ids": [
+      "11111111-2222-3333-4444-555555555555"
+    ]
+  },
+  "datadog_action_execution_policy": {
+    "ids": [
+      "11111111-2222-3333-4444-555555555555"
+    ]
+  },
+  "datadog_agentless_scanning_aws_scan_options": {
+    "ids": [
+      "123456789012"
+    ]
+  },
+  "datadog_agentless_scanning_azure_scan_options": {
+    "ids": [
+      "12345678-1234-1234-1234-123456789012"
+    ]
+  },
+  "datadog_agentless_scanning_gcp_scan_options": {
+    "ids": [
+      "company-project-prod"
+    ]
+  },
+  "datadog_ai_gateway_budget": {
+    "ids": [
+      "\u003cbudget_id\u003e"
+    ]
+  },
+  "datadog_ai_gateway_data_capture_override": {
+    "ids": [
+      "\u003coverride_id\u003e"
+    ]
+  },
+  "datadog_ai_gateway_governance": {
+    "ids": [
+      "organization"
+    ]
+  },
+  "datadog_ai_gateway_model_group": {
+    "ids": [
+      "\u003cmodel_group_id\u003e"
+    ]
+  },
+  "datadog_ai_gateway_policy": {
+    "ids": [
+      "55555555-5555-5555-5555-555555555555:coding-agent",
+      "coding-agent"
+    ]
+  },
+  "datadog_ai_gateway_provider": {
+    "ids": [
+      "\u003cprovider_id\u003e"
+    ]
+  },
+  "datadog_ai_gateway_rate_limit": {
+    "ids": [
+      "\u003crate_limit_id\u003e"
+    ]
+  },
+  "datadog_ai_gateway_routing_rule": {
+    "ids": [
+      "coding"
+    ]
+  },
+  "datadog_api_key": {
+    "ids": [
+      "11111111-2222-3333-4444-555555555555"
+    ]
+  },
+  "datadog_apm_retention_filter": {
+    "ids": [
+      "\u003cfilter_id\u003e"
+    ]
+  },
+  "datadog_apm_retention_filter_order": {
+    "ids": [
+      "\u003cfoo\u003e"
+    ]
+  },
+  "datadog_app_builder_app": {
+    "ids": [
+      "11111111-2222-3333-4444-555555555555"
+    ]
+  },
+  "datadog_app_key_registration": {
+    "ids": [
+      "11111111-2222-3333-4444-555555555555"
+    ]
+  },
+  "datadog_application_key": {
+    "ids": [
+      "11111111-2222-3333-4444-555555555555"
+    ]
+  },
+  "datadog_appsec_exclusion_filter": {
+    "ids": [
+      "45b7032f-0ac4-4b2f-9118-363523c625f6"
+    ]
+  },
+  "datadog_appsec_waf_custom_rule": {
+    "ids": [
+      ""
+    ]
+  },
+  "datadog_authn_mapping": {
+    "ids": [
+      "000000-0000-0000-0000-000000000000"
+    ]
+  },
+  "datadog_aws_cur_config": {
+    "ids": [
+      "\u003ccloud_account_id\u003e"
+    ]
+  },
+  "datadog_aws_wif_identity_mapping": {
+    "ids": [
+      "00000000-0000-0000-0000-000000000000"
+    ]
+  },
+  "datadog_aws_wif_intake_mapping": {
+    "ids": [
+      "00000000-0000-0000-0000-000000000000"
+    ]
+  },
+  "datadog_azure_uc_config": {
+    "ids": [
+      "\u003ccloud_account_id\u003e"
+    ]
+  },
+  "datadog_cloud_configuration_rule": {
+    "ids": [
+      "m0o-hto-lkb"
+    ]
+  },
+  "datadog_cloud_inventory_sync_config": {
+    "ids": [
+      "\u003csync-config-id\u003e"
+    ]
+  },
+  "datadog_cloud_workload_security_agent_rule": {
+    "ids": [
+      "m0o-hto-lkb"
+    ]
+  },
+  "datadog_compliance_resource_evaluation_filter": {
+    "ids": [
+      "aws:00000000000000"
+    ]
+  },
+  "datadog_cost_budget": {
+    "ids": [
+      "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    ]
+  },
+  "datadog_cost_custom_forecast": {
+    "ids": [
+      "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+    ]
+  },
+  "datadog_csm_threats_agent_rule": {
+    "ids": [
+      "cws_custom:\u003crule_id\u003e",
+      "cws_custom:\u003crule_id\u003e`.",
+      "jm4-lwh-8cs:m0o-hto-lkb",
+      "m0o-hto-lkb"
+    ]
+  },
+  "datadog_csm_threats_policy": {
+    "ids": [
+      "jm4-lwh-8cs"
+    ]
+  },
+  "datadog_custom_allocation_rule": {
+    "ids": [
+      "\u003crule_id\u003e"
+    ]
+  },
+  "datadog_custom_allocation_rules": {
+    "ids": [
+      "order"
+    ]
+  },
+  "datadog_dashboard": {
+    "ids": [
+      "sv7-gyh-kas"
+    ]
+  },
+  "datadog_dashboard_json": {
+    "ids": [
+      "sv7-gyh-kas"
+    ]
+  },
+  "datadog_dashboard_list": {
+    "ids": [
+      "123456"
+    ]
+  },
+  "datadog_dashboard_v2": {
+    "ids": [
+      "sv7-gyh-kas"
+    ]
+  },
+  "datadog_dataset": {
+    "ids": [
+      "\u003cdataset_id\u003e"
+    ]
+  },
+  "datadog_datastore": {
+    "ids": [
+      "datastore-id"
+    ]
+  },
+  "datadog_datastore_item": {
+    "ids": [
+      "datastore-id:item-key"
+    ]
+  },
+  "datadog_deployment_gate": {
+    "ids": [
+      ""
+    ]
+  },
+  "datadog_derived_metric": {
+    "ids": [
+      "custom.cpu.total"
+    ]
+  },
+  "datadog_downtime": {
+    "ids": [
+      "2081"
+    ]
+  },
+  "datadog_downtime_schedule": {
+    "ids": [
+      "00e000000-0000-1234-0000-000000000000"
+    ]
+  },
+  "datadog_fleet_schedule": {
+    "ids": [
+      "\u003cschedule_id\u003e"
+    ]
+  },
+  "datadog_gcp_uc_config": {
+    "ids": [
+      "\u003ccloud_account_id\u003e"
+    ]
+  },
+  "datadog_github_oidc_identity_mapping": {
+    "ids": [
+      "00000000-0000-0000-0000-000000000000"
+    ]
+  },
+  "datadog_github_oidc_intake_mapping": {
+    "ids": [
+      "00000000-0000-0000-0000-000000000000"
+    ]
+  },
+  "datadog_governance_control": {
+    "ids": [
+      "unused_api_keys"
+    ]
+  },
+  "datadog_incident_notification_rule": {
+    "ids": [
+      "00000000-0000-0000-0000-000000000000"
+    ]
+  },
+  "datadog_incident_notification_template": {
+    "ids": [
+      "11111111-2222-3333-4444-555555555555"
+    ]
+  },
+  "datadog_incident_type": {
+    "ids": [
+      "12345678-1234-1234-1234-1234567890ab"
+    ]
+  },
+  "datadog_incident_user_defined_field": {
+    "ids": [
+      "12345678-1234-1234-1234-1234567890ab"
+    ]
+  },
+  "datadog_incident_user_defined_role": {
+    "ids": [
+      "12345678-1234-1234-1234-1234567890ab"
+    ]
+  },
+  "datadog_integration_aws_account": {
+    "ids": [
+      "\u003cdatadog-aws-account-config-id\u003e"
+    ]
+  },
+  "datadog_integration_aws_account_ccm_config": {
+    "ids": [
+      "\u003caws_account_config_id\u003e"
+    ]
+  },
+  "datadog_integration_aws_event_bridge": {
+    "ids": [
+      "event-source-name-abc12345"
+    ]
+  },
+  "datadog_integration_aws_external_id": {
+    "ids": [
+      "${id}"
+    ]
+  },
+  "datadog_integration_azure": {
+    "ids": [
+      "${tenant_name}:${client_id}"
+    ]
+  },
+  "datadog_integration_cloudflare_account": {
+    "ids": [
+      "\u003cID\u003e"
+    ]
+  },
+  "datadog_integration_confluent_account": {
+    "ids": [
+      "\u003cID\u003e"
+    ]
+  },
+  "datadog_integration_confluent_resource": {
+    "ids": [
+      "confluent_account_id:confluent_resource_id"
+    ]
+  },
+  "datadog_integration_fastly_account": {
+    "ids": [
+      "a8f5f167f44f4964e6c998dee827110c"
+    ]
+  },
+  "datadog_integration_fastly_service": {
+    "ids": [
+      "account-id:service-id"
+    ]
+  },
+  "datadog_integration_gcp": {
+    "ids": [
+      "project_id"
+    ]
+  },
+  "datadog_integration_gcp_sts": {
+    "ids": [
+      "9c303af3-b963-45e0-8c8f-469b9e1a213f"
+    ]
+  },
+  "datadog_integration_pagerduty_service_object": {
+    "ids": [
+      "${service_name}"
+    ]
+  },
+  "datadog_integration_slack_channel": {
+    "ids": [
+      "foo:#test_channel"
+    ]
+  },
+  "datadog_logs_archive": {
+    "ids": [
+      "1Aabc2_dfQPLnXy3HlfK4hi"
+    ]
+  },
+  "datadog_logs_custom_destination": {
+    "ids": [
+      "destination-id"
+    ]
+  },
+  "datadog_logs_metric": {
+    "ids": [
+      "testing.logs.metric"
+    ]
+  },
+  "datadog_logs_restriction_query": {
+    "ids": [
+      "\u003crestriction_query_id\u003e"
+    ]
+  },
+  "datadog_metric_metadata": {
+    "ids": [
+      "request.time"
+    ]
+  },
+  "datadog_metric_tag_configuration": {
+    "ids": [
+      "example.terraform.dist.metric"
+    ]
+  },
+  "datadog_monitor": {
+    "ids": [
+      "2081"
+    ]
+  },
+  "datadog_monitor_json": {
+    "ids": [
+      "123456"
+    ]
+  },
+  "datadog_monitor_notification_rule": {
+    "ids": [
+      "00e000000-0000-1234-0000-000000000000"
+    ]
+  },
+  "datadog_observability_pipeline": {
+    "ids": [
+      "8beabbc4-1f4d-11f0-942b-da7ad0900001"
+    ]
+  },
+  "datadog_on_call_escalation_policy": {
+    "ids": [
+      "b03a07d5-49da-43e9-83b4-5d84969b588b"
+    ]
+  },
+  "datadog_on_call_schedule": {
+    "ids": [
+      "b03a07d5-49da-43e9-83b4-5d84969b588b"
+    ]
+  },
+  "datadog_on_call_team_routing_rules": {
+    "ids": [
+      "b03a07d5-49da-43e9-83b4-5d84969b588b"
+    ]
+  },
+  "datadog_openapi_api": {
+    "ids": [
+      "90646597-5fdb-4a17-a240-647003f8c028"
+    ]
+  },
+  "datadog_org_connection": {
+    "ids": [
+      "\u003corg_connection_id\u003e"
+    ]
+  },
+  "datadog_org_group": {
+    "ids": [
+      "\u003corg_group_uuid\u003e"
+    ]
+  },
+  "datadog_org_group_membership": {
+    "ids": [
+      "\u003cmembership_uuid\u003e"
+    ]
+  },
+  "datadog_org_group_policy": {
+    "ids": [
+      "\u003cpolicy_uuid\u003e"
+    ]
+  },
+  "datadog_org_group_policy_override": {
+    "ids": [
+      "\u003coverride_uuid\u003e"
+    ]
+  },
+  "datadog_organization_settings": {
+    "ids": [
+      "11111111-2222-3333-4444-555555555555"
+    ]
+  },
+  "datadog_powerpack": {
+    "ids": [
+      "11111111-2222-3333-4444-555555555555",
+      "abc-def-ghi"
+    ]
+  },
+  "datadog_powerpack_v2": {
+    "ids": [
+      "11111111-2222-3333-4444-555555555555",
+      "\u003cpowerpack-id\u003e",
+      "abc-def-ghi"
+    ]
+  },
+  "datadog_reference_table": {
+    "ids": [
+      "00000000-0000-0000-0000-000000000000"
+    ]
+  },
+  "datadog_restriction_policy": {
+    "ids": [
+      "\u003cpolicy_id\u003e"
+    ]
+  },
+  "datadog_role": {
+    "ids": [
+      "000000-0000-0000-0000-000000000000"
+    ]
+  },
+  "datadog_rum_application": {
+    "ids": [
+      "a1b2c3d4-a1b2-a1b2-a1b2-a1b2c3d4e5f6"
+    ]
+  },
+  "datadog_rum_exclusion_filter": {
+    "ids": [
+      "\u003capplication_id\u003e:\u003cexclusion_filter_id\u003e"
+    ]
+  },
+  "datadog_rum_metric": {
+    "ids": [
+      "testing.rum.metric"
+    ]
+  },
+  "datadog_rum_operation": {
+    "ids": [
+      "\u003coperation_id\u003e"
+    ]
+  },
+  "datadog_rum_operation_journey_link": {
+    "ids": [
+      "\u003coperation_id\u003e:\u003cjourney_id\u003e"
+    ]
+  },
+  "datadog_rum_retention_filter": {
+    "ids": [
+      "\u003capplication_id\u003e:\u003cretention_filter_id\u003e"
+    ]
+  },
+  "datadog_rum_retention_filters_order": {
+    "ids": [
+      "\u003capplication_id\u003e"
+    ]
+  },
+  "datadog_rum_retention_quota": {
+    "ids": [
+      "\u003capplication_id\u003e"
+    ]
+  },
+  "datadog_security_findings_default_inbox_rule": {
+    "ids": [
+      "secret_default_rule"
+    ]
+  },
+  "datadog_security_findings_due_date_rule": {
+    "ids": [
+      "00000000-0000-0000-0000-000000000000"
+    ]
+  },
+  "datadog_security_findings_due_date_rules_order": {
+    "ids": [
+      "security_findings_due_date_rules_order"
+    ]
+  },
+  "datadog_security_findings_inbox_rule": {
+    "ids": [
+      "00000000-0000-0000-0000-000000000000"
+    ]
+  },
+  "datadog_security_findings_inbox_rules_order": {
+    "ids": [
+      "security_findings_inbox_rules_order"
+    ]
+  },
+  "datadog_security_findings_mute_rule": {
+    "ids": [
+      "00000000-0000-0000-0000-000000000000"
+    ]
+  },
+  "datadog_security_findings_mute_rules_order": {
+    "ids": [
+      "security_findings_mute_rules_order"
+    ]
+  },
+  "datadog_security_findings_severity_modifier_rule": {
+    "ids": [
+      "00000000-0000-0000-0000-000000000000"
+    ]
+  },
+  "datadog_security_findings_severity_modifier_rules_order": {
+    "ids": [
+      "security_findings_severity_modifier_rules_order"
+    ]
+  },
+  "datadog_security_findings_ticket_creation_rule": {
+    "ids": [
+      "00000000-0000-0000-0000-000000000000"
+    ]
+  },
+  "datadog_security_findings_ticket_creation_rules_order": {
+    "ids": [
+      "security_findings_ticket_creation_rules_order"
+    ]
+  },
+  "datadog_security_monitoring_critical_asset": {
+    "ids": [
+      "1dab677c-5eb4-4ac8-b1d3-444bf0117e19"
+    ]
+  },
+  "datadog_security_monitoring_default_rule": {
+    "ids": [
+      "m0o-hto-lkb"
+    ]
+  },
+  "datadog_security_monitoring_filter": {
+    "ids": [
+      "m0o-hto-lkb"
+    ]
+  },
+  "datadog_security_monitoring_rule": {
+    "ids": [
+      "m0o-hto-lkb"
+    ]
+  },
+  "datadog_security_monitoring_rule_json": {
+    "ids": [
+      "aaa-yyy-vvv"
+    ]
+  },
+  "datadog_security_monitoring_suppression": {
+    "ids": [
+      "m0o-hto-lkb"
+    ]
+  },
+  "datadog_security_notification_rule": {
+    "ids": [
+      "yq9-t9l-bso"
+    ]
+  },
+  "datadog_sensitive_data_scanner_group": {
+    "ids": [
+      "\u003cgroup_id\u003e"
+    ]
+  },
+  "datadog_sensitive_data_scanner_group_order": {
+    "ids": [
+      "order"
+    ]
+  },
+  "datadog_sensitive_data_scanner_rule": {
+    "ids": [
+      "\u003crule_id\u003e"
+    ]
+  },
+  "datadog_service_access_token": {
+    "ids": [
+      "\u003cservice_account_id\u003e:\u003ctoken_id\u003e"
+    ]
+  },
+  "datadog_service_account": {
+    "ids": [
+      "6f1b44c0-30b2-11eb-86bc-279f7c1ebaa4"
+    ]
+  },
+  "datadog_service_account_application_key": {
+    "ids": [
+      "\u003cservice_account_id\u003e:\u003capplication_key_id\u003e"
+    ]
+  },
+  "datadog_service_definition_yaml": {
+    "ids": [
+      "\u003cdd-service\u003e"
+    ]
+  },
+  "datadog_service_level_objective": {
+    "ids": [
+      "12345678901234567890123456789012"
+    ]
+  },
+  "datadog_slo_correction": {
+    "ids": [
+      "11111111-3fee-11eb-8a13-77cd9f15119e"
+    ]
+  },
+  "datadog_software_catalog": {
+    "ids": [
+      "\u003cname\u003e"
+    ]
+  },
+  "datadog_spans_metric": {
+    "ids": [
+      "testing.span.metric"
+    ]
+  },
+  "datadog_status_page": {
+    "ids": [
+      "09a89ab4-d622-4fbd-87e5-81b4124bd064"
+    ]
+  },
+  "datadog_status_page_component": {
+    "ids": [
+      "09a89ab4-d622-4fbd-87e5-81b4124bd064:1e2c6615-801b-4630-9d31-5b2f27d5b6f0"
+    ]
+  },
+  "datadog_status_page_degradation_template": {
+    "ids": [
+      "09a89ab4-d622-4fbd-87e5-81b4124bd064:1e2c6615-801b-4630-9d31-5b2f27d5b6f0"
+    ]
+  },
+  "datadog_status_page_email_access_policy": {
+    "ids": [
+      "09a89ab4-d622-4fbd-87e5-81b4124bd064:7c4f9a3e-2b1d-4e6a-9f0c-3d8b5a1e6c2f"
+    ]
+  },
+  "datadog_status_page_maintenance_template": {
+    "ids": [
+      "09a89ab4-d622-4fbd-87e5-81b4124bd064:7c4f9a3e-2b1d-4e6a-9f0c-3d8b5a1e6c2f"
+    ]
+  },
+  "datadog_synthetics_concurrency_cap": {
+    "ids": [
+      "\u003cname\u003e"
+    ]
+  },
+  "datadog_synthetics_global_variable": {
+    "ids": [
+      "abcde123-fghi-456-jkl-mnopqrstuv"
+    ]
+  },
+  "datadog_synthetics_private_location": {
+    "ids": [
+      "pl:private-location-name-abcdef123456"
+    ]
+  },
+  "datadog_synthetics_test": {
+    "ids": [
+      "abc-123-xyz"
+    ]
+  },
+  "datadog_tag_pipeline_ruleset": {
+    "ids": [
+      "your-ruleset-id-here"
+    ]
+  },
+  "datadog_tag_pipeline_rulesets": {
+    "ids": [
+      "order"
+    ]
+  },
+  "datadog_tag_rule": {
+    "ids": [
+      "\u003crule_id\u003e"
+    ]
+  },
+  "datadog_team": {
+    "ids": [
+      "bf064c56-edb0-11ed-ae91-da7ad0900002"
+    ]
+  },
+  "datadog_team_connection": {
+    "ids": [
+      "${connection_id}"
+    ]
+  },
+  "datadog_team_link": {
+    "ids": [
+      "${team_id}:${resource_id}"
+    ]
+  },
+  "datadog_team_membership": {
+    "ids": [
+      "${team_id}:${user_id}"
+    ]
+  },
+  "datadog_team_notification_rule": {
+    "ids": [
+      "${team_id}:${rule_id}"
+    ]
+  },
+  "datadog_team_permission_setting": {
+    "ids": [
+      "${team_id}:${action}"
+    ]
+  },
+  "datadog_team_sync": {
+    "ids": [
+      "github",
+      "servicenow"
+    ]
+  },
+  "datadog_usage_quota": {
+    "ids": [
+      "ai_credits/\u003cquota_id\u003e"
+    ]
+  },
+  "datadog_user": {
+    "ids": [
+      "6f1b44c0-30b2-11eb-86bc-279f7c1ebaa4"
+    ]
+  },
+  "datadog_user_role": {
+    "ids": [
+      "${role_id}:${user_id}"
+    ]
+  },
+  "datadog_webhook": {
+    "ids": [
+      "example-webhook"
+    ]
+  },
+  "datadog_webhook_custom_variable": {
+    "ids": [
+      "EXAMPLE_VARIABLE"
+    ]
+  },
+  "datadog_webhook_oauth2_client_credentials": {
+    "ids": [
+      "11111111-2222-3333-4444-555555555555"
+    ]
+  },
+  "datadog_workflow_automation": {
+    "ids": [
+      "11111111-2222-3333-4444-555555555555"
+    ]
+  }
+}

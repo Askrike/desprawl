@@ -90,6 +90,61 @@ resource "x_q" "b" {
 	}
 }
 
+// Attributes generated config has no line for (deprecated ones) are
+// restored from the import, even on a resource that plans clean, except
+// the id, empty values, and values another type's resource holds under the
+// same name.
+func TestReconcileRestoresLeftOut(t *testing.T) {
+	ws := model.Workspace{Dir: t.TempDir()}
+	const src = `resource "x_q" "a" {
+  name = "a"
+}
+
+resource "x_q" "b" {
+  name = "b"
+}
+
+resource "x_policy" "p" {
+  doc = "{}"
+}
+`
+	if err := os.WriteFile(ws.Path(generatedFile), []byte(src), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	str, set := json.RawMessage(`"string"`), json.RawMessage(`["set","string"]`)
+	g := Generator{WS: ws, Schemas: &tf.Schemas{Resources: map[string]*tf.SchemaBlock{
+		"x_q": {Attributes: map[string]*tf.SchemaAttr{
+			"id": {Type: str, Optional: true, Computed: true}, "name": {Type: str, Required: true},
+			"roles": {Type: set, Optional: true, Computed: true}, "flag": {Type: json.RawMessage(`"bool"`), Optional: true},
+			"doc": {Type: str, Optional: true, Computed: true},
+		}},
+		"x_policy": {Attributes: map[string]*tf.SchemaAttr{"doc": {Type: str, Required: true}}},
+	}}}
+	a := `{"id": "1", "name": "a", "roles": ["r1", "r2"], "flag": false, "doc": "{\"x\":1}"}`
+	b := `{"id": "2", "name": "b", "roles": [], "doc": null}`
+	plan := `{"resource_changes": [
+	  {"address": "x_q.a", "mode": "managed", "type": "x_q", "change": {"actions": ["no-op"], "before": ` + a + `, "after": ` + a + `}},
+	  {"address": "x_q.b", "mode": "managed", "type": "x_q", "change": {"actions": ["no-op"], "before": ` + b + `, "after": ` + b + `}},
+	  {"address": "x_policy.p", "mode": "managed", "type": "x_policy", "change": {"actions": ["no-op"],
+	    "before": {"doc": "{\"x\":1}"}, "after": {"doc": "{\"x\":1}"}}}]}`
+	if err := g.reconcile([]byte(plan), map[string][]string{}); err != nil {
+		t.Fatal(err)
+	}
+	out, _ := os.ReadFile(ws.Path(generatedFile))
+	if !strings.Contains(string(out), `roles = ["r1", "r2"]`) {
+		t.Errorf("roles not restored:\n%s", out)
+	}
+	for _, not := range []string{"id", "flag", "roles = []", "doc = \"{\\\"x"} {
+		if strings.Contains(string(out), not) {
+			t.Errorf("%q restored:\n%s", not, out)
+		}
+	}
+	var rec map[string][]Reconciled
+	if err := ws.ReadJSON(reconciledFile, &rec); err != nil || fmt.Sprint(rec) != "map[x_q.a:[{roles  []}]]" {
+		t.Errorf("reconciled = %v, %v", rec, err)
+	}
+}
+
 // A plan that still fails after the back-out failed for another reason:
 // Restore puts the reconciled values back, and edges in backed-out
 // attributes leave links.json only while the back-out holds.

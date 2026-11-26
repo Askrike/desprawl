@@ -126,26 +126,97 @@ func parentAttrs(schemas *tf.Schemas, typ string) []string {
 }
 
 // sourceCandidates are data sources with a computed list of objects that
-// carry string fields.
-func sourceCandidates(schemas *tf.Schemas) []string {
-	var out []string
+// carry string or number fields: an attribute, or a list or set block
+// whose fields are all computed. Those named after a resource type in
+// types come first (aws_instances for aws_instance), each part sorted.
+func sourceCandidates(schemas *tf.Schemas, types []string) []string {
+	want := map[string]bool{}
+	for _, t := range types {
+		want[t] = true
+	}
+	var named, rest []string
 	for ds, blk := range schemas.DataSources {
-		for _, a := range blk.Attributes {
-			if a.Computed && (!a.Optional && objectListFields(a) != nil || isDynamic(a)) {
-				out = append(out, ds)
-				break
-			}
+		if !hasEntryList(blk) {
+			continue
+		}
+		if one := singular(ds); one != ds && want[one] {
+			named = append(named, ds)
+		} else {
+			rest = append(rest, ds)
 		}
 	}
-	sort.Strings(out)
-	return out
+	sort.Strings(named)
+	sort.Strings(rest)
+	return append(named, rest...)
+}
+
+func hasEntryList(blk *tf.SchemaBlock) bool {
+	for _, a := range blk.Attributes {
+		if a.Computed && (!a.Optional && objectListFields(a) != nil || isDynamic(a)) {
+			return true
+		}
+	}
+	for name := range blk.BlockTypes {
+		if fields, _ := entryFields(blk, name); fields != nil {
+			return true
+		}
+	}
+	return false
+}
+
+// singular is a plural name's singular form: the type a listing data
+// source is named after (policies -> policy, roles -> role); a name that
+// isn't plural comes back as is.
+func singular(name string) string {
+	switch {
+	case strings.HasSuffix(name, "ies"):
+		return strings.TrimSuffix(name, "ies") + "y"
+	case strings.HasSuffix(name, "sses"), strings.HasSuffix(name, "xes"):
+		return strings.TrimSuffix(name, "es")
+	}
+	return strings.TrimSuffix(name, "s")
 }
 
 // isDynamic reports an attribute whose type is only known once read.
 func isDynamic(a *tf.SchemaAttr) bool { return string(a.Type) == `"dynamic"` }
 
-// objectListFields returns the string fields of a list or set of objects
-// attribute, or nil if it isn't one.
+// entryFields returns the string and number fields of a data source's
+// list of entries: an attribute holding a list or set of objects, or a
+// list or set block whose attributes are all computed. ok is false if
+// the data source has no attribute or block of that name; fields is nil
+// if it isn't such a list.
+func entryFields(blk *tf.SchemaBlock, list string) (fields []string, ok bool) {
+	if a := blk.Attributes[list]; a != nil {
+		return objectListFields(a), true
+	}
+	bt := blk.BlockTypes[list]
+	if bt == nil {
+		return nil, false
+	}
+	if (bt.NestingMode != "list" && bt.NestingMode != "set") || bt.Block == nil {
+		return nil, true
+	}
+	var out []string
+	for name, a := range bt.Block.Attributes {
+		if !a.Computed || a.Optional || a.Required {
+			return nil, true
+		}
+		if scalarField(a.Type) {
+			out = append(out, name)
+		}
+	}
+	sort.Strings(out)
+	return out, true
+}
+
+// scalarField reports a string or number type: a field that can hold an
+// ID or a name.
+func scalarField(t json.RawMessage) bool {
+	return string(t) == `"string"` || string(t) == `"number"`
+}
+
+// objectListFields returns the string and number fields of a list or set
+// of objects attribute, or nil if it isn't one.
 func objectListFields(a *tf.SchemaAttr) []string {
 	var t []json.RawMessage
 	if json.Unmarshal(a.Type, &t) != nil || len(t) != 2 {
@@ -165,7 +236,7 @@ func objectListFields(a *tf.SchemaAttr) []string {
 	}
 	var out []string
 	for name, ft := range fields {
-		if string(ft) == `"string"` {
+		if scalarField(ft) {
 			out = append(out, name)
 		}
 	}

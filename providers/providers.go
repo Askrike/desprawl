@@ -86,6 +86,11 @@ type Config struct {
 	// retries, so a list API that keeps failing is reported in seconds
 	// instead of retried until the timeout.
 	QueryProvider map[string]any `json:"query_provider,omitempty"`
+	// Version is the provider version constraint for a workspace whose
+	// desprawl.hcl sets none: a release known to work with this pack, so a
+	// provider release that breaks importing doesn't break every workspace
+	// the day it ships. A version in desprawl.hcl always wins.
+	Version string `json:"version,omitempty"`
 }
 
 type Param struct {

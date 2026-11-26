@@ -27,6 +27,7 @@ resource "aws_lambda_function" "f" {
   name = var.name
   kms_key_arn = azurerm_kubernetes_cluster.c.identity[0].principal_id
   runtime = aws_lambda_function.sibling.runtime
+  handler = jsondecode(base64decode(aws_s3_bucket.b.policy)).Version
   lifecycle {
     ignore_changes = [aws_s3_bucket.b.id]
   }

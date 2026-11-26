@@ -205,6 +205,43 @@ resource "x_app" "web" {
 	}
 }
 
+// An embedded rule finds a name after a prefix in the same word
+// ("@hook-my-pager"), but not one that ends inside a word.
+func TestEmbeddedAfterPrefix(t *testing.T) {
+	plan, err := tf.ParsePlan([]byte(`{"resource_changes":[
+	 {"address":"x_hook.h","mode":"managed","type":"x_hook","name":"h","change":{"before":{"id":"my-pager","name":"my-pager"}}},
+	 {"address":"x_alert.a","mode":"managed","type":"x_alert","name":"a","change":{"before":{"id":"1","message":"Down. @hook-my-pager","other":"Down. @hook-my-pagers"}}}
+	]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	src := []byte(`
+resource "x_alert" "a" {
+  message = "Down. @hook-my-pager"
+  other   = "Down. @hook-my-pagers"
+}
+`)
+	rs := rules.NewSet([]rules.Rule{
+		{Source: "x_alert", Path: "message", Target: "x_hook", Attr: "name", Match: rules.MatchEmbedded},
+		{Source: "x_alert", Path: "other", Target: "x_hook", Attr: "name", Match: rules.MatchEmbedded},
+	})
+	ix, err := index.Build(plan, nil, rs)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err := Link(src, ix, Options{Rules: rs})
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := strings.Join(strings.Fields(string(r.Config)), " ")
+	if want := `message = "Down. @hook-${x_hook.h.name}"`; !strings.Contains(got, want) {
+		t.Errorf("missing %s in:\n%s", want, r.Config)
+	}
+	if want := `other = "Down. @hook-my-pagers"`; !strings.Contains(got, want) {
+		t.Errorf("missing %s in:\n%s", want, r.Config)
+	}
+}
+
 // A "$" right before a reference must not escape it into literal text.
 func TestQuoteDollarBeforeRef(t *testing.T) {
 	got := quote([]part{{lit: "cost$"}, {ref: "x_a.b.id"}})

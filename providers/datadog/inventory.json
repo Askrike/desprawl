@@ -1,0 +1,55 @@
+{
+  "sources": [
+    {
+      "data_source": "datadog_monitors",
+      "list": "monitors",
+      "id": "id",
+      "name": "name"
+    },
+    {
+      "data_source": "datadog_service_level_objectives",
+      "list": "slos",
+      "id": "id",
+      "name": "name"
+    },
+    {
+      "data_source": "datadog_teams",
+      "list": "teams",
+      "id": "id",
+      "name": "name"
+    },
+    {
+      "data_source": "datadog_roles",
+      "list": "roles",
+      "id": "id",
+      "name": "name"
+    },
+    {
+      "data_source": "datadog_monitor_config_policies",
+      "list": "monitor_config_policies",
+      "id": "id"
+    }
+  ],
+  "kinds": {
+    "datadog_monitors": {
+      "type": "datadog_monitor",
+      "id": "{id}"
+    },
+    "datadog_service_level_objectives": {
+      "type": "datadog_service_level_objective",
+      "id": "{id}"
+    },
+    "datadog_teams": {
+      "type": "datadog_team",
+      "id": "{id}"
+    },
+    "datadog_roles": {
+      "type": "datadog_role",
+      "id": "{id}"
+    },
+    "datadog_monitor_config_policies": {
+      "type": "datadog_monitor_config_policy",
+      "id": "{id}"
+    }
+  }
+}

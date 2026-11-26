@@ -1,6 +1,8 @@
 package generate
 
 import (
+	"maps"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -42,6 +44,15 @@ func hint(body *hclwrite.Body, schema *tf.SchemaBlock, identity map[string]any, 
 		} else {
 			h.Why = "the error is about " + strings.Join(names, ", ") + "; remove the one the resource can do without (removing loses that setting)"
 		}
+		if set, at := leftOut(present, schema); len(set) > 0 {
+			// Generated config writes every settable attribute, null when
+			// unset, except those Terraform leaves out (deprecated ones):
+			// the error is likely about one of those, and the cloud has
+			// its value.
+			paths := slices.Sorted(maps.Keys(set))
+			h.Override = &Override{Set: set}
+			h.Why = "generated config leaves out " + strings.Join(paths, ", ") + " (Terraform omits deprecated attributes), which the error is likely about; replace each placeholder with the value the cloud holds (read the resource from the provider's API), or, if it has none, remove " + at + " instead (that loses its settings)"
+		}
 	case len(missing) > 0:
 		p := missing[0]
 		if v, ok := placeholderValue(schemaAttr(schema, p)); ok && !strings.Contains(p, ".") {
@@ -50,6 +61,50 @@ func hint(body *hclwrite.Body, schema *tf.SchemaBlock, identity map[string]any, 
 		}
 	}
 	return h
+}
+
+// leftOut finds, in the deepest nested block the error names, the
+// settable attributes generated config has no line for, with a
+// placeholder for each, and the block's path.
+func leftOut(present []node, schema *tf.SchemaBlock) (map[string]string, string) {
+	var deepest *node
+	for i, n := range present {
+		if n.block != nil && strings.Contains(n.path, ".") && (deepest == nil || strings.Count(n.path, ".") > strings.Count(deepest.path, ".")) {
+			deepest = &present[i]
+		}
+	}
+	if deepest == nil {
+		return nil, ""
+	}
+	s := nestedSchema(schema, deepest.path)
+	if s == nil {
+		return nil, ""
+	}
+	body := deepest.block.Body()
+	set := map[string]string{}
+	for name, a := range s.Attributes {
+		if body.GetAttribute(name) != nil {
+			continue
+		}
+		if v, ok := placeholderValue(a); ok && !a.Sensitive {
+			set[deepest.path+"."+name] = v
+		}
+	}
+	return set, deepest.path
+}
+
+// nestedSchema is the schema of the nested block at a path ("a.0.b.1").
+func nestedSchema(s *tf.SchemaBlock, path string) *tf.SchemaBlock {
+	for _, seg := range strings.Split(path, ".") {
+		if isIndex(seg) {
+			continue
+		}
+		if s == nil || s.BlockTypes[seg] == nil {
+			return nil
+		}
+		s = s.BlockTypes[seg].Block
+	}
+	return s
 }
 
 // placeholderValue is an HCL placeholder for a settable attribute.

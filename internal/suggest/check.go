@@ -86,15 +86,14 @@ func CheckSource(schemas *tf.Schemas, s inventory.Source) error {
 	if blk == nil {
 		return fmt.Errorf("no data source %s", s.DataSource)
 	}
-	a := blk.Attributes[s.List]
-	if a == nil {
-		return fmt.Errorf("no attribute %q", s.List)
+	fields, ok := entryFields(blk, s.List)
+	if !ok {
+		return fmt.Errorf("no attribute or block %q", s.List)
 	}
-	if !isDynamic(a) { // untyped entries are checked by reading them
-		fields := objectListFields(a)
+	if a := blk.Attributes[s.List]; a == nil || !isDynamic(a) { // untyped entries are checked by reading them
 		for _, f := range append(s.IDFields(), s.Kind, s.Name) {
 			if f != "" && !slices.Contains(fields, f) {
-				return fmt.Errorf("%s has no string field %q (it has %s)", s.List, f, strings.Join(fields, ", "))
+				return fmt.Errorf("%s has no string or number field %q (it has %s)", s.List, f, strings.Join(fields, ", "))
 			}
 		}
 	}

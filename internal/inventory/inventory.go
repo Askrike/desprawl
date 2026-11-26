@@ -10,12 +10,14 @@ package inventory
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"maps"
 	"os"
 	"path/filepath"
 	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
@@ -175,7 +177,8 @@ func (s Source) IDFields() []string {
 
 var pathPlaceholder = regexp.MustCompile(`\{[A-Za-z_][A-Za-z0-9_.]*\}`)
 
-// Field is the string at a dotted path in an entry, or "".
+// Field is the string or number at a dotted path in an entry, as a
+// string, or "".
 func Field(obj map[string]any, path string) string {
 	if path == "" {
 		return ""
@@ -188,8 +191,15 @@ func Field(obj map[string]any, path string) string {
 		}
 		v = m[k]
 	}
-	s, _ := v.(string)
-	return s
+	switch x := v.(type) {
+	case string:
+		return x
+	case json.Number: // a numeric ID, as read (see reader.plan)
+		return x.String()
+	case float64: // a numeric ID, as plain JSON decoding gives it
+		return strconv.FormatFloat(x, 'f', -1, 64)
+	}
+	return ""
 }
 
 // Targets maps entries to import targets. Entries of unknown kinds are

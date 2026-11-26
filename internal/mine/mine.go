@@ -145,7 +145,13 @@ func (m miner) expr(e hclsyntax.Expression, path []string) {
 	case *hclsyntax.ScopeTraversalExpr:
 		m.ref(e.Traversal, path, rules.MatchExact)
 	case *hclsyntax.RelativeTraversalExpr, *hclsyntax.IndexExpr, *hclsyntax.SplatExpr:
-		// aws_x.y[0].arn, aws_x.y[*].arn
+		// aws_x.y[0].arn, aws_x.y[*].arn; not a field of a function's
+		// result (jsondecode(x.y.key).email), which isn't x.y's value.
+		if rt, ok := e.(*hclsyntax.RelativeTraversalExpr); ok {
+			if _, call := rt.Source.(*hclsyntax.FunctionCallExpr); call {
+				return
+			}
+		}
 		for _, t := range e.Variables() {
 			m.ref(t, path, rules.MatchExact)
 		}

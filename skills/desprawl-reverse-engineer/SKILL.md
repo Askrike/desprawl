@@ -47,7 +47,10 @@ desprawl init -no-progress -provider hashicorp/aws \
 ```
 
 Chain the loop's first `run` (step 2) onto `init` like this: it runs only
-if `init` succeeds, and saves a round trip.
+if `init` succeeds, and saves a round trip. If `init` prints `pack: 0
+rules`, desprawl ships no pack for that provider: run `desprawl mine-docs
+-provider <ns>/<name>` in the workspace before `run`, so link has the
+provider docs' rules and `import-format` their import IDs.
 
 `-output <dir>` sets where the imported Terraform goes (`-output .` puts it
 in the workspace itself), and `init` adds it to `draw`. To change
@@ -56,10 +59,13 @@ file tools, not `sed` or heredocs.
 
 Leave `-version` out, even when the user's existing code pins an older
 major version: the generated config imports and plans fine with the newer
-one. Newer providers can list more resource types (`init` prints `N
-resource types, M listable`), and older ones may need more permissions to
-read a resource. If you must pin, compare that `listable` count with an
-unpinned `init`, and expect fewer resources.
+one. Without a version, a provider whose pack names one (aws does) gets
+that release, known to work with desprawl, and `init` says so; others get
+the latest. A version in `desprawl.hcl` always wins. Newer providers can
+list more resource types (`init` prints `N resource types, M listable`),
+and older ones may need more permissions to read a resource. If you must
+pin, compare that `listable` count with an unpinned `init`, and expect
+fewer resources.
 
 `init` writes `desprawl.hcl`. Run again with flags, it rewrites the file
 from them (losing comments and anything else in it: prefer editing the
@@ -97,7 +103,7 @@ look for a stuck `az account get-access-token` child process. Never enable
 `TF_LOG` debug logging on a real account: the log contains credentials.
 
 desprawl ships packs (provider knowledge) for aws, google, azurerm,
-kubernetes and auth0. For another provider, run `desprawl mine-docs
+kubernetes, auth0 and datadog. For another provider, run `desprawl mine-docs
 -provider <ns>/<name>` in the workspace first; the loop below fills in the
 rest. Fixes to a pack go into the workspace, in `.desprawl/pack/<name>/`.
 
@@ -149,19 +155,48 @@ from the error and the attributes the problem lists.
 
 - **Failed list types**: permission errors and services that aren't
   enabled are expected; mention them, don't chase them.
-- **Can't be listed**: only add what matters to the user
-  (`add-target -type T -id ID`, with `-provider aws.us` for a block other
-  than the type's provider's first); the rest stays out.
+- **Can't be listed**: when the pack has no inventory, first add the
+  inventory sources desprawl suggests (each with its `kinds` line) and
+  run again: one data source finds every resource of its type, and
+  discover checks it with a sample import. Then look up the types
+  desprawl lists as connected to what it found (the pack's rules link
+  them, or an imported value names one) through the provider's own API,
+  plus any type the found resources visibly name, and add every one that
+  exists (`add-target -type T -id ID`, with `-provider aws.us` for a
+  block other than the type's provider's first). Adding one can connect
+  more: run again and repeat until that list holds nothing new. Beyond
+  those, add what matters to the user; the rest stays out. To find out
+  whether a resource exists, add it and let `run` decide: an import that
+  fails is reported as left out and costs one plan. Don't conclude from
+  your own API call that it doesn't exist; if a command to look is
+  refused, try a simpler one rather than stopping.
+- **Two types for one object** (a structured resource and a raw-JSON
+  variant of it): import the structured one; its attributes can be
+  linked and checked one by one. When its generated config leaves out
+  values the object needs (deprecated attributes, which Terraform omits:
+  old dashboard widgets' queries), import the raw-JSON variant instead
+  (`datadog_dashboard_json`, not `datadog_dashboard`): it keeps every
+  field. Embedded rules still link names inside the JSON.
 - **Left out of the config**: a placeholder must be a value that is
   obviously one and is never applied (`ignore_changes`); never one that
   would change infrastructure if applied. Tell the user every placeholder
   you introduced. Removing an attribute loses that setting: remove the one
   the resource can do without. If a resource doesn't matter, `exclude` it.
+  When the fix `set`s an attribute generated config left out (Terraform
+  omits deprecated ones), read the resource from the provider's API and
+  set the value it holds: that keeps the whole block, and verify checks
+  the value.
 - **Maybe references**: add a rule only if the attribute really names that
   kind of resource (a cluster name, a role ID), not when two settings
   happen to be equal ("Disabled", "RS256"). Write the reason in its note.
   Add the ones that aren't with `"rejected": true`, so they stop coming
-  back.
+  back. A `key:value` tag or label whose value is another resource's
+  handle or name *is* a reference when the provider uses that tag to
+  attach the two (a `team:`, `owner:` or `service:` tag that puts a
+  monitor under a team, say): check the provider's docs. It isn't one
+  when the tag is free text that just happens to match. Of two
+  candidates (the handle and the display name), accept the one the tag
+  holds, and reject the other.
 - **Types and attributes to exclude** (a pack that has none): exclude
   only types that are data, secrets and provider-owned defaults, never
   infrastructure people configure, and only attributes that are computed

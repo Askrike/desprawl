@@ -1,7 +1,9 @@
 package inventory
 
 import (
+	"encoding/json"
 	"maps"
+	"strings"
 	"testing"
 )
 
@@ -59,5 +61,19 @@ func TestEntryID(t *testing.T) {
 	}
 	if got := (Source{ID: "id"}).EntryID(map[string]any{"id": "x"}); got != "x" {
 		t.Errorf("plain EntryID = %q", got)
+	}
+}
+
+// A numeric ID past float64's exact range keeps every digit: entries are
+// decoded with json.Number, which Field writes as read.
+func TestFieldLargeNumber(t *testing.T) {
+	dec := json.NewDecoder(strings.NewReader(`{"id": 9007199254740993}`))
+	dec.UseNumber()
+	var obj map[string]any
+	if err := dec.Decode(&obj); err != nil {
+		t.Fatal(err)
+	}
+	if got := Field(obj, "id"); got != "9007199254740993" {
+		t.Errorf("Field = %q, want 9007199254740993", got)
 	}
 }

@@ -41,6 +41,15 @@ type Reconciled struct {
 // defaults to something other than the live value). Defaulted paths under
 // a reconciled attribute are taken out of defaulted.
 //
+// It also restores attributes generated config has no line for at all,
+// where the import holds a value: Terraform writes every settable
+// attribute, null when unset, except deprecated ones, which still carry
+// live settings (and references) that would otherwise be lost silently,
+// since an optional+computed attribute left out plans clean. A value
+// another type's resource holds under the same name isn't restored: that
+// resource manages it (a setting split out of the deprecated attribute
+// into its own resource).
+//
 // There is no plan to check it: restoring an imported value can trip a
 // validator (two attributes the API returns but config may not both set),
 // which is rare, so verify's plan is the check and Unreconcile the way back.
@@ -57,10 +66,11 @@ func (g Generator) reconcile(planJSON []byte, defaulted map[string][]string) err
 	for _, b := range f.Body().Blocks() {
 		blocks[hclx.Address(b)] = b
 	}
+	held := heldByType(plan)
 	done := map[string][]Reconciled{}
 	n := 0
 	for _, rc := range plan.ResourceChanges {
-		if rc.Mode != "managed" || rc.IsNoop() || blocks[rc.Address] == nil {
+		if rc.Mode != "managed" || blocks[rc.Address] == nil {
 			continue
 		}
 		var before, after map[string]json.RawMessage
@@ -75,7 +85,11 @@ func (g Generator) reconcile(planJSON []byte, defaulted map[string][]string) err
 		for _, name := range slices.Sorted(maps.Keys(before)) {
 			b := before[name]
 			a := schema.Attributes[name]
-			if a == nil || !(a.Optional || a.Required) || a.Sensitive || string(b) == "null" || jsonEqual(b, after[name]) {
+			if a == nil || !(a.Optional || a.Required) || a.Sensitive || string(b) == "null" {
+				continue
+			}
+			changed := !rc.IsNoop() && !jsonEqual(b, after[name])
+			if !changed && !(body.GetAttribute(name) == nil && restorable(name, b, rc.Type, held)) {
 				continue
 			}
 			ty, err := ctyjson.UnmarshalType(a.Type)
@@ -113,6 +127,62 @@ func (g Generator) reconcile(planJSON []byte, defaulted map[string][]string) err
 		g.Log.Verbose("reconciled %d attributes with imported values", n)
 	}
 	return g.WS.WriteJSON(reconciledFile, done)
+}
+
+// restorable says whether an imported value generated config left out
+// goes back in: not the resource's own id (Terraform's identifier, never
+// written), not an empty value, and not one another type's resource holds
+// under the same name (see reconcile).
+func restorable(name string, value json.RawMessage, typ string, held map[string]map[string]map[string]bool) bool {
+	var v any
+	if name == "id" || json.Unmarshal(value, &v) != nil || v == nil || isZero(v) {
+		return false
+	}
+	if m, ok := v.(map[string]any); ok && len(m) == 0 {
+		return false
+	}
+	for t := range held[name][canonical(value)] {
+		if t != typ {
+			return false
+		}
+	}
+	return true
+}
+
+// heldByType indexes the imported top-level values by attribute name and
+// value: the resource types holding each.
+func heldByType(plan *tf.PlanJSON) map[string]map[string]map[string]bool {
+	held := map[string]map[string]map[string]bool{}
+	for _, rc := range plan.ResourceChanges {
+		var before map[string]json.RawMessage
+		if rc.Mode != "managed" || json.Unmarshal(rc.Change.Before, &before) != nil {
+			continue
+		}
+		for name, v := range before {
+			if string(v) == "null" {
+				continue
+			}
+			k := canonical(v)
+			if held[name] == nil {
+				held[name] = map[string]map[string]bool{}
+			}
+			if held[name][k] == nil {
+				held[name][k] = map[string]bool{}
+			}
+			held[name][k][rc.Type] = true
+		}
+	}
+	return held
+}
+
+// canonical is a JSON value re-encoded, so equal values compare equal.
+func canonical(v json.RawMessage) string {
+	var x any
+	if json.Unmarshal(v, &x) != nil {
+		return string(v)
+	}
+	b, _ := json.Marshal(x)
+	return string(b)
 }
 
 // Unreconcile backs out the reconciled attributes of the resources a

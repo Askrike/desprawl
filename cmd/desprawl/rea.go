@@ -441,6 +441,13 @@ func cmdRun(args []string) error {
 		return err
 	}
 	if err := w.Generate(false); err != nil {
+		// What discover couldn't do is often why (nothing found to
+		// import): print it rather than only the error.
+		if schemas, serr := w.Schemas(context.Background()); serr == nil {
+			if groups, perr := w.DiscoverProblems(schemas); perr == nil {
+				rea.PrintProblems(os.Stdout, groups, asJSON)
+			}
+		}
 		return err
 	}
 	opts, err := w.LinkOptions([]string{"pack"}, true)

@@ -1,0 +1,695 @@
+[
+  {
+    "source": "datadog_action_connection",
+    "path": "external_secrets_manager.connection_id",
+    "target": "datadog_action_connection",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_ai_gateway_rate_limit",
+    "path": "team_id",
+    "target": "datadog_team",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_apm_retention_filter_order",
+    "path": "filter_ids",
+    "target": "datadog_apm_retention_filter",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_authn_mapping",
+    "path": "role",
+    "target": "datadog_role",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_aws_wif_identity_mapping",
+    "path": "account_identifier",
+    "target": "datadog_service_account",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_aws_wif_identity_mapping",
+    "path": "arn_pattern",
+    "target": "aws_caller_identity",
+    "attr": "account_id",
+    "match": "embedded",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_cost_custom_forecast",
+    "path": "budget_uid",
+    "target": "datadog_cost_budget",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_custom_allocation_rules",
+    "path": "rule_ids",
+    "target": "datadog_custom_allocation_rule",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 6
+  },
+  {
+    "source": "datadog_dashboard",
+    "path": "dashboard_lists",
+    "target": "datadog_dashboard_list",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_dashboard_list",
+    "path": "dash_item.dash_id",
+    "target": "datadog_dashboard",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "datadog_datastore_item",
+    "path": "datastore_id",
+    "target": "datadog_datastore",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "datadog_github_oidc_identity_mapping",
+    "path": "account_identifier",
+    "target": "datadog_service_account",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_incident_notification_rule",
+    "path": "incident_type",
+    "target": "datadog_incident_type",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_incident_notification_rule",
+    "path": "notification_template",
+    "target": "datadog_incident_notification_template",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_incident_notification_template",
+    "path": "incident_type",
+    "target": "datadog_incident_type",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "datadog_incident_user_defined_field",
+    "path": "incident_type",
+    "target": "datadog_incident_type",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_incident_user_defined_role",
+    "path": "incident_type",
+    "target": "datadog_incident_type",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_integration_aws_account",
+    "path": "auth_config.aws_auth_config_role.external_id",
+    "target": "datadog_integration_aws_external_id",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_integration_confluent_resource",
+    "path": "account_id",
+    "target": "datadog_integration_confluent_account",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_integration_fastly_service",
+    "path": "account_id",
+    "target": "datadog_integration_fastly_account",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_integration_gcp_sts",
+    "path": "client_email",
+    "target": "google_service_account",
+    "attr": "email",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_logs_archive_order",
+    "path": "archive_ids",
+    "target": "datadog_logs_archive",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "datadog_logs_index_order",
+    "path": "indexes",
+    "target": "datadog_logs_index",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_logs_pipeline_order",
+    "path": "pipelines",
+    "target": "datadog_logs_custom_pipeline",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_logs_pipeline_order",
+    "path": "pipelines",
+    "target": "datadog_logs_integration_pipeline",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "query",
+    "target": "datadog_monitor",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_monitor",
+    "path": "query",
+    "target": "datadog_synthetics_test",
+    "attr": "monitor_id",
+    "match": "embedded",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_org_group_membership",
+    "path": "org_group_id",
+    "target": "datadog_org_group",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "datadog_org_group_policy",
+    "path": "org_group_id",
+    "target": "datadog_org_group",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 3
+  },
+  {
+    "source": "datadog_org_group_policy_override",
+    "path": "org_group_id",
+    "target": "datadog_org_group",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_org_group_policy_override",
+    "path": "policy_id",
+    "target": "datadog_org_group_policy",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_restriction_policy",
+    "path": "bindings.principals",
+    "target": "datadog_current_user",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_restriction_policy",
+    "path": "bindings.principals",
+    "target": "datadog_current_user",
+    "attr": "org_id",
+    "match": "embedded",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_restriction_policy",
+    "path": "resource_id",
+    "target": "datadog_action_execution_policy",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_restriction_policy",
+    "path": "resource_id",
+    "target": "datadog_monitor",
+    "attr": "id",
+    "match": "embedded",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_role",
+    "path": "permission.id",
+    "target": "datadog_permissions",
+    "attr": "permissions.api_keys_read",
+    "match": "exact",
+    "origin": "docs",
+    "support": 3
+  },
+  {
+    "source": "datadog_role",
+    "path": "permission.id",
+    "target": "datadog_permissions",
+    "attr": "permissions.api_keys_write",
+    "match": "exact",
+    "origin": "docs",
+    "support": 3
+  },
+  {
+    "source": "datadog_rum_operation_journey_link",
+    "path": "operation_id",
+    "target": "datadog_rum_operation",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_security_findings_due_date_rules_order",
+    "path": "rule_ids",
+    "target": "datadog_security_findings_due_date_rule",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_security_findings_inbox_rules_order",
+    "path": "rule_ids",
+    "target": "datadog_security_findings_inbox_rule",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_security_findings_mute_rules_order",
+    "path": "rule_ids",
+    "target": "datadog_security_findings_mute_rule",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_security_findings_severity_modifier_rules_order",
+    "path": "rule_ids",
+    "target": "datadog_security_findings_severity_modifier_rule",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_security_findings_ticket_creation_rules_order",
+    "path": "rule_ids",
+    "target": "datadog_security_findings_ticket_creation_rule",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_sensitive_data_scanner_rule",
+    "path": "group_id",
+    "target": "datadog_sensitive_data_scanner_group",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 5
+  },
+  {
+    "source": "datadog_sensitive_data_scanner_rule",
+    "path": "standard_pattern_id",
+    "target": "datadog_sensitive_data_scanner_standard_pattern",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 4
+  },
+  {
+    "source": "datadog_service_access_token",
+    "path": "scopes",
+    "target": "datadog_permissions",
+    "attr": "permissions.dashboards_read",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_service_access_token",
+    "path": "scopes",
+    "target": "datadog_permissions",
+    "attr": "permissions.monitors_read",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_service_access_token",
+    "path": "scopes",
+    "target": "datadog_permissions",
+    "attr": "permissions.monitors_write",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_service_account",
+    "path": "roles",
+    "target": "datadog_role",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 3
+  },
+  {
+    "source": "datadog_service_account_application_key",
+    "path": "scopes",
+    "target": "datadog_permissions",
+    "attr": "permissions.monitors_read",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_service_account_application_key",
+    "path": "scopes",
+    "target": "datadog_permissions",
+    "attr": "permissions.monitors_write",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_slo_correction",
+    "path": "slo_id",
+    "target": "datadog_service_level_objective",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "datadog_status_page_component",
+    "path": "page_id",
+    "target": "datadog_status_page",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 4
+  },
+  {
+    "source": "datadog_status_page_degradation_template",
+    "path": "components_affected.id",
+    "target": "datadog_status_page_component",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_status_page_degradation_template",
+    "path": "page_id",
+    "target": "datadog_status_page",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_status_page_email_access_policy",
+    "path": "page_id",
+    "target": "datadog_status_page",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "datadog_status_page_maintenance_template",
+    "path": "component_ids",
+    "target": "datadog_status_page_component",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_status_page_maintenance_template",
+    "path": "page_id",
+    "target": "datadog_status_page",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_synthetics_test",
+    "path": "options_list.min_location_failed",
+    "target": "datadog_synthetics_test",
+    "attr": "options_list.0.min_location_failed",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_synthetics_test",
+    "path": "options_list.monitor_priority",
+    "target": "datadog_synthetics_test",
+    "attr": "options_list.0.monitor_priority",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_synthetics_test",
+    "path": "options_list.retry.count",
+    "target": "datadog_synthetics_test",
+    "attr": "options_list.0.retry.0.count",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_synthetics_test",
+    "path": "options_list.retry.interval",
+    "target": "datadog_synthetics_test",
+    "attr": "options_list.0.retry.0.interval",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_synthetics_test",
+    "path": "options_list.tick_every",
+    "target": "datadog_synthetics_test",
+    "attr": "options_list.0.tick_every",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_tag_indexing_rule_order",
+    "path": "rule_ids",
+    "target": "datadog_tag_indexing_rule",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "datadog_tag_pipeline_rulesets",
+    "path": "ruleset_ids",
+    "target": "datadog_tag_pipeline_ruleset",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 7
+  },
+  {
+    "source": "datadog_team_connection",
+    "path": "team.id",
+    "target": "datadog_team",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 2
+  },
+  {
+    "source": "datadog_team_link",
+    "path": "team_id",
+    "target": "datadog_team",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_team_membership",
+    "path": "team_id",
+    "target": "datadog_team",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_team_membership",
+    "path": "user_id",
+    "target": "datadog_user",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_team_notification_rule",
+    "path": "team_id",
+    "target": "datadog_team",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_team_permission_setting",
+    "path": "team_id",
+    "target": "datadog_team",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_usage_quota",
+    "path": "scope.role_uuid",
+    "target": "datadog_role",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_user",
+    "path": "roles",
+    "target": "datadog_role",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_user_role",
+    "path": "role_id",
+    "target": "datadog_role",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "datadog_user_role",
+    "path": "user_id",
+    "target": "datadog_user",
+    "attr": "id",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "google_service_account_iam_member",
+    "path": "service_account_id",
+    "target": "google_service_account",
+    "attr": "name",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  },
+  {
+    "source": "google_service_account_key",
+    "path": "service_account_id",
+    "target": "google_service_account",
+    "attr": "name",
+    "match": "exact",
+    "origin": "docs",
+    "support": 1
+  }
+]

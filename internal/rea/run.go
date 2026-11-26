@@ -52,7 +52,9 @@ func (w Workspace) Discover(types, exclude []string, opts discover.Options) (err
 	// Each provider block on its own: its pack, its scope.
 	var targets []model.Target
 	rep := &discover.Report{}
-	var inv *inventoryReport
+	// Inventory reports by provider: each block's pack reads its own
+	// sources, and only that provider's problems are about them.
+	inv := map[string]*inventoryReport{}
 	for _, prov := range w.Config.Providers {
 		pw := w.scoped(prov)
 		if len(w.Config.Providers) > 1 {
@@ -68,13 +70,13 @@ func (w Workspace) Discover(types, exclude []string, opts discover.Options) (err
 		targets = append(targets, ts...)
 		mergeReport(rep, r)
 		if ir != nil {
-			if inv == nil {
-				inv = &inventoryReport{}
+			if inv[prov.Name] == nil {
+				inv[prov.Name] = &inventoryReport{}
 			}
-			mergeInventory(inv, ir)
+			mergeInventory(inv[prov.Name], ir)
 		}
 	}
-	if inv != nil {
+	if len(inv) > 0 {
 		if err := w.WriteJSON("inventory.json", inv); err != nil {
 			return err
 		}
@@ -284,7 +286,8 @@ func (w Workspace) scopeParams() []scopeParam {
 	return out
 }
 
-// inventoryReport is .desprawl/inventory.json: what inventory sources
+// inventoryReport is one provider's part of .desprawl/inventory.json
+// (keyed by provider name): what inventory sources
 // reported, for discover's problems and for filling gaps by hand.
 type inventoryReport struct {
 	Kinds    map[string]inventory.KindSummary `json:"kinds"`
@@ -443,4 +446,31 @@ func DriftError(groups []ProblemGroup) error {
 		}
 	}
 	return nil
+}
+
+// inventory is the inventory report of the workspace's provider (the
+// current block's): what its pack's sources found. An inventory.json from
+// before reports were kept by provider is one report for all of them.
+func (w Workspace) inventory() (inventoryReport, error) {
+	var raw map[string]json.RawMessage
+	if err := w.ReadJSON("inventory.json", &raw); err != nil {
+		if os.IsNotExist(err) {
+			err = nil
+		}
+		return inventoryReport{}, err
+	}
+	var r inventoryReport
+	if b, ok := raw[w.Provider().Name]; ok {
+		return r, json.Unmarshal(b, &r)
+	}
+	// Before reports were kept by provider: one report, whose fields are
+	// the top-level keys. A provider named like a field ("errors") is found
+	// above first.
+	if slices.ContainsFunc(slices.Collect(maps.Keys(raw)), func(k string) bool {
+		return slices.Contains([]string{"kinds", "unmapped", "misfit", "errors", "truncated", "bad_partitions", "bad_mappings", "bad_per_parent"}, k)
+	}) {
+		err := w.ReadJSON("inventory.json", &r)
+		return r, err
+	}
+	return r, nil
 }

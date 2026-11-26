@@ -56,6 +56,12 @@ const conventionTypes = 5
 
 var notNameLike = regexp.MustCompile(`^([0-9.]+|true|false|null|enabled|disabled|[A-Z]+)$`)
 
+// A resource's ID made of digits only is a target for suggestions from this
+// many digits on: shorter numbers are more often ports, sizes and counts.
+const minNumberID = 6
+
+var digits = regexp.MustCompile(`^[0-9]+$`)
+
 type owner struct{ addr, typ, attr string }
 
 // Candidates finds unresolved literals that equal some other resource's
@@ -122,6 +128,7 @@ func Candidates(src []byte, plan *tf.PlanJSON, schemas *tf.Schemas, opts link.Op
 
 	broad := map[string][]owner{}
 	names := map[string][]owner{} // resources' own names, for embedded candidates
+	ownNames := map[string][]owner{}
 	entries := map[string][]mapEntry{}
 	byEntry := map[[2]string][]owner{} // map entries by value and key
 	for _, rc := range plan.ResourceChanges {
@@ -147,10 +154,23 @@ func Candidates(src []byte, plan *tf.PlanJSON, schemas *tf.Schemas, opts link.Op
 		}
 		for attr, v := range vals {
 			s, ok := v.(string)
-			if !ok || len(s) < 3 || notNameLike.MatchString(s) || dropped(rc.Type, attr) {
+			if !ok || len(s) < 3 || dropped(rc.Type, attr) {
+				continue
+			}
+			if notNameLike.MatchString(s) {
+				// A resource's own numeric ID can be what another's number
+				// or digit string names; short numbers are ports and counts.
+				if attr == "id" && digits.MatchString(s) && len(s) >= minNumberID {
+					broad[s] = append(broad[s], owner{rc.Address, rc.Type, attr})
+				}
 				continue
 			}
 			broad[s] = append(broad[s], owner{rc.Address, rc.Type, attr})
+			// A name-like attribute that isn't the ID (a handle, when the
+			// ID is generated) can be the name others embed too.
+			if attr != "id" && len(s) >= 4 && strings.ContainsAny(s, "-_") && wholeName.MatchString(s) && !isRef[rc.Address+"."+attr] {
+				ownNames[s] = append(ownNames[s], owner{rc.Address, rc.Type, attr})
+			}
 		}
 		// A name nested in a block ("metadata.0.name") when the import ID
 		// is composite ("namespace/name").
@@ -160,6 +180,18 @@ func Candidates(src []byte, plan *tf.PlanJSON, schemas *tf.Schemas, opts link.Op
 					broad[s] = append(broad[s], owner{rc.Address, rc.Type, attr})
 				}
 			}
+		}
+	}
+
+	// Of the other name-like attributes, those only one resource has; one
+	// equal to its own ID is the meaningful name of it.
+	for v, os := range ownNames {
+		one := true
+		for _, o := range os {
+			one = one && o.addr == os[0].addr
+		}
+		if one {
+			names[v] = append(slices.DeleteFunc(names[v], func(n owner) bool { return n.addr == os[0].addr }), os...)
 		}
 	}
 
@@ -218,8 +250,9 @@ func Candidates(src []byte, plan *tf.PlanJSON, schemas *tf.Schemas, opts link.Op
 			}
 		}
 		// Names of other resources inside a longer string (a host name).
-		for _, word := range nameWord.FindAllString(l.Value, -1) {
-			if word == l.Value || len(word) < 3 || insideLinked(word, l.Linked) {
+		for _, whole := range nameWord.FindAllString(l.Value, -1) {
+			word := nameIn(whole, names)
+			if word == "" || word == l.Value || len(word) < 3 || insideLinked(word, l.Linked) {
 				continue
 			}
 			groups := map[string][]owner{}
@@ -262,6 +295,22 @@ func Candidates(src []byte, plan *tf.PlanJSON, schemas *tf.Schemas, opts link.Op
 	}
 	sort.Slice(out, func(i, j int) bool { return out[i].key() < out[j].key() })
 	return out, nil
+}
+
+// nameIn returns the longest of word and its tails after a "-" or "_"
+// that is some resource's name ("pager" in "webhook-pager"), or "": a
+// prefix ("webhook-" here) can mark what kind of name follows. Only tails,
+// since link matches a name up to where the word ends.
+func nameIn(word string, names map[string][]owner) string {
+	for i := 0; i < len(word); i++ {
+		if i > 0 && word[i-1] != '-' && word[i-1] != '_' {
+			continue
+		}
+		if len(names[word[i:]]) > 0 {
+			return word[i:]
+		}
+	}
+	return ""
 }
 
 // insideLinked says whether word is part of a value already linked in the

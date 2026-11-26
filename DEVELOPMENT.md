@@ -68,7 +68,8 @@ their reference-like attributes, to classify in `providers/<provider>/catalog.js
    run in later rounds with one list block per parent. Revisions collapse to the latest.
 2. **Generate** with `terraform plan -generate-config-out`, then repair what Terraform generates
    but can't validate (the emptiest offending attribute is removed), reconcile drift with the
-   imported values (verify backs out any its plan rejects), and apply `overrides.json`.
+   imported values and restore the deprecated attributes Terraform leaves out of generated
+   config (verify backs out any its plan rejects), and apply `overrides.json`.
    The IDs the first plan reads are probed as the unlistable types documented with the same
    import ID (an association named by the subnet it attaches to); the plan decides which exist,
    and a probe is kept only if its config names something its object's config doesn't.
